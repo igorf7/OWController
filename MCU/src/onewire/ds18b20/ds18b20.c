@@ -31,7 +31,10 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20Mem_t *mem)
     mem->config.alarm_low = rxData[3];
     mem->config.resolution = rxData[4];
 
-    int16_t temperature = (rxData[1] << 8) | rxData[0];
+    uint16_t temperature = (rxData[1] << 8) | rxData[0];
+    uint16_t sign = temperature & DS18B20_SIGN_MASK;
+
+    if (sign != 0) temperature = (0xFFFF - temperature + 1);
     
     switch (mem->config.resolution)
     {
@@ -57,6 +60,7 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20Mem_t *mem)
     }
 
     mem->value = (float)temperature * DS18B20_T_STEP;
+    if (sign != 0) mem->value *= (-1);
     
     return OW_OK;
 }

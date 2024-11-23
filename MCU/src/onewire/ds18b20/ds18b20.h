@@ -14,7 +14,7 @@
 #define DS18B20_11_BITS_DATA_MASK           0x7FE
 #define DS18B20_12_BITS_DATA_MASK           0x7FF
 
-//#define DS18B20_SIGN_MASK                   0xF800
+#define DS18B20_SIGN_MASK                   0xF800
 
 #define DS18B20_T_STEP                      0.0625f
 
