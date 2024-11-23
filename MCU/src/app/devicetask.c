@@ -6,7 +6,8 @@
 #define DEVICE_GANG_SIZE    64 // Maximum number of devices on a 1-wire bus
 
 static OW_Device_t owDevice[DEVICE_GANG_SIZE];
-static DS18B20Mem_t ds18B20Mem[DEVICE_GANG_SIZE];
+//static DS18B20Mem_t ds18B20Mem[DEVICE_GANG_SIZE];
+uint8_t devDataBuff[128];
 static uint8_t deviceCount = 0;
 static bool isThermometer = false;
 
