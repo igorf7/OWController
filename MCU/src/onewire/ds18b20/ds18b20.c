@@ -31,44 +31,33 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20Mem_t *mem)
     mem->config.alarm_low = rxData[3];
     mem->config.resolution = rxData[4];
 
-    uint16_t tRegValue = (rxData[1] << 8) | rxData[0];
-    uint16_t sign = tRegValue & DS18B20_SIGN_MASK;
-
-    if (sign != 0)
-    {
-        tRegValue = (0xFFFF - tRegValue + 1);
-    }
-
+    int16_t temperature = (rxData[1] << 8) | rxData[0];
+    
     switch (mem->config.resolution)
     {
         case DS18B20_9_BITS_RESOLUTION:
-            tRegValue &= DS18B20_9_BITS_DATA_MASK;
+            temperature &= DS18B20_9_BITS_DATA_MASK;
             break;
 
         case DS18B20_10_BITS_RESOLUTION:
-            tRegValue &= DS18B20_10_BITS_DATA_MASK;
+            temperature &= DS18B20_10_BITS_DATA_MASK;
             break;
 
         case DS18B20_11_BITS_RESOLUTION:
-            tRegValue &= DS18B20_11_BITS_DATA_MASK;
+            temperature &= DS18B20_11_BITS_DATA_MASK;
             break;
 
         case DS18B20_12_BITS_RESOLUTION:
-            tRegValue &= DS18B20_12_BITS_DATA_MASK;
+            temperature &= DS18B20_12_BITS_DATA_MASK;
             break;
 
         default:
-            tRegValue &= DS18B20_12_BITS_DATA_MASK;
+            temperature &= DS18B20_12_BITS_DATA_MASK;
             break;
     }
 
-    mem->value = (float)tRegValue * DS18B20_T_STEP;
-
-    if (sign != 0)
-    {
-        mem->value *= (-1);
-    }
-
+    mem->value = (float)temperature * DS18B20_T_STEP;
+    
     return OW_OK;
 }
 
