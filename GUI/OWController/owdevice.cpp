@@ -11,7 +11,7 @@ OWDevice::OWDevice()
  * @brief OWDevice::getName
  * @param family
  * @return
- */
+
 const QString &OWDevice::getName(quint8 family)
 {
     devName = deviceMap.key(family);
@@ -19,7 +19,7 @@ const QString &OWDevice::getName(quint8 family)
         devName = "0x" + QString::number(family, 16).toUpper();
     }
     return devName;
-}
+} */
 
 /**
  * @brief OWDevice::getFamily

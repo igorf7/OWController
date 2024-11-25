@@ -69,7 +69,7 @@ void Set_USBClock(void)
 */
 bool USB_SendToHost(uint8_t opcode, int16_t size, uint8_t *data)
 {
-    uint32_t timeout = 1500000;
+    uint32_t timeout = 1000000;
     AppLayerPacket_t *txUsbPacket = (AppLayerPacket_t*)usbTxBuffer;
     
     txUsbPacket->rep_id = eRepId_4; // Report ID

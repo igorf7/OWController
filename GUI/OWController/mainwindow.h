@@ -31,6 +31,9 @@ protected:
     qint32 pollingEvent = 0;
     void timerEvent(QTimerEvent *event);
 
+public slots:
+    void sendOneWireCommand(TOpcode opcode, quint8 *data, quint8 data_len);
+
 private slots:
     void onConnectButtonClicked();
     void onSearchButtonClicked();
@@ -61,7 +64,7 @@ private:
 
     int selectedDeviceCount = 0;
     int totalDeviceCount = 0;
-    int showDeviceCount = 0;
+    int currDevNumber = 0;
 
     float deviceValue = 0.0;
 
@@ -75,7 +78,6 @@ private:
     void startUsbPolling();
     void stopUsbPolling();
     void deinitWidgets();
-    void sendOneWireCommand(TOpcode opcode, quint8 *data, quint8 data_len);
     void createWidgetLayout(int count);
     void handleReceivedPacket();
     void initDeviceComboBox();

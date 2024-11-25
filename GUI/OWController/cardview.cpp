@@ -8,7 +8,7 @@ CardView::CardView(QWidget *parent)
 {
     ui->setupUi(this);
 
-    color.setRgb(0, 0, 0, 15);
+    color.setRgb(0, 0, 0, 20);
 }
 
 CardView::~CardView()
@@ -26,5 +26,5 @@ void CardView::paintEvent(QPaintEvent*)
     painter.setPen(QPen(color));
     painter.setBrush(QBrush(color));
     painter.drawRoundedRect(QRect(1, 1, this->width()-3,
-                                  this->height()-3), 10, 10);
+                                  this->height()-3), 11, 11);
 }

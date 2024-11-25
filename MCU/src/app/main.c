@@ -6,8 +6,8 @@ static HidProp_t hidProp;
 static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcCounter;
-static bool isOWReadEnabled = false;
-static uint8_t devType = DS18B20;
+static bool isOnewireReadEnabled = false;
+static uint8_t devType = DS1971;
 static uint8_t usbRxBuffer[wMaxPacketSize];
 
 /* Program entry point */
@@ -81,7 +81,7 @@ void onSecondEvent(void)
     USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
     
     // Schedule a task to read a 1-wire devices
-    if (isOWReadEnabled) {
+    if (isOnewireReadEnabled) {
         PutTask(DeviceReadTask, &devType);
     }
 }
@@ -103,9 +103,10 @@ void USB_HandleRxData(void)
         		break;
             case eReadCmd:
                 devType = rx_packet->data[0];
-                isOWReadEnabled = true;
+                isOnewireReadEnabled = true;
         		break;
             case eWriteCmd:
+                PutTask(DeviceWriteTask, rx_packet->data);
         		break;
             case eSyncRtcCmd:
                 disableRtcInterrupt(RTC_IT_SEC);

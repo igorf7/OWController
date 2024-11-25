@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\src\app;..\src\board;..\src\onewire;..\src\onewire\ds18b20;..\src\USB-FS\inc</IncludePath>
+              <IncludePath>..\src\app;..\src\board;..\src\ds18b20;..\src\ds1971;..\src\onewire;..\src\USB-FS\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -465,7 +465,12 @@
             <File>
               <FileName>ds18b20.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\onewire\ds18b20\ds18b20.c</FilePath>
+              <FilePath>..\src\ds18b20\ds18b20.c</FilePath>
+            </File>
+            <File>
+              <FileName>ds1971.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\ds1971\ds1971.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -844,7 +849,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\src\app;..\src\board;..\src\onewire;..\src\onewire\ds18b20;..\src\USB-FS\inc</IncludePath>
+              <IncludePath>..\src\app;..\src\board;..\src\ds18b20;..\src\ds1971;..\src\onewire;..\src\USB-FS\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -971,7 +976,12 @@
             <File>
               <FileName>ds18b20.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\onewire\ds18b20\ds18b20.c</FilePath>
+              <FilePath>..\src\ds18b20\ds18b20.c</FilePath>
+            </File>
+            <File>
+              <FileName>ds1971.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\ds1971\ds1971.c</FilePath>
             </File>
           </Files>
         </Group>

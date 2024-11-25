@@ -19,8 +19,6 @@
 #define OW_SKIP_ROM_CMD                0xCC
 #define OW_SEARCH_ROM_CMD              0xF0
 #define OW_CONVERT_CMD                 0x44
-#define OW_WRITE_SCRATCHPAD_CMD        0x4E
-#define OW_READ_SCRATCHPAD_CMD         0xBE
 
 #define OW_ROM_SIZE                    8U
 

@@ -126,7 +126,7 @@ void MainWindow::onDeviceComboBoxChanged(int index)
 
     if (!isConnected) return;
 
-    showDeviceCount = 0;
+    currDevNumber = 0;
     isShowClockEnabled = false;
 
     selectedDeviceCount = devFoundMap.value(ui->deviceComboBox->currentText());
@@ -222,6 +222,59 @@ void MainWindow::initDeviceComboBox()
 }
 
 /**
+ * @brief MainWindow::createWidgetLayout
+ */
+void MainWindow::createWidgetLayout(int count)
+{
+    devWidgetList.clear();
+
+    /* Delete previous layout if exist */
+    if (deviceViewLayout != nullptr) {
+        while (QLayoutItem* item = deviceViewLayout->takeAt(0)) {
+            delete item->widget();
+            delete item;
+        }
+        delete deviceViewLayout;
+        deviceViewLayout = nullptr;
+    }
+
+    if (count < 1) return;
+
+    /* Create new layout */
+    deviceViewLayout = new QVBoxLayout;
+
+    if (isShowClockEnabled) {
+        devWidgetList << new ClockView;
+        deviceViewLayout->addWidget(devWidgetList.at(0));
+    }
+    else {
+        quint8 device_family = owDevice.getFamily(ui->deviceComboBox->currentText());
+
+        for (int i = 0; i < count; i++)
+        {
+            switch (device_family)
+            {
+            case 0x14: // DS1971
+                devWidgetList << new DS1971;
+                break;
+            case 0x10: // DS18S20
+            case 0x28: // DS18B20
+                ds18b20 = new DS18B20;
+                connect(ds18b20, &DS18B20::sendCommand, this, &MainWindow::sendOneWireCommand);
+                devWidgetList << ds18b20;
+                break;
+            default:  // any other device
+                devWidgetList << new DS_OTHER;
+                break;
+            }
+            if (devWidgetList.at(i) == nullptr) return;
+            deviceViewLayout->addWidget(devWidgetList.at(i));
+        }
+    }
+    ui->scrollAreaWidgetContents->setLayout(deviceViewLayout);
+}
+
+/**
  * @brief MainWindow::handleReceivedPacket
  */
 void MainWindow::handleReceivedPacket()
@@ -277,88 +330,34 @@ void MainWindow::handleReceivedPacket()
 }
 
 /**
- * @brief MainWindow::createWidgetLayout
- */
-void MainWindow::createWidgetLayout(int count)
-{
-    devWidgetList.clear();
-
-    /* Delete previous layout if exist */
-    if (deviceViewLayout != nullptr) {
-        while (QLayoutItem* item = deviceViewLayout->takeAt(0)) {
-            delete item->widget();
-            delete item;
-        }
-        delete deviceViewLayout;
-        deviceViewLayout = nullptr;
-    }
-
-    if (count < 1) return;
-
-    /* Create new layout */
-    deviceViewLayout = new QVBoxLayout;
-
-    if (isShowClockEnabled) {
-        devWidgetList << new ClockView;
-        deviceViewLayout->addWidget(devWidgetList.at(0));
-    }
-    else {
-        quint8 device_family = owDevice.getFamily(ui->deviceComboBox->currentText());
-
-        for (int i = 0; i < count; i++)
-        {
-            switch (device_family)
-            {
-            case 0x14: // DS1971
-                devWidgetList << new DS1971;
-                break;
-            case 0x10: // DS18S20
-            case 0x28: // DS18B20
-                devWidgetList << new DS18B20;
-                break;
-            default:  // any other device
-                devWidgetList << new DS_OTHER;
-                break;
-            }
-            if (devWidgetList.at(i) == nullptr) return;
-            deviceViewLayout->addWidget(devWidgetList.at(i));
-        }
-    }
-    ui->scrollAreaWidgetContents->setLayout(deviceViewLayout);
-}
-
-/**
  * @brief MainWindow::showReceivedData
  * @param rx_packet
  */
 void MainWindow::showReceivedData(TAppLayerPacket *rx_packet)
 {
     quint64 device_address = *((quint64*)rx_packet->data);
-    float   therm_value;
     quint8  device_family = (device_address & 0xFF);
 
     if (device_family != owDevice.getFamily(ui->deviceComboBox->currentText())) return;
 
     switch (device_family)
     {
-    case 0x14: // DS1971
-        ds1971 = (DS1971*)devWidgetList.at(showDeviceCount++);
-        ds1971->showAddress(device_address);
+    case 0x14:  // DS1971
+        ds1971 = (DS1971*)devWidgetList.at(currDevNumber++);
+        ds1971->showDeviceData(rx_packet->data);
         break;
-    case 0x10: // DS18S20
-    case 0x28: // DS18B20
-        ds18b20 = (DS18B20*)devWidgetList.at(showDeviceCount++);
-        ds18b20->showAddress(device_address);
-        therm_value = *((float*)(rx_packet->data + sizeof(device_address)));
-        ds18b20->showValue(therm_value);
+    case 0x10:  // DS18S20
+    case 0x28:  // DS18B20
+        ds18b20 = (DS18B20*)devWidgetList.at(currDevNumber++);
+        ds18b20->showDeviceData(rx_packet->data);
         break;
-    default:
-        dsOther = (DS_OTHER*)devWidgetList.at(showDeviceCount++);
-        dsOther->showAddress(device_address);
+    default:    // Any other device
+        dsOther = (DS_OTHER*)devWidgetList.at(currDevNumber++);
+        dsOther->showDeviceData(rx_packet->data);
         break;
     }
 
-    if (showDeviceCount >= selectedDeviceCount) showDeviceCount = 0;
+    if (currDevNumber >= selectedDeviceCount) currDevNumber = 0;
 }
 
 /**

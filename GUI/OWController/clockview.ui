@@ -17,20 +17,20 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>RTC:</string>
+      <string>MCU RTC:</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QLCDNumber" name="timeLcd">
      <property name="inputMethodHints">
-      <set>Qt::InputMethodHint::ImhNone</set>
+      <set>Qt::ImhNone</set>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Shadow::Plain</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <property name="smallDecimalPoint">
       <bool>false</bool>
@@ -39,10 +39,10 @@
       <number>8</number>
      </property>
      <property name="mode">
-      <enum>QLCDNumber::Mode::Dec</enum>
+      <enum>QLCDNumber::Dec</enum>
      </property>
      <property name="segmentStyle">
-      <enum>QLCDNumber::SegmentStyle::Flat</enum>
+      <enum>QLCDNumber::Flat</enum>
      </property>
      <property name="value" stdset="0">
       <double>0.000000000000000</double>
@@ -67,7 +67,7 @@
       <string>Date</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>

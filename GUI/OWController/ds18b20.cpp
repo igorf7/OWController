@@ -1,10 +1,17 @@
 #include "ds18b20.h"
 #include "ui_ds18b20.h"
+#include "owdevice.h"
+#include <QValidator>
 
 DS18B20::DS18B20(CardView *parent) :
     CardView(parent), ui(new Ui::DS18B20)
 {
     ui->setupUi(this);
+
+    /* Connecting signals to slots */
+    connect(ui->settingsPushButton, SIGNAL(clicked()),
+            this, SLOT(onSettingsButtonClicked()));
+
 }
 
 DS18B20::~DS18B20()
@@ -13,25 +20,215 @@ DS18B20::~DS18B20()
 }
 
 /**
- * @brief DS18B20::showAddress
- * @param addr
+ * @brief DS18B20::showDeviceData
+ * @param data
  */
-void DS18B20::showAddress(quint64 &addr)
+void DS18B20::showDeviceData(quint8 *data)
 {
-    ui->addrLabel->setText(QString::number(addr, 16).toUpper());
-}
+    quint8 *pData = data;
+    quint8 resolution;
 
-/**
- * @brief DS18B20::showValue
- * @param value
- */
-void DS18B20::showValue(float value)
-{
-    if (value < 0.0f) {
+    deviceAddress = *((quint64*)pData);
+    pData += sizeof(deviceAddress);
+
+
+
+    deviceData = *((float*)pData);
+    pData += sizeof(deviceData);
+
+    devAlarmHigh = *(pData + 0);
+    devAlarmLow = *(pData + 1);
+    resolution = *(pData + 2);
+    devIndex =  *(pData + 3);;
+
+    ui->addrLabel->setText(QString::number(devIndex));
+
+    switch (resolution) {
+    case 0x1F:
+        devResolution = 9;
+        break;
+    case 0x3F:
+        devResolution = 10;
+        break;
+    case 0x5F:
+        devResolution = 11;
+        break;
+    case 0x7F:
+        devResolution = 12;
+        break;
+    default:
+        break;
+    }
+
+    if (deviceData < 0.0f) {
         ui->temperValueLabel->setStyleSheet("color: blue");
     }
     else {
         ui->temperValueLabel->setStyleSheet("color: red");
     }
-    ui->temperValueLabel->setText(QString::number(value, 'f', 1) + " °C");
+    ui->temperValueLabel->setText(QString::number(deviceData, 'f', 1) + " °C");
+}
+
+/**
+ * @brief DS18B20::onSettingsButtonClicked
+ */
+void DS18B20::onSettingsButtonClicked()
+{
+    settingsWindow = new QDialog(this);
+
+    settingsWindow->setWindowFlags((settingsWindow->windowFlags())
+                                 & (~Qt::WindowContextHelpButtonHint));
+
+    QPixmap pm = QPixmap(1, 1);
+    pm.fill(QColor(0, 0, 0, 0));
+    settingsWindow->setWindowIcon(QIcon(pm));
+
+    settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
+    settingsWindow->resize(this->window()->width(), 150);
+    settingsWindow->setModal(true);
+
+    settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
+
+    QVBoxLayout *vdlgLayout = new QVBoxLayout;
+    QLabel *addressLabel = new QLabel;
+    QLabel *descrLabel = new QLabel;
+    descrLabel->setStyleSheet("color: green");
+    QLabel *almHighLabel = new QLabel("Alarm High, °C");
+    QLabel *almLowLabel = new QLabel("Alarm Low, °C");
+    QLabel *resolutionLabel = new QLabel("Resolution, bit");
+    almHighLineEdit = new QLineEdit;
+    almLowLineEdit = new QLineEdit;
+    resolutionLineEdit = new QLineEdit;
+    QGridLayout *editLayout = new QGridLayout;
+
+    almHighLineEdit->setFrame(false);
+    almLowLineEdit->setFrame(false);
+    resolutionLineEdit->setFrame(false);
+
+    editLayout->addWidget(almHighLabel, 0, 0);
+    editLayout->addWidget(almHighLineEdit, 0, 1);
+    editLayout->addWidget(almLowLabel, 1, 0);
+    editLayout->addWidget(almLowLineEdit, 1, 1);
+    editLayout->addWidget(resolutionLabel, 2, 0);
+    editLayout->addWidget(resolutionLineEdit, 2, 1);
+
+    QPushButton *writeButton = new QPushButton("Write");
+    QPushButton *readButton = new QPushButton("Read");
+    QPushButton *closeButton = new QPushButton("Close");
+    QHBoxLayout *hbtnLayout = new QHBoxLayout;
+
+    hbtnLayout->addWidget(writeButton);
+    hbtnLayout->addWidget(readButton);
+    hbtnLayout->addWidget(closeButton);
+    vdlgLayout->addWidget(addressLabel);
+    vdlgLayout->addWidget(descrLabel);
+    vdlgLayout->addLayout(editLayout);
+    vdlgLayout->addLayout(hbtnLayout);
+    settingsWindow->setLayout(vdlgLayout);
+
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
+    connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
+    connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
+
+    addressLabel->setText("Address: " + QString::number(deviceAddress, 16).toUpper());
+    descrLabel->setText(OWDevice::getDescription(devFamilyCode));
+
+    QIntValidator *alm_val = new QIntValidator(settingsWindow);
+    QIntValidator *res_val = new QIntValidator(settingsWindow);
+    alm_val->setRange(-55, 125);
+    res_val->setRange(9, 12);
+    almHighLineEdit->setValidator(alm_val);
+    almLowLineEdit->setValidator(alm_val);
+    resolutionLineEdit->setValidator(res_val);
+    almHighLineEdit->setText(QString::number(devAlarmHigh));
+    almLowLineEdit->setText(QString::number(devAlarmLow));
+    resolutionLineEdit->setText(QString::number(devResolution));
+
+    settingsWindow->show();
+}
+
+/**
+ * @brief DS18B20::onWriteButtonClicked
+ */
+void DS18B20::onWriteButtonClicked()
+{
+    quint8 alm_high, alm_low, resolution;
+    quint8 tx_data[11];
+
+    if (almHighLineEdit->hasAcceptableInput()) {
+        alm_high = (quint8)almHighLineEdit->text().toShort();
+    }
+    else {
+        almHighLineEdit->setText(QString::number(devAlarmHigh));
+        return;
+    }
+    if (almLowLineEdit->hasAcceptableInput()) {
+        alm_low = (quint8)almLowLineEdit->text().toShort();
+    }
+    else {
+        almLowLineEdit->setText(QString::number(devAlarmLow));
+        return;
+    }
+    if (resolutionLineEdit->hasAcceptableInput()) {
+        resolution = (quint8)resolutionLineEdit->text().toUShort();;
+    }
+    else {
+        resolutionLineEdit->setText(QString::number(devResolution));
+        return;
+    }
+
+    *((quint64*)tx_data) = deviceAddress;
+    quint8 len  = sizeof(deviceAddress);
+    tx_data[len++] = alm_high;
+    tx_data[len++] = alm_low;
+
+    switch (resolution) {
+    case 9:
+        resolution = 0x1F;
+        break;
+    case 10:
+        resolution = 0x3F;
+        break;
+    case 11:
+        resolution = 0x5F;
+        break;
+    case 12:
+        resolution = 0x7F;
+        break;
+    default:
+        break;
+    }
+
+    tx_data[len++] = resolution;
+
+    almHighLineEdit->clear();
+    almLowLineEdit->clear();
+    resolutionLineEdit->clear();
+
+    devAlarmHigh = devAlarmLow = devResolution = 0;
+
+    emit sendCommand(eWriteCmd, tx_data, len);
+}
+
+/**
+ * @brief DS18B20::onReadButtonClicked
+ */
+void DS18B20::onReadButtonClicked()
+{
+    if (settingsWindow != nullptr) {
+        almHighLineEdit->setText(QString::number(devAlarmHigh));
+        almLowLineEdit->setText(QString::number(devAlarmLow));
+        resolutionLineEdit->setText(QString::number(devResolution));
+    }
+}
+
+/**
+ * @brief DS18B20::onCloseButtonClicked
+ */
+void DS18B20::onCloseButtonClicked()
+{
+    if (settingsWindow != nullptr) {
+        settingsWindow->close();
+        delete settingsWindow;
+    }
 }

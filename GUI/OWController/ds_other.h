@@ -2,6 +2,7 @@
 #define DS_OTHER_H
 
 #include "cardview.h"
+#include <QDialog>
 
 namespace Ui {
 class DS_OTHER;
@@ -15,10 +16,22 @@ public:
     explicit DS_OTHER(CardView *parent = nullptr);
     ~DS_OTHER();
 
-    void showAddress(quint64 &addr);
+    void showDeviceData(quint8 *data);
+
+private slots:
+    void onSettingsButtonClicked();
+    void onCloseButtonClicked();
 
 private:
     Ui::DS_OTHER *ui;
+
+    QDialog *settingsWindow = nullptr;
+
+    quint64 deviceAddress = 0;
+
+    quint8 devFamilyCode = 0;
+
+    quint8 devIndex = 0;
 };
 
 #endif // DS_OTHER_H
