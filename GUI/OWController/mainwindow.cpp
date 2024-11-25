@@ -255,18 +255,25 @@ void MainWindow::createWidgetLayout(int count)
             switch (device_family)
             {
             case 0x14: // DS1971
-                devWidgetList << new DS1971;
+                ds1971 = new DS1971;
+                connect(ds1971, &DS1971::sendCommand, this, &MainWindow::sendOneWireCommand);
+                devWidgetList << ds1971;
                 break;
+
             case 0x10: // DS18S20
+                break;
+
             case 0x28: // DS18B20
                 ds18b20 = new DS18B20;
                 connect(ds18b20, &DS18B20::sendCommand, this, &MainWindow::sendOneWireCommand);
                 devWidgetList << ds18b20;
                 break;
+
             default:  // any other device
                 devWidgetList << new DS_OTHER;
                 break;
             }
+
             if (devWidgetList.at(i) == nullptr) return;
             deviceViewLayout->addWidget(devWidgetList.at(i));
         }
@@ -346,11 +353,15 @@ void MainWindow::showReceivedData(TAppLayerPacket *rx_packet)
         ds1971 = (DS1971*)devWidgetList.at(currDevNumber++);
         ds1971->showDeviceData(rx_packet->data);
         break;
+
     case 0x10:  // DS18S20
+        break;
+
     case 0x28:  // DS18B20
         ds18b20 = (DS18B20*)devWidgetList.at(currDevNumber++);
         ds18b20->showDeviceData(rx_packet->data);
         break;
+
     default:    // Any other device
         dsOther = (DS_OTHER*)devWidgetList.at(currDevNumber++);
         dsOther->showDeviceData(rx_packet->data);

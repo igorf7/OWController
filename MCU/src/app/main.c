@@ -106,6 +106,7 @@ void USB_HandleRxData(void)
                 isOnewireReadEnabled = true;
         		break;
             case eWriteCmd:
+                //isOnewireReadEnabled = false;
                 PutTask(DeviceWriteTask, rx_packet->data);
         		break;
             case eSyncRtcCmd:

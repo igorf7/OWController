@@ -87,28 +87,30 @@ void DeviceReadTask(void *prm)
                 case DS1971:
                     dev_index++;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
-                    *(dataBuffer + OW_ROM_SIZE) = dev_index;
-                    //DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_SCRATCHPAD_SIZE, dataBuffer);
+                    DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
+                    *(dataBuffer + OW_ROM_SIZE + DS1971_EEPROM_SIZE) = dev_index;
+                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_EEPROM_SIZE + 1, dataBuffer);
                     break;
                 
                 case DS18B20:
+                    break;
+                
                 case DS18S20:
                     dev_index++;
                     isThermometer = true;
                     DS18B20_ReadScratchpad(&ds18B20);
                     ds18B20.conf.index = dev_index;
-                    /// ShowTemperature(ds18B20.value, dev_index); // for example, output to LCD display
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE + sizeof(ds18B20), dataBuffer);
+                    /// ShowTemperature(ds18B20.value, dev_index); // for example, output to LCD display
                     break;
                 
                 default:    // for all other devices show only the address
                     dev_index++;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     *(dataBuffer + OW_ROM_SIZE) = dev_index;
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_SCRATCHPAD_SIZE, dataBuffer);
+                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + 1, dataBuffer);
                     continue;
             }
         }
@@ -127,22 +129,43 @@ void DeviceReadTask(void *prm)
 */
 void DeviceWriteTask(void *prm)
 {
-    WriteData_t *wr_data = (WriteData_t*)prm;
-    uint8_t dev_family = wr_data->address & 0xFF;
-    
-    OW_Reset();
-    OW_MatchRom(((uint8_t*)&wr_data->address));
+    uint64_t address = 0;
+    uint8_t *buffer = (uint8_t*)prm;
+    memcpy((uint8_t*)&address, buffer, OW_ROM_SIZE);
+    uint8_t dev_family = (address & 0xFF);
+    uint8_t check_sum = 0;
     
     switch (dev_family)
     {
     	case DS18B20:
-            DS18B20_WriteScratchpad((uint8_t*)&wr_data->conf);
             OW_Reset();
-            OW_MatchRom(((uint8_t*)&wr_data->address));
+            OW_MatchRom((uint8_t*)&address);
+            DS18B20_WriteScratchpad(buffer + OW_ROM_SIZE);
+            OW_Reset();
+            OW_MatchRom((uint8_t*)&address);
             DS18B20_CopyScratchpad();
     		break;
-//    	case:
-//    		break;
+        
+    	case DS1971:
+            check_sum = OW_CalcChecksum(buffer + OW_ROM_SIZE, DS1971_SCRATCHPAD_SIZE);
+            OW_Reset();
+            OW_MatchRom((uint8_t*)&address);
+            DS1971_WriteScratchpad(buffer + OW_ROM_SIZE);
+            OW_Reset();
+            OW_MatchRom((uint8_t*)&address);
+            DS1971_ReadScratchpad(buffer);
+            if (check_sum == OW_CalcChecksum(buffer, DS1971_SCRATCHPAD_SIZE))
+            {
+                OW_Reset();
+                OW_MatchRom((uint8_t*)&address);
+                DS1971_CopyScratchpad();
+                /* Data line is held high for 10ms by the bus master
+                   to provide energy for copying data from the scratchpad to EEPROM */
+                Wait_ticks(1500000);
+            }
+            __nop();
+    		break;
+        
     	default:
     		break;
     }

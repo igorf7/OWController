@@ -100,7 +100,7 @@ void OW_MatchRom(uint8_t *address)
 {   
     OW_SendReceiveByte(OW_MATCH_ROM_CMD);
     
-    for (uint8_t i = 0; i < 8; i++)
+    for (uint8_t i = 0; i < OW_ROM_SIZE; i++)
     {
         OW_SendReceiveByte(address[i]);
     }

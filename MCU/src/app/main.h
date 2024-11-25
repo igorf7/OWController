@@ -13,11 +13,6 @@
 #define KR_KEY_Enable       ((uint16_t)0xCCCC)
 #define WatchdogReload(key) (IWDG->KR = key)
 
-__STATIC_INLINE void Wait_ticks(volatile uint32_t nCount)
-{
-    for (; nCount != 0; nCount--);
-}
-
 __STATIC_INLINE void InitWatchdog(void)
 {
     IWDG->KR = IWDG_WA_Enable;

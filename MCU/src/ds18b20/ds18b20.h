@@ -37,11 +37,11 @@ typedef struct
     Config_t conf;
 } DS18B20_t;
 
-typedef struct
-{
-    uint64_t address;
-    Config_t conf;
-} WriteData_t;
+//typedef struct
+//{
+//    uint64_t address;
+//    Config_t conf;
+//} WriteData_t;
 
 /* API */
 void DS18B20_Convert(void);

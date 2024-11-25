@@ -2,7 +2,8 @@
 #include "ui_ds1971.h"
 #include "owdevice.h"
 #include <QLineEdit>
-#include <QTextEdit>
+#include <QMessageBox>
+#include <QDebug>
 
 DS1971::DS1971(CardView *parent)
     : CardView(parent), ui(new Ui::DS1971)
@@ -25,9 +26,17 @@ DS1971::~DS1971()
  */
 void DS1971::showDeviceData(quint8 *data)
 {
-    deviceAddress = *((quint64*)data);
+    quint8 *pData = data;
 
-    devIndex = *(data + sizeof(deviceAddress));
+    deviceAddress = *((quint64*)pData);
+    pData += sizeof(deviceAddress);
+
+    for (auto i = 0; i < DS1971_MEMORY_SIZE; i++) {
+        ds1971memory[i] = *pData;
+        pData++;
+    }
+
+    devIndex = *(data + sizeof(deviceAddress) + DS1971_MEMORY_SIZE);
 
     ui->deviceIndexLabel->setText(QString::number(devIndex));
     ui->addrLabel->setText(QString::number(deviceAddress, 16).toUpper());
@@ -54,7 +63,8 @@ void DS1971::onSettingsButtonClicked()
     QLabel *descrLabel = new QLabel;
     descrLabel->setStyleSheet("color: green");
 
-    QTextEdit *memEdit = new QTextEdit;
+    memEdit = new QPlainTextEdit;
+    QLabel *memLabel = new QLabel("Device memory (can be edited and rewritten):");
 
     QPushButton *writeButton = new QPushButton("Write");
     QPushButton *readButton = new QPushButton("Read");
@@ -66,16 +76,78 @@ void DS1971::onSettingsButtonClicked()
     hbtnLayout->addWidget(closeButton);
     vdlgLayout->addWidget(addressLabel);
     vdlgLayout->addWidget(descrLabel);
+    vdlgLayout->addWidget(memLabel);
     vdlgLayout->addWidget(memEdit);
+    vdlgLayout->addStretch();
     vdlgLayout->addLayout(hbtnLayout);
     settingsWindow->setLayout(vdlgLayout);
 
     connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
+    connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
+    connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
 
     addressLabel->setText("Address: " + QString::number(deviceAddress, 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
+    this->showDeviceMemory();
+
     settingsWindow->show();
+}
+
+/**
+ * @brief DS1971::showDeviceMemory
+ */
+void DS1971::showDeviceMemory()
+{
+    memEdit->clear();
+    QString output;
+    for (auto i = 0; i < DS1971_MEMORY_SIZE; i += MEM_EDITOR_LINE_LEN)
+    {
+        for (auto j = 0; j < MEM_EDITOR_LINE_LEN; j++)
+        {
+            if (ds1971memory[j+i] < 16) output.append("0");
+            output.append(QString::number(ds1971memory[j+i], 16).toUpper());
+            output.append(" ");
+        }
+        memEdit->appendPlainText(output);
+        output.clear();
+    }
+}
+
+/**
+ * @brief DS1971::onReadButtonClicked
+ */
+void DS1971::onReadButtonClicked()
+{
+    memEdit->clear();
+    this->showDeviceMemory();
+}
+
+/**
+ * @brief DS1971::onWriteButtonClicked
+ */
+void DS1971::onWriteButtonClicked()
+{
+    quint8 tx_data[44];
+
+    *((quint64*)tx_data) = deviceAddress;
+    quint8 len  = sizeof(deviceAddress);
+
+    QString str = memEdit->toPlainText().simplified();
+    QStringList str_list = str.split(' ');
+    bool ok = false;
+    for (auto i = 0; i < DS1971_MEMORY_SIZE; i++) {
+        tx_data[len + i] = str_list.at(i).toUInt(&ok, 16);
+
+        if (!ok) {
+            QMessageBox::critical(this, tr("Error!"), tr("Incorrect input."));
+            return;
+        }
+    }
+
+    memEdit->clear();
+    len += DS1971_MEMORY_SIZE;
+    emit sendCommand(eWriteCmd, tx_data, len);
 }
 
 /**

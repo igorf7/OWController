@@ -31,6 +31,7 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20_t *mem)
     
     temperature = (rxDataBuffer[1] << 8) | rxDataBuffer[0];
     sign = temperature & DS18B20_SIGN_MASK;
+    
     if (sign != 0) temperature = (0xFFFF - temperature + 1);
     
     mem->conf.alarm_high = rxDataBuffer[2];
@@ -75,8 +76,6 @@ void DS18B20_WriteScratchpad(uint8_t *data)
     {
         OW_SendReceiveByte(data[i]);
     }
-    
-    //OW_SendReceiveByte(DS18B20_COPY_SCRATCHPAD);
 }
 
 /*!
