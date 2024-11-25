@@ -5,6 +5,5 @@
         <file>images/clock72.png</file>
         <file>images/settings.png</file>
         <file>images/search.png</file>
-        <file>images/arrow_right.png</file>
     </qresource>
 </RCC>
