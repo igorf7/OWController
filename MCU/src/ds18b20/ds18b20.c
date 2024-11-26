@@ -61,8 +61,8 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20_t *mem)
             break;
     }
     
-    mem->value = (sign == 0) ? (float)temperature * 0.0625f : (float)temperature * -0.0625f;
-    
+    mem->value = (float)temperature * 0.0625f;
+    if (sign != 0) mem->value *= (-1);
     return OW_OK;
 }
 

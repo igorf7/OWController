@@ -18,7 +18,7 @@ public:
     explicit DS18B20(CardView *parent = nullptr);
     ~DS18B20();
 
-    void showDeviceData(quint8 *data);
+    void showDeviceData(quint8 *data, int index);
 
 signals:
     void sendCommand(TOpcode opcode, quint8 *data, quint8 data_len);
@@ -42,7 +42,6 @@ private:
 
     float deviceData = 0.0f;
 
-    quint8 devIndex = 0;
     qint8 devAlarmHigh = 0;
     qint8 devAlarmLow = 0;
     quint8 devResolution = 0;

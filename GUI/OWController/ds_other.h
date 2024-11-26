@@ -16,7 +16,7 @@ public:
     explicit DS_OTHER(CardView *parent = nullptr);
     ~DS_OTHER();
 
-    void showDeviceData(quint8 *data);
+    void showDeviceData(quint8 *data, int index);
 
 private slots:
     void onSettingsButtonClicked();
@@ -30,8 +30,6 @@ private:
     quint64 deviceAddress = 0;
 
     quint8 devFamilyCode = 0;
-
-    quint8 devIndex = 0;
 };
 
 #endif // DS_OTHER_H

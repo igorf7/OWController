@@ -23,7 +23,7 @@ DS18B20::~DS18B20()
  * @brief DS18B20::showDeviceData
  * @param data
  */
-void DS18B20::showDeviceData(quint8 *data)
+void DS18B20::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint8 resolution;
@@ -31,17 +31,12 @@ void DS18B20::showDeviceData(quint8 *data)
     deviceAddress = *((quint64*)pData);
     pData += sizeof(deviceAddress);
 
-
-
     deviceData = *((float*)pData);
     pData += sizeof(deviceData);
 
     devAlarmHigh = *(pData + 0);
     devAlarmLow = *(pData + 1);
     resolution = *(pData + 2);
-    devIndex =  *(pData + 3);;
-
-    ui->addrLabel->setText(QString::number(devIndex));
 
     switch (resolution) {
     case 0x1F:
@@ -66,6 +61,7 @@ void DS18B20::showDeviceData(quint8 *data)
     else {
         ui->temperValueLabel->setStyleSheet("color: red");
     }
+    ui->deviceIndexLabel->setText(QString::number(index));
     ui->temperValueLabel->setText(QString::number(deviceData, 'f', 1) + " °C");
 }
 
@@ -135,7 +131,7 @@ void DS18B20::onSettingsButtonClicked()
 
     QIntValidator *alm_val = new QIntValidator(settingsWindow);
     QIntValidator *res_val = new QIntValidator(settingsWindow);
-    alm_val->setRange(-55, 125);
+    alm_val->setRange(-128, 127);
     res_val->setRange(9, 12);
     almHighLineEdit->setValidator(alm_val);
     almLowLineEdit->setValidator(alm_val);
@@ -152,7 +148,8 @@ void DS18B20::onSettingsButtonClicked()
  */
 void DS18B20::onWriteButtonClicked()
 {
-    quint8 alm_high, alm_low, resolution;
+    quint8 alm_high, alm_low,
+           resolution;
     quint8 tx_data[11];
 
     if (almHighLineEdit->hasAcceptableInput()) {

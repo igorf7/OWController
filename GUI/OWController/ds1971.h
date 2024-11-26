@@ -18,7 +18,7 @@ public:
     explicit DS1971(CardView *parent = nullptr);
     ~DS1971();
 
-    void showDeviceData(quint8 *data);
+    void showDeviceData(quint8 *data, int index);
 
 signals:
     void sendCommand(TOpcode opcode, quint8 *data, quint8 data_len);
@@ -40,8 +40,6 @@ private:
     QPlainTextEdit *memEdit = nullptr;
 
     quint64 deviceAddress = 0;
-
-    quint8 devIndex = 0;
 
     quint8 ds1971memory[DS1971_MEMORY_SIZE];
 

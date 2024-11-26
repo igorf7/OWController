@@ -68,7 +68,7 @@ void DeviceEnumerate(void *prm)
 */
 void DeviceReadTask(void *prm)
 {
-    uint8_t dev_index = 0;
+    //uint8_t dev_index = 0;
     uint8_t dev_family = *((uint8_t*)prm);
     
     isThermometer = false;
@@ -85,21 +85,21 @@ void DeviceReadTask(void *prm)
             switch (dev_family)
             {
                 case DS1971:
-                    dev_index++;
+                    //dev_index++;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
-                    *(dataBuffer + OW_ROM_SIZE + DS1971_EEPROM_SIZE) = dev_index;
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_EEPROM_SIZE + 1, dataBuffer);
+                    //*(dataBuffer + OW_ROM_SIZE + DS1971_EEPROM_SIZE) = dev_index;
+                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_EEPROM_SIZE, dataBuffer);
                     break;
+                
+//                case DS18S20:
+//                    break;
                 
                 case DS18B20:
-                    break;
-                
-                case DS18S20:
-                    dev_index++;
+                    //dev_index++;
                     isThermometer = true;
                     DS18B20_ReadScratchpad(&ds18B20);
-                    ds18B20.conf.index = dev_index;
+                    //ds18B20.conf.index = dev_index;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE + sizeof(ds18B20), dataBuffer);
@@ -107,10 +107,10 @@ void DeviceReadTask(void *prm)
                     break;
                 
                 default:    // for all other devices show only the address
-                    dev_index++;
+                    //dev_index++;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
-                    *(dataBuffer + OW_ROM_SIZE) = dev_index;
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + 1, dataBuffer);
+                    //*(dataBuffer + OW_ROM_SIZE) = dev_index;
+                    USB_SendToHost(eReadCmd, OW_ROM_SIZE, dataBuffer);
                     continue;
             }
         }

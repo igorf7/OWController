@@ -24,7 +24,7 @@ DS1971::~DS1971()
  * @brief DS1971::showDeviceData
  * @param addr
  */
-void DS1971::showDeviceData(quint8 *data)
+void DS1971::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
 
@@ -36,9 +36,7 @@ void DS1971::showDeviceData(quint8 *data)
         pData++;
     }
 
-    devIndex = *(data + sizeof(deviceAddress) + DS1971_MEMORY_SIZE);
-
-    ui->deviceIndexLabel->setText(QString::number(devIndex));
+    ui->deviceIndexLabel->setText(QString::number(index));
     ui->addrLabel->setText(QString::number(deviceAddress, 16).toUpper());
 }
 

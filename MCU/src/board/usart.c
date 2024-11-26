@@ -52,12 +52,13 @@ void UsartSetBaudrate(USART_TypeDef *USARTx, uint32_t baudrate)
 
 /*!
  */
-void UsartTransmit(USART_TypeDef *USARTx, uint8_t *data, int16_t len)
+void UsartTransmit(USART_TypeDef *USARTx, uint8_t *data, int16_t len, uint32_t timeout)
 {    
     while (len--)
     {
         while(!(USARTx->SR & USART_FLAG_TXE))
         {
+            if (--timeout == 0) break;
         }
         USARTx->DR = *data++;
     }
@@ -65,12 +66,13 @@ void UsartTransmit(USART_TypeDef *USARTx, uint8_t *data, int16_t len)
 
 /*!
  */
-void UsartReceive(USART_TypeDef *USARTx, uint8_t *data, int16_t len)
+void UsartReceive(USART_TypeDef *USARTx, uint8_t *data, int16_t len, uint32_t timeout)
 {
     while (len--)
     {
         while(!(USARTx->SR & USART_FLAG_RXNE))
         {
+            if (--timeout == 0) break;
         }
         *data++ = USARTx->DR;
     }
@@ -78,15 +80,20 @@ void UsartReceive(USART_TypeDef *USARTx, uint8_t *data, int16_t len)
 
 /*!
  */
-uint8_t UsartTxRxByte(USART_TypeDef *USARTx, uint8_t data_byte)
+uint8_t UsartTxRxByte(USART_TypeDef *USARTx, uint8_t data_byte, uint32_t timeout)
 {
+    volatile uint32_t tx_timeout = timeout;
+    volatile uint32_t rx_timeout = timeout;
+    
     while(!(USARTx->SR & USART_FLAG_TXE))
     {
+        if (--tx_timeout == 0) break;
     }
     USARTx->DR = (data_byte & (uint16_t)0x01FF);
     
     while(!(USARTx->SR & USART_FLAG_RXNE))
     {
+        if (--rx_timeout == 0) break;
     }
     return (uint8_t)(USARTx->DR & (uint16_t)0x01FF);
 }

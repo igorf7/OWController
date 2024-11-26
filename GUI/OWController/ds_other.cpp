@@ -21,15 +21,13 @@ DS_OTHER::~DS_OTHER()
  * @brief DS_OTHER::showAddress
  * @param addr
  */
-void DS_OTHER::showDeviceData(quint8 *data)
+void DS_OTHER::showDeviceData(quint8 *data, int index)
 {
     deviceAddress = *((quint64*)data);
 
     devFamilyCode = (quint8)(deviceAddress & 0xFF);
 
-    devIndex = *(data + sizeof(deviceAddress));
-
-    ui->deviceIndexLabel->setText(QString::number(devIndex));
+    ui->deviceIndexLabel->setText(QString::number(index));
     ui->addrLabel->setText(QString::number(deviceAddress, 16).toUpper());
 }
 

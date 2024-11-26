@@ -260,8 +260,8 @@ void MainWindow::createWidgetLayout(int count)
                 devWidgetList << ds1971;
                 break;
 
-            case 0x10: // DS18S20
-                break;
+            // case 0x10: // DS18S20
+            //     break;
 
             case 0x28: // DS18B20
                 ds18b20 = new DS18B20;
@@ -351,20 +351,20 @@ void MainWindow::showReceivedData(TAppLayerPacket *rx_packet)
     {
     case 0x14:  // DS1971
         ds1971 = (DS1971*)devWidgetList.at(currDevNumber++);
-        ds1971->showDeviceData(rx_packet->data);
+        ds1971->showDeviceData(rx_packet->data, currDevNumber);
         break;
 
-    case 0x10:  // DS18S20
-        break;
+    // case 0x10:  // DS18S20
+    //     break;
 
     case 0x28:  // DS18B20
         ds18b20 = (DS18B20*)devWidgetList.at(currDevNumber++);
-        ds18b20->showDeviceData(rx_packet->data);
+        ds18b20->showDeviceData(rx_packet->data, currDevNumber);
         break;
 
     default:    // Any other device
         dsOther = (DS_OTHER*)devWidgetList.at(currDevNumber++);
-        dsOther->showDeviceData(rx_packet->data);
+        dsOther->showDeviceData(rx_packet->data, currDevNumber);
         break;
     }
 
