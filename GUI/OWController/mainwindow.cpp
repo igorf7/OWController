@@ -79,7 +79,7 @@ void MainWindow::onConnectButtonClicked()
         ui->connectPushButton->setIcon(QIcon(":/images/switch-on.png"));
         statusBar()->showMessage(tr("USB порт открыт"));
         this->startUsbPolling();
-        this->onClockButtonClicked();
+        //this->onClockButtonClicked();
         this->onSearchButtonClicked();
     }
 }
@@ -104,37 +104,14 @@ void MainWindow::onClockButtonClicked()
 
     if (isShowClockEnabled) {
         isShowClockEnabled = false;
-        //ui->deviceComboBox->setEnabled(true);
         count = selectedDeviceCount;
     }
     else {
         isShowClockEnabled = true;
-        //ui->deviceComboBox->setEnabled(false);
         count = 1;
     }
 
-    this->createWidgetLayout(count);
-}
-
-/**
- * @brief onDeviceComboBoxChanged
- * @param index
- */
-void MainWindow::onDeviceComboBoxChanged(int index)
-{
-    Q_UNUSED(index)
-
-    if (!isConnected) return;
-
-    currDevNumber = 0;
-    isShowClockEnabled = false;
-
-    selectedDeviceCount = devFoundMap.value(ui->deviceComboBox->currentText());
-    ui->deviceCountLabel->setText(QString::number(selectedDeviceCount));
-    this->createWidgetLayout(selectedDeviceCount);
-
-    quint8 fam = owDevice.getFamily(ui->deviceComboBox->currentText());
-    this->sendOneWireCommand(eReadCmd, &fam, 1);
+    this->createWidgetsLayout(count);
 }
 
 /**
@@ -222,10 +199,33 @@ void MainWindow::initDeviceComboBox()
 }
 
 /**
- * @brief MainWindow::createWidgetLayout
+ * @brief onDeviceComboBoxChanged
+ * @param index
  */
-void MainWindow::createWidgetLayout(int count)
+void MainWindow::onDeviceComboBoxChanged(int index)
 {
+    Q_UNUSED(index)
+
+    if (!isConnected) return;
+
+    currDevNumber = 0;
+    isShowClockEnabled = false;
+
+    selectedDeviceCount = devFoundMap.value(ui->deviceComboBox->currentText());
+    ui->deviceCountLabel->setText(QString::number(selectedDeviceCount));
+    this->createWidgetsLayout(selectedDeviceCount);
+
+    quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
+    this->sendOneWireCommand(eReadCmd, &dev_family, sizeof(dev_family));
+}
+
+/**
+ * @brief MainWindow::createWidgetsLayout
+ */
+void MainWindow::createWidgetsLayout(int count)
+{
+    if (count < 1) return;
+
     devWidgetList.clear();
 
     /* Delete previous layout if exist */
@@ -238,8 +238,6 @@ void MainWindow::createWidgetLayout(int count)
         deviceViewLayout = nullptr;
     }
 
-    if (count < 1) return;
-
     /* Create new layout */
     deviceViewLayout = new QVBoxLayout;
 
@@ -248,7 +246,7 @@ void MainWindow::createWidgetLayout(int count)
         deviceViewLayout->addWidget(devWidgetList.at(0));
     }
     else {
-        quint8 device_family = owDevice.getFamily(ui->deviceComboBox->currentText());
+        quint8 device_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
 
         for (int i = 0; i < count; i++)
         {
@@ -345,7 +343,7 @@ void MainWindow::showReceivedData(TAppLayerPacket *rx_packet)
     quint64 device_address = *((quint64*)rx_packet->data);
     quint8  device_family = (device_address & 0xFF);
 
-    if (device_family != owDevice.getFamily(ui->deviceComboBox->currentText())) return;
+    if (device_family != OWDevice::getFamily(ui->deviceComboBox->currentText())) return;
 
     switch (device_family)
     {

@@ -13,19 +13,19 @@ public:
 
     static const QString &getName(quint8 family)
     {
-        deviceName = deviceMap.key(family);
-        return deviceName;
+        return deviceName = deviceMap.key(family);
     }
 
     static const QString &getDescription(quint8 family)
     {
-        descriptionString = description.value(family);
-        return descriptionString;
+        return descriptionString = description.value(family);
     }
 
-    //const QString &getName(quint8 family);
-    quint8 getFamily(const QString &name);
-    int getQuantity();
+    static quint8 getFamily(const QString &name)
+    {
+        return deviceMap.value(name);
+    }
+
     void addAddress(quint64 &addr);
     void clearAddressList();
     int getCount();
@@ -37,7 +37,7 @@ private:
     static inline QString deviceName;
     static inline QString descriptionString;
     /* Supported devices map */
-    static inline TDeviceMap deviceMap =
+    static const inline TDeviceMap deviceMap =
     {
         {"DS1990A", 0x01},  // 64-bit unique serial number
         {"DS1991", 0x02},   // 2048 bits of nonvolatile read/write memory
@@ -80,7 +80,7 @@ private:
     };
 
     /* Device description */
-    static inline QHash<quint8, QString> description =
+    static const inline QHash<quint8, QString> description =
     {
         {0x01, "64-bit unique serial number.\n"},
         {0x02, "2048 bits of nonvolatile read/write memory organized as three \nsecure keys of 384 bits each and a 512 bit scratch pad.\n"},

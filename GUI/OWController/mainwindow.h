@@ -78,7 +78,7 @@ private:
     void startUsbPolling();
     void stopUsbPolling();
     void deinitWidgets();
-    void createWidgetLayout(int count);
+    void createWidgetsLayout(int count);
     void handleReceivedPacket();
     void initDeviceComboBox();
     void showReceivedData(TAppLayerPacket *rx_packet);

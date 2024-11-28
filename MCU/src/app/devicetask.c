@@ -68,7 +68,6 @@ void DeviceEnumerate(void *prm)
 */
 void DeviceReadTask(void *prm)
 {
-    //uint8_t dev_index = 0;
     uint8_t dev_family = *((uint8_t*)prm);
     
     isThermometer = false;
@@ -85,7 +84,6 @@ void DeviceReadTask(void *prm)
             switch (dev_family)
             {
                 case DS1971:
-                    //dev_index++;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
                     //*(dataBuffer + OW_ROM_SIZE + DS1971_EEPROM_SIZE) = dev_index;
@@ -96,7 +94,6 @@ void DeviceReadTask(void *prm)
 //                    break;
                 
                 case DS18B20:
-                    //dev_index++;
                     isThermometer = true;
                     DS18B20_ReadScratchpad(&ds18B20);
                     //ds18B20.conf.index = dev_index;
@@ -107,7 +104,6 @@ void DeviceReadTask(void *prm)
                     break;
                 
                 default:    // for all other devices show only the address
-                    //dev_index++;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     //*(dataBuffer + OW_ROM_SIZE) = dev_index;
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE, dataBuffer);

@@ -75,14 +75,19 @@ static void BackgroundTask(void)
 */
 void onSecondEvent(void)
 {
+    static uint8_t seconds = 0;
+    
     rtcCounter = RTC_GetCounter();
     
     // Send RTC value
     USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
     
-    // Schedule a task to read a 1-wire devices
-    if (isOnewireReadEnabled) {
-        PutTask(DeviceReadTask, &devType);
+    if (!(seconds % 3)) {
+        // Schedule a task to read a 1-wire devices
+        if (isOnewireReadEnabled) {
+            PutTask(DeviceReadTask, &devType);
+        }
+        if (++seconds == 60) seconds = 0;
     }
 }
 

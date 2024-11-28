@@ -8,35 +8,6 @@ OWDevice::OWDevice()
 }
 
 /**
- * @brief OWDevice::getName
- * @param family
- * @return
-
-const QString &OWDevice::getName(quint8 family)
-{
-    devName = deviceMap.key(family);
-    if (devName == "") {
-        devName = "0x" + QString::number(family, 16).toUpper();
-    }
-    return devName;
-} */
-
-/**
- * @brief OWDevice::getFamily
- * @param name
- * @return
- */
-quint8 OWDevice::getFamily(const QString &name)
-{
-    return deviceMap.value(name);
-}
-
-int OWDevice::getQuantity()
-{
-    return deviceMap.size();
-}
-
-/**
  * @brief addAddress
  * @param addr
  */
@@ -74,7 +45,8 @@ int OWDevice::getCountByName(const QString &name)
 
     for (auto i = 0; i < devAddressList.size(); ++i) {
         if ((devAddressList.at(i) & 0xFF) == family) {
-            dev_count++;            }
+            dev_count++;
+        }
     }
     return dev_count;
 }
