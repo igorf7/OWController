@@ -20,9 +20,10 @@ ClockView::~ClockView()
  * @param data
  * @param index
  */
-void ClockView::showDeviceData(quint8 *data)
+void ClockView::showDeviceData(quint8 *data, int index)
 {
     Q_UNUSED(data)
+    Q_UNUSED(index)
 }
 
 /**

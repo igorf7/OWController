@@ -312,7 +312,8 @@ void MainWindow::handleReceivedPacket()
             break;
         case eReadCmd:
             if (!isShowClockEnabled && !deviceWidget.isEmpty()) {
-                deviceWidget.at(selDevices.value(dev_addr))->showDeviceData(rx_packet->data);
+                int index = selDevices.value(dev_addr);
+                deviceWidget.at(index)->showDeviceData(rx_packet->data, index + 1);
             }
             break;
         case eWriteCmd:

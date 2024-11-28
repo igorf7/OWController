@@ -17,7 +17,7 @@ public:
     explicit DS1971(CardView *parent = nullptr);
     ~DS1971();
 
-    void showDeviceData(quint8 *data);
+    void showDeviceData(quint8 *data, int index);
     void setAddress(quint64 address);
     void setIndex(int index);
 

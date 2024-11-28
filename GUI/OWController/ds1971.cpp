@@ -24,12 +24,12 @@ DS1971::~DS1971()
  * @brief DS1971::showDateTime
  * @param addr
  */
-void DS1971::showDeviceData(quint8 *data)
+void DS1971::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint64 address = *((quint64*)pData);
 
-    if (address != myAddress) return;
+    if ((address != myAddress) || (index != myIndex)) return;
 
     pData += sizeof(myAddress);
 

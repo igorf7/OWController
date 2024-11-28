@@ -16,7 +16,7 @@ public:
     explicit DS_OTHER(CardView *parent = nullptr);
     ~DS_OTHER();
 
-    void showDeviceData(quint8 *data);
+    void showDeviceData(quint8 *data, int index);
     void setAddress(quint64 address);
     void setIndex(int index);
 

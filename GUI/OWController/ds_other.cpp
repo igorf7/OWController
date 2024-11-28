@@ -21,12 +21,12 @@ DS_OTHER::~DS_OTHER()
  * @brief DS_OTHER::showAddress
  * @param addr
  */
-void DS_OTHER::showDeviceData(quint8 *data)
+void DS_OTHER::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint64 address = *((quint64*)pData);
 
-    if (address != myAddress) return;
+    if ((address != myAddress) || (index != myIndex)) return;
 
     devFamilyCode = (quint8)(myAddress & 0xFF);
 

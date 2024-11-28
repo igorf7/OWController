@@ -23,12 +23,12 @@ DS18B20::~DS18B20()
  * @brief DS18B20::showDateTime
  * @param data
  */
-void DS18B20::showDeviceData(quint8 *data)
+void DS18B20::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint64 address = *((quint64*)pData);
 
-    if (address != myAddress) return;
+    if ((address != myAddress) || (index != myIndex)) return;
 
     quint8 resolution;
 

@@ -16,7 +16,7 @@ public:
     explicit ClockView(CardView *parent = nullptr);
     ~ClockView();
 
-    void showDeviceData(quint8 *data);
+    void showDeviceData(quint8 *data, int index);
     void setAddress(quint64 address);
     void setIndex(int index);
     void showDeviceData(quint32 timestamp);
