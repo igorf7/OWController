@@ -51,7 +51,6 @@ private:
 
     QVBoxLayout *deviceViewLayout = nullptr;
     QList<CardView*> deviceWidget;
-    //TDeviceMap devFoundMap;
     QList<quint64> allDeviceAddressList;
     QHash<quint64, int> selDevices;
 
@@ -61,12 +60,6 @@ private:
     DS_OTHER  *dsOtherView;
 
     quint32 timeStamp;
-
-    int selDeviceCount = 0;
-    //int totalDeviceCount = 0;
-    //int currDevNumber = 0;
-
-    float deviceValue = 0.0;
 
     bool isConnected = false;
     bool isPollingRunning = false;

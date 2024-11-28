@@ -103,7 +103,7 @@ void MainWindow::onClockButtonClicked()
 
     if (isShowClockEnabled) {
         isShowClockEnabled = false;
-        count = selDeviceCount;
+        count = selDevices.size();
     }
     else {
         isShowClockEnabled = true;
@@ -220,10 +220,9 @@ void MainWindow::onDeviceComboBoxChanged(int index)
         }
     }
 
-    selDeviceCount = selDevices.size();
-    ui->deviceCountLabel->setText(QString::number(selDeviceCount));
+    ui->deviceCountLabel->setText(QString::number(selDevices.size()));
 
-    this->createWidgetsLayout(selDeviceCount);
+    this->createWidgetsLayout(selDevices.size());
     this->sendOneWireCommand(eReadCmd, &dev_family, sizeof(dev_family));
 }
 
