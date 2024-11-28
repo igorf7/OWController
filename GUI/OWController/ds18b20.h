@@ -17,7 +17,9 @@ public:
     explicit DS18B20(CardView *parent = nullptr);
     ~DS18B20();
 
-    void showDeviceData(quint8 *data, int index);
+    void showDeviceData(quint8 *data);
+    void setAddress(quint64 address);
+    void setIndex(int index);
 
 private slots:
     void onSettingsButtonClicked();
@@ -34,7 +36,8 @@ private:
     QLineEdit *almHighLineEdit = nullptr;
     QLineEdit *almLowLineEdit = nullptr;
     QLineEdit *resolutionLineEdit = nullptr;
-    quint64 deviceAddress = 0;
+    quint64 myAddress = 0;
+    int myIndex = 0;
 
     float deviceData = 0.0f;
 

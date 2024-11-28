@@ -51,7 +51,9 @@ private:
 
     QVBoxLayout *deviceViewLayout = nullptr;
     QList<CardView*> deviceWidget;
-    TDeviceMap devFoundMap;
+    //TDeviceMap devFoundMap;
+    QList<quint64> allDeviceAddressList;
+    QHash<quint64, int> selDevices;
 
     ClockView *clockView;
     DS18B20   *ds18b20View;
@@ -60,9 +62,9 @@ private:
 
     quint32 timeStamp;
 
-    int selectedDeviceCount = 0;
-    int totalDeviceCount = 0;
-    int currDevNumber = 0;
+    int selDeviceCount = 0;
+    //int totalDeviceCount = 0;
+    //int currDevNumber = 0;
 
     float deviceValue = 0.0;
 

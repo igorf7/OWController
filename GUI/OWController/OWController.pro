@@ -17,8 +17,7 @@ SOURCES += \
     ds_other.cpp \
     hidapi/hid.c \
     main.cpp \
-    mainwindow.cpp \
-    owdevice.cpp
+    mainwindow.cpp
 
 HEADERS += \
     cardview.h \

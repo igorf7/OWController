@@ -26,51 +26,38 @@ public:
         return deviceMap.value(name);
     }
 
-    static void addAddress(quint64 &addr)
-    {
-        devAddressList.append(addr);
-    }
+    // static void addAddress(quint64 &addr)
+    // {
+    //     devAddressList.append(addr);
+    // }
 
-    static void clearAddressList()
-    {
-        devAddressList.clear();
-    }
+    // static void clearAddressList()
+    // {
+    //     devAddressList.clear();
+    // }
 
-    static int getCount()
-    {
-        return devAddressList.size();
-    }
+    // static int getCount()
+    // {
+    //     return devAddressList.size();
+    // }
 
-    static int getCountByName(const QString &name)
-    {
-        int dev_count = 0;
-        quint8 family = getFamily(name);
+    // static void getFound(TDeviceMap &map)
+    // {
+    //     int cnt = 0;
 
-        for (auto i = 0; i < devAddressList.size(); ++i) {
-            if ((devAddressList.at(i) & 0xFF) == family) {
-                dev_count++;
-            }
-        }
-        return dev_count;
-    }
+    //     QMapIterator<QString, quint8> it(deviceMap);
 
-    static void getFound(TDeviceMap &map)
-    {
-        int cnt = 0;
-
-        QMapIterator<QString, quint8> it(deviceMap);
-
-        while (it.hasNext()) {
-            it.next();
-            cnt = getCountByName(it.key());
-            if (cnt > 0) {
-                map.insert(it.key(), cnt);
-            }
-        }
-    }
+    //     while (it.hasNext()) {
+    //         it.next();
+    //         cnt = getCountByName(it.key());
+    //         if (cnt > 0) {
+    //             map.insert(it.key(), cnt);
+    //         }
+    //     }
+    // }
 
 private:
-    static inline QList<quint64> devAddressList;
+    //static inline QList<quint64> devAddressList;
     static inline QString deviceName;
     static inline QString descriptionString;
     /* Supported devices map */
@@ -158,6 +145,19 @@ private:
         {0x42, "Programmable resolution digital thermometer with 'sequence \ndetect' and 2 PIO channels. It measures temperature \nfrom -40°C to +85°C in 0.75 seconds (max).\n"},
         {0x43, "20Kb 1-Wire EEPROM.\n"}
     };
+
+    // static int getCountByName(const QString &name)
+    // {
+    //     int dev_count = 0;
+    //     quint8 family = getFamily(name);
+
+    //     for (auto i = 0; i < devAddressList.size(); ++i) {
+    //         if ((devAddressList.at(i) & 0xFF) == family) {
+    //             dev_count++;
+    //         }
+    //     }
+    //     return dev_count;
+    // }
 };
 
 #endif // OWDEVICE_H

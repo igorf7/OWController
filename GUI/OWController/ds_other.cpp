@@ -21,14 +21,35 @@ DS_OTHER::~DS_OTHER()
  * @brief DS_OTHER::showAddress
  * @param addr
  */
-void DS_OTHER::showDeviceData(quint8 *data, int index)
+void DS_OTHER::showDeviceData(quint8 *data)
 {
-    deviceAddress = *((quint64*)data);
+    quint8 *pData = data;
+    quint64 address = *((quint64*)pData);
 
-    devFamilyCode = (quint8)(deviceAddress & 0xFF);
+    if (address != myAddress) return;
 
-    ui->deviceIndexLabel->setText(QString::number(index));
-    ui->addrLabel->setText(QString::number(deviceAddress, 16).toUpper());
+    devFamilyCode = (quint8)(myAddress & 0xFF);
+
+    ui->deviceIndexLabel->setText(QString::number(myIndex));
+    ui->addrLabel->setText(QString::number(myAddress, 16).toUpper());
+}
+
+/**
+ * @brief DS_OTHER::setAddress
+ * @param address
+ */
+void DS_OTHER::setAddress(quint64 address)
+{
+    myAddress = address;
+}
+
+/**
+ * @brief DS_OTHER::setIndex
+ * @param index
+ */
+void DS_OTHER::setIndex(int index)
+{
+    myIndex = index;
 }
 
 /**
@@ -61,7 +82,7 @@ void DS_OTHER::onSettingsButtonClicked()
     vdlgLayout->addWidget(descrLabel);
     settingsWindow->setLayout(vdlgLayout);
 
-    addressLabel->setText("Address: " + QString::number(deviceAddress, 16).toUpper());
+    addressLabel->setText("Address: " + QString::number(myAddress, 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     settingsWindow->show();

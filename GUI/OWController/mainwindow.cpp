@@ -88,8 +88,8 @@ void MainWindow::onConnectButtonClicked()
  */
 void MainWindow::onSearchButtonClicked()
 {
-    devFoundMap.clear();
-    OWDevice::clearAddressList();
+    allDeviceAddressList.clear();
+
     ui->searchPushButton->setEnabled(false);
     this->sendOneWireCommand(eSearchCmd, nullptr, 0);
 }
@@ -103,7 +103,7 @@ void MainWindow::onClockButtonClicked()
 
     if (isShowClockEnabled) {
         isShowClockEnabled = false;
-        count = selectedDeviceCount;
+        count = selDeviceCount;
     }
     else {
         isShowClockEnabled = true;
@@ -185,15 +185,16 @@ void MainWindow::initDeviceComboBox()
 {
     ui->deviceComboBox->clear();
 
-    OWDevice::getFound(devFoundMap);
+    QStringList ComboBoxItems;
 
-    QMapIterator<QString, quint8> it(devFoundMap);
-
-    while (it.hasNext()) {
-        it.next();
-        ui->deviceComboBox->addItem(it.key());
+    for (auto i = 0; i < allDeviceAddressList.size(); ++i) {
+        quint8 dev_family = allDeviceAddressList.at(i) & 0xFF;
+        QString name = OWDevice::getName(dev_family);
+        if (!ComboBoxItems.contains(name)) {
+            ComboBoxItems.append(name);
+        }
     }
-
+    ui->deviceComboBox->addItems(ComboBoxItems);
     ui->searchPushButton->setEnabled(true);
 }
 
@@ -207,14 +208,22 @@ void MainWindow::onDeviceComboBoxChanged(int index)
 
     if (!isConnected) return;
 
-    currDevNumber = 0;
     isShowClockEnabled = false;
+    selDevices.clear();
 
-    selectedDeviceCount = devFoundMap.value(ui->deviceComboBox->currentText());
-    ui->deviceCountLabel->setText(QString::number(selectedDeviceCount));
+    int dev_num = 0;
     quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
 
-    this->createWidgetsLayout(selectedDeviceCount);
+    for (int i = 0; i < allDeviceAddressList.size(); ++i) {
+        if (dev_family == (allDeviceAddressList.at(i) & 0xFF)) {
+            selDevices.insert(allDeviceAddressList.at(i), dev_num++);
+        }
+    }
+
+    selDeviceCount = selDevices.size();
+    ui->deviceCountLabel->setText(QString::number(selDeviceCount));
+
+    this->createWidgetsLayout(selDeviceCount);
     this->sendOneWireCommand(eReadCmd, &dev_family, sizeof(dev_family));
 }
 
@@ -264,7 +273,12 @@ void MainWindow::createWidgetsLayout(int count)
             }
 
             if (deviceWidget.at(i) == nullptr) return;
-            connect(deviceWidget.at(i), &CardView::sendCommand, this, &MainWindow::sendOneWireCommand);
+            quint64 dev_address = selDevices.key(i);
+            deviceWidget.at(i)->setAddress(dev_address);
+            int index = selDevices.value(dev_address);
+            deviceWidget.at(i)->setIndex(index + 1);
+            connect(deviceWidget.at(i), &CardView::sendCommand,
+                    this, &MainWindow::sendOneWireCommand);
             deviceViewLayout->addWidget(deviceWidget.at(i));
         }
     }
@@ -278,7 +292,7 @@ void MainWindow::createWidgetsLayout(int count)
 void MainWindow::handleReceivedPacket()
 {
     TAppLayerPacket *rx_packet = (TAppLayerPacket*)rxUsbBuffer;
-    quint64 dev_addr = 0;
+    quint64 dev_addr = *((quint64*)rx_packet->data);
 
     if (rx_packet->rep_id == eRepId_4)
     {
@@ -287,24 +301,19 @@ void MainWindow::handleReceivedPacket()
         case eSearchCmd:
             break;
         case eEnumerate:
-            dev_addr = *((quint64*)rx_packet->data);
-            OWDevice::addAddress(dev_addr);
+            allDeviceAddressList.append(dev_addr);
             break;
         case eEnumerateDone:
             this->initDeviceComboBox();
-            totalDeviceCount = OWDevice::getCount();
-
-            if ((totalDeviceCount == 0) && (!isShowClockEnabled)) {
+            if ((allDeviceAddressList.size() == 0) && (!isShowClockEnabled)) {
                 this->onClockButtonClicked();
             }
             statusBar()->showMessage(tr("Обнаружено 1-Wre устройств: ") +
-                                         QString::number(totalDeviceCount), 5000);
+                                         QString::number(allDeviceAddressList.size()), 5000);
             break;
         case eReadCmd:
-            if (!isShowClockEnabled) {
-                deviceWidget.at(currDevNumber)->showDeviceData(rx_packet->data, currDevNumber+1);
-                currDevNumber++;
-                if (currDevNumber >= selectedDeviceCount) currDevNumber = 0;
+            if (!isShowClockEnabled && !deviceWidget.isEmpty()) {
+                deviceWidget.at(selDevices.value(dev_addr))->showDeviceData(rx_packet->data);
             }
             break;
         case eWriteCmd:

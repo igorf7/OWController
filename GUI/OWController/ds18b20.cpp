@@ -23,13 +23,16 @@ DS18B20::~DS18B20()
  * @brief DS18B20::showDateTime
  * @param data
  */
-void DS18B20::showDeviceData(quint8 *data, int index)
+void DS18B20::showDeviceData(quint8 *data)
 {
     quint8 *pData = data;
+    quint64 address = *((quint64*)pData);
+
+    if (address != myAddress) return;
+
     quint8 resolution;
 
-    deviceAddress = *((quint64*)pData);
-    pData += sizeof(deviceAddress);
+    pData += sizeof(myAddress);
 
     deviceData = *((float*)pData);
     pData += sizeof(deviceData);
@@ -61,8 +64,26 @@ void DS18B20::showDeviceData(quint8 *data, int index)
     else {
         ui->temperValueLabel->setStyleSheet("color: red");
     }
-    ui->deviceIndexLabel->setText(QString::number(index));
+    ui->deviceIndexLabel->setText(QString::number(myIndex));
     ui->temperValueLabel->setText(QString::number(deviceData, 'f', 1) + " °C");
+}
+
+/**
+ * @brief DS18B20::setAddress
+ * @param address
+ */
+void DS18B20::setAddress(quint64 address)
+{
+    myAddress = address;
+}
+
+/**
+ * @brief DS18B20::setIndex
+ * @param index
+ */
+void DS18B20::setIndex(int index)
+{
+    myIndex = index;
 }
 
 /**
@@ -126,7 +147,7 @@ void DS18B20::onSettingsButtonClicked()
     connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
 
-    addressLabel->setText("Address: " + QString::number(deviceAddress, 16).toUpper());
+    addressLabel->setText("Address: " + QString::number(myAddress, 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     QIntValidator *alm_val = new QIntValidator(settingsWindow);
@@ -174,8 +195,8 @@ void DS18B20::onWriteButtonClicked()
         return;
     }
 
-    *((quint64*)tx_data) = deviceAddress;
-    quint8 len  = sizeof(deviceAddress);
+    *((quint64*)tx_data) = myAddress;
+    quint8 len  = sizeof(myAddress);
     tx_data[len++] = alm_high;
     tx_data[len++] = alm_low;
 

@@ -24,20 +24,40 @@ DS1971::~DS1971()
  * @brief DS1971::showDateTime
  * @param addr
  */
-void DS1971::showDeviceData(quint8 *data, int index)
+void DS1971::showDeviceData(quint8 *data)
 {
     quint8 *pData = data;
+    quint64 address = *((quint64*)pData);
 
-    deviceAddress = *((quint64*)pData);
-    pData += sizeof(deviceAddress);
+    if (address != myAddress) return;
+
+    pData += sizeof(myAddress);
 
     for (auto i = 0; i < DS1971_MEMORY_SIZE; i++) {
         ds1971memory[i] = *pData;
         pData++;
     }
 
-    ui->deviceIndexLabel->setText(QString::number(index));
-    ui->addrLabel->setText(QString::number(deviceAddress, 16).toUpper());
+    ui->deviceIndexLabel->setText(QString::number(myIndex));
+    ui->addrLabel->setText(QString::number(myAddress, 16).toUpper());
+}
+
+/**
+ * @brief DS1971::setAddress
+ * @param address
+ */
+void DS1971::setAddress(quint64 address)
+{
+    myAddress = address;
+}
+
+/**
+ * @brief DS1971::setIndex
+ * @param index
+ */
+void DS1971::setIndex(int index)
+{
+    myIndex = index;
 }
 
 /**
@@ -84,7 +104,7 @@ void DS1971::onSettingsButtonClicked()
     connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
 
-    addressLabel->setText("Address: " + QString::number(deviceAddress, 16).toUpper());
+    addressLabel->setText("Address: " + QString::number(myAddress, 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     this->showDeviceMemory();
@@ -128,8 +148,8 @@ void DS1971::onWriteButtonClicked()
 {
     quint8 tx_data[44];
 
-    *((quint64*)tx_data) = deviceAddress;
-    quint8 len  = sizeof(deviceAddress);
+    *((quint64*)tx_data) = myAddress;
+    quint8 len  = sizeof(myAddress);
 
     QString str = memEdit->toPlainText().simplified();
     QStringList str_list = str.split(' ');
