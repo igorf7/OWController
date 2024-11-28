@@ -26,14 +26,51 @@ public:
         return deviceMap.value(name);
     }
 
-    void addAddress(quint64 &addr);
-    void clearAddressList();
-    int getCount();
-    int getCountByName(const QString &name);
-    void getFound(TDeviceMap &map);
+    static void addAddress(quint64 &addr)
+    {
+        devAddressList.append(addr);
+    }
+
+    static void clearAddressList()
+    {
+        devAddressList.clear();
+    }
+
+    static int getCount()
+    {
+        return devAddressList.size();
+    }
+
+    static int getCountByName(const QString &name)
+    {
+        int dev_count = 0;
+        quint8 family = getFamily(name);
+
+        for (auto i = 0; i < devAddressList.size(); ++i) {
+            if ((devAddressList.at(i) & 0xFF) == family) {
+                dev_count++;
+            }
+        }
+        return dev_count;
+    }
+
+    static void getFound(TDeviceMap &map)
+    {
+        int cnt = 0;
+
+        QMapIterator<QString, quint8> it(deviceMap);
+
+        while (it.hasNext()) {
+            it.next();
+            cnt = getCountByName(it.key());
+            if (cnt > 0) {
+                map.insert(it.key(), cnt);
+            }
+        }
+    }
 
 private:
-    QList<quint64> devAddressList;
+    static inline QList<quint64> devAddressList;
     static inline QString deviceName;
     static inline QString descriptionString;
     /* Supported devices map */

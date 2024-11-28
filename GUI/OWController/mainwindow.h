@@ -50,15 +50,13 @@ private:
     CustomHid *hidDevice = nullptr;
 
     QVBoxLayout *deviceViewLayout = nullptr;
-    QList<QWidget*> devWidgetList;
+    QList<CardView*> deviceWidget;
     TDeviceMap devFoundMap;
 
-    OWDevice  owDevice;
-
     ClockView *clockView;
-    DS18B20   *ds18b20;
-    DS1971    *ds1971;
-    DS_OTHER  *dsOther;
+    DS18B20   *ds18b20View;
+    DS1971    *ds1971View;
+    DS_OTHER  *dsOtherView;
 
     quint32 timeStamp;
 
@@ -81,6 +79,5 @@ private:
     void createWidgetsLayout(int count);
     void handleReceivedPacket();
     void initDeviceComboBox();
-    void showReceivedData(TAppLayerPacket *rx_packet);
 };
 #endif // MAINWINDOW_H

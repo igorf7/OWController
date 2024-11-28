@@ -21,7 +21,7 @@ DS1971::~DS1971()
 }
 
 /**
- * @brief DS1971::showDeviceData
+ * @brief DS1971::showDateTime
  * @param addr
  */
 void DS1971::showDeviceData(quint8 *data, int index)
@@ -51,7 +51,7 @@ void DS1971::onSettingsButtonClicked()
                                    & (~Qt::WindowContextHelpButtonHint));
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
-    settingsWindow->resize(this->window()->width(), 150);
+    settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);

@@ -10,34 +10,34 @@ OWDevice::OWDevice()
 /**
  * @brief addAddress
  * @param addr
- */
+
 void OWDevice::addAddress(quint64 &addr)
 {
     devAddressList.append(addr);
-}
+} */
 
 /**
  * @brief clearAddressList
- */
+
 void OWDevice::clearAddressList()
 {
     devAddressList.clear();
-}
+} */
 
 /**
  * @brief OWDevice::getCount
  * @return
- */
+
 int OWDevice::getCount()
 {
     return devAddressList.size();
-}
+} */
 
 /**
  * @brief OWDevice::getCountByName
  * @param name
  * @return
- */
+
 int OWDevice::getCountByName(const QString &name)
 {
     int dev_count = 0;
@@ -49,12 +49,12 @@ int OWDevice::getCountByName(const QString &name)
         }
     }
     return dev_count;
-}
+} */
 
 /**
  * @brief OWDevice::getFound
  * @param map
- */
+
 void OWDevice::getFound(TDeviceMap &map)
 {
     int cnt = 0;
@@ -68,4 +68,4 @@ void OWDevice::getFound(TDeviceMap &map)
             map.insert(it.key(), cnt);
         }
     }
-}
+} */

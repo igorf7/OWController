@@ -2,7 +2,6 @@
 #define DS1971_H
 
 #include "cardview.h"
-#include "usertypes.h"
 #include <QDialog>
 #include <QPlainTextEdit>
 
@@ -19,9 +18,6 @@ public:
     ~DS1971();
 
     void showDeviceData(quint8 *data, int index);
-
-signals:
-    void sendCommand(TOpcode opcode, quint8 *data, quint8 data_len);
 
 private slots:
     void onSettingsButtonClicked();

@@ -46,7 +46,7 @@ void DS_OTHER::onSettingsButtonClicked()
     settingsWindow->setWindowIcon(QIcon(pm));
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
-    settingsWindow->resize(this->window()->width(), 150);
+    settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
 
 

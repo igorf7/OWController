@@ -2,7 +2,6 @@
 #define DS18B20_H
 
 #include "cardview.h"
-#include "usertypes.h"
 #include <QDialog>
 #include <QLineEdit>
 
@@ -19,9 +18,6 @@ public:
     ~DS18B20();
 
     void showDeviceData(quint8 *data, int index);
-
-signals:
-    void sendCommand(TOpcode opcode, quint8 *data, quint8 data_len);
 
 private slots:
     void onSettingsButtonClicked();

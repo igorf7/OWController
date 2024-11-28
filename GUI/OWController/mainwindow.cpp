@@ -79,7 +79,6 @@ void MainWindow::onConnectButtonClicked()
         ui->connectPushButton->setIcon(QIcon(":/images/switch-on.png"));
         statusBar()->showMessage(tr("USB порт открыт"));
         this->startUsbPolling();
-        //this->onClockButtonClicked();
         this->onSearchButtonClicked();
     }
 }
@@ -90,7 +89,7 @@ void MainWindow::onConnectButtonClicked()
 void MainWindow::onSearchButtonClicked()
 {
     devFoundMap.clear();
-    owDevice.clearAddressList();
+    OWDevice::clearAddressList();
     ui->searchPushButton->setEnabled(false);
     this->sendOneWireCommand(eSearchCmd, nullptr, 0);
 }
@@ -186,7 +185,7 @@ void MainWindow::initDeviceComboBox()
 {
     ui->deviceComboBox->clear();
 
-    owDevice.getFound(devFoundMap);
+    OWDevice::getFound(devFoundMap);
 
     QMapIterator<QString, quint8> it(devFoundMap);
 
@@ -213,9 +212,9 @@ void MainWindow::onDeviceComboBoxChanged(int index)
 
     selectedDeviceCount = devFoundMap.value(ui->deviceComboBox->currentText());
     ui->deviceCountLabel->setText(QString::number(selectedDeviceCount));
-    this->createWidgetsLayout(selectedDeviceCount);
-
     quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
+
+    this->createWidgetsLayout(selectedDeviceCount);
     this->sendOneWireCommand(eReadCmd, &dev_family, sizeof(dev_family));
 }
 
@@ -226,7 +225,7 @@ void MainWindow::createWidgetsLayout(int count)
 {
     if (count < 1) return;
 
-    devWidgetList.clear();
+    deviceWidget.clear();
 
     /* Delete previous layout if exist */
     if (deviceViewLayout != nullptr) {
@@ -242,40 +241,34 @@ void MainWindow::createWidgetsLayout(int count)
     deviceViewLayout = new QVBoxLayout;
 
     if (isShowClockEnabled) {
-        devWidgetList << new ClockView;
-        deviceViewLayout->addWidget(devWidgetList.at(0));
+        deviceWidget << new ClockView;
+        deviceViewLayout->addWidget(deviceWidget.at(0));
     }
     else {
         quint8 device_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
-
         for (int i = 0; i < count; i++)
         {
             switch (device_family)
             {
             case 0x14: // DS1971
-                ds1971 = new DS1971;
-                connect(ds1971, &DS1971::sendCommand, this, &MainWindow::sendOneWireCommand);
-                devWidgetList << ds1971;
+                deviceWidget << new DS1971;
                 break;
 
-            // case 0x10: // DS18S20
-            //     break;
-
             case 0x28: // DS18B20
-                ds18b20 = new DS18B20;
-                connect(ds18b20, &DS18B20::sendCommand, this, &MainWindow::sendOneWireCommand);
-                devWidgetList << ds18b20;
+                deviceWidget << new DS18B20;
                 break;
 
             default:  // any other device
-                devWidgetList << new DS_OTHER;
+                deviceWidget << new DS_OTHER;
                 break;
             }
 
-            if (devWidgetList.at(i) == nullptr) return;
-            deviceViewLayout->addWidget(devWidgetList.at(i));
+            if (deviceWidget.at(i) == nullptr) return;
+            connect(deviceWidget.at(i), &CardView::sendCommand, this, &MainWindow::sendOneWireCommand);
+            deviceViewLayout->addWidget(deviceWidget.at(i));
         }
     }
+
     ui->scrollAreaWidgetContents->setLayout(deviceViewLayout);
 }
 
@@ -295,11 +288,11 @@ void MainWindow::handleReceivedPacket()
             break;
         case eEnumerate:
             dev_addr = *((quint64*)rx_packet->data);
-            owDevice.addAddress(dev_addr);
+            OWDevice::addAddress(dev_addr);
             break;
         case eEnumerateDone:
             this->initDeviceComboBox();
-            totalDeviceCount = owDevice.getCount();
+            totalDeviceCount = OWDevice::getCount();
 
             if ((totalDeviceCount == 0) && (!isShowClockEnabled)) {
                 this->onClockButtonClicked();
@@ -309,7 +302,9 @@ void MainWindow::handleReceivedPacket()
             break;
         case eReadCmd:
             if (!isShowClockEnabled) {
-                this->showReceivedData(rx_packet);
+                deviceWidget.at(currDevNumber)->showDeviceData(rx_packet->data, currDevNumber+1);
+                currDevNumber++;
+                if (currDevNumber >= selectedDeviceCount) currDevNumber = 0;
             }
             break;
         case eWriteCmd:
@@ -322,8 +317,8 @@ void MainWindow::handleReceivedPacket()
                     this->sendOneWireCommand(eSyncRtcCmd, (quint8*)&timeStamp, sizeof(timeStamp));
                 }
                 else {
-                    clockView = (ClockView*)devWidgetList.at(0);
-                    clockView->showDateTime(timeStamp);
+                    clockView = (ClockView*)deviceWidget.at(0);
+                    clockView->showDeviceData(timeStamp);
                 }
             }
             break;
@@ -335,46 +330,11 @@ void MainWindow::handleReceivedPacket()
 }
 
 /**
- * @brief MainWindow::showReceivedData
- * @param rx_packet
- */
-void MainWindow::showReceivedData(TAppLayerPacket *rx_packet)
-{
-    quint64 device_address = *((quint64*)rx_packet->data);
-    quint8  device_family = (device_address & 0xFF);
-
-    if (device_family != OWDevice::getFamily(ui->deviceComboBox->currentText())) return;
-
-    switch (device_family)
-    {
-    case 0x14:  // DS1971
-        ds1971 = (DS1971*)devWidgetList.at(currDevNumber++);
-        ds1971->showDeviceData(rx_packet->data, currDevNumber);
-        break;
-
-    // case 0x10:  // DS18S20
-    //     break;
-
-    case 0x28:  // DS18B20
-        ds18b20 = (DS18B20*)devWidgetList.at(currDevNumber++);
-        ds18b20->showDeviceData(rx_packet->data, currDevNumber);
-        break;
-
-    default:    // Any other device
-        dsOther = (DS_OTHER*)devWidgetList.at(currDevNumber++);
-        dsOther->showDeviceData(rx_packet->data, currDevNumber);
-        break;
-    }
-
-    if (currDevNumber >= selectedDeviceCount) currDevNumber = 0;
-}
-
-/**
  * @brief MainWindow::deinitWidgets
  */
 void MainWindow::deinitWidgets()
 {
-    for (auto &it : devWidgetList) {
+    for (auto &it : deviceWidget) {
         if (it != nullptr) it->close();
     }
     ui->deviceCountLabel->setText("0");

@@ -20,7 +20,7 @@ DS18B20::~DS18B20()
 }
 
 /**
- * @brief DS18B20::showDeviceData
+ * @brief DS18B20::showDateTime
  * @param data
  */
 void DS18B20::showDeviceData(quint8 *data, int index)
@@ -80,7 +80,7 @@ void DS18B20::onSettingsButtonClicked()
     settingsWindow->setWindowIcon(QIcon(pm));
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
-    settingsWindow->resize(this->window()->width(), 150);
+    settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
