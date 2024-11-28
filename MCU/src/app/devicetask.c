@@ -86,7 +86,6 @@ void DeviceReadTask(void *prm)
                 case DS1971:
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
-                    //*(dataBuffer + OW_ROM_SIZE + DS1971_EEPROM_SIZE) = dev_index;
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_EEPROM_SIZE, dataBuffer);
                     break;
                 
@@ -96,7 +95,6 @@ void DeviceReadTask(void *prm)
                 case DS18B20:
                     isThermometer = true;
                     DS18B20_ReadScratchpad(&ds18B20);
-                    //ds18B20.conf.index = dev_index;
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
                     memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE + sizeof(ds18B20), dataBuffer);
@@ -105,7 +103,6 @@ void DeviceReadTask(void *prm)
                 
                 default:    // for all other devices show only the address
                     memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
-                    //*(dataBuffer + OW_ROM_SIZE) = dev_index;
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE, dataBuffer);
                     continue;
             }
