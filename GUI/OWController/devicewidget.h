@@ -3,10 +3,6 @@
 
 #include "cardview.h"
 
-namespace Ui {
-class DeviceWidget;
-}
-
 class DeviceWidget : public CardView
 {
     Q_OBJECT
@@ -21,9 +17,6 @@ public:
 
 signals:
     void sendCommand(TOpcode opcode, quint8 *data, quint8 data_len);
-
-private:
-    Ui::DeviceWidget *ui;
 };
 
 #endif // DEVICEWIDGET_H
