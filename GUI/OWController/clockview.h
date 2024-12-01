@@ -16,10 +16,7 @@ public:
     explicit ClockView(CardView *parent = nullptr);
     ~ClockView();
 
-    void showDeviceData(quint8 *data, int index);
-    void setAddress(quint64 address);
-    void setIndex(int index);
-    void showDeviceData(quint32 timestamp);
+    void showDateTime(quint32 timestamp);
 
 private:
     Ui::ClockView *ui;

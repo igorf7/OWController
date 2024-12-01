@@ -1,24 +1,24 @@
 #ifndef DS_OTHER_H
 #define DS_OTHER_H
 
-#include "cardview.h"
+#include "devicewidget.h"
 #include <QDialog>
 
 namespace Ui {
 class DS_OTHER;
 }
 
-class DS_OTHER : public CardView
+class DS_OTHER : public DeviceWidget
 {
     Q_OBJECT
 
 public:
-    explicit DS_OTHER(CardView *parent = nullptr);
+    explicit DS_OTHER(DeviceWidget *parent = nullptr);
     ~DS_OTHER();
 
-    void showDeviceData(quint8 *data, int index);
-    void setAddress(quint64 address);
-    void setIndex(int index);
+    void showDeviceData(quint8 *data, int index) override;
+    void setAddress(quint64 address) override;
+    void setIndex(int index) override;
 
 private slots:
     void onSettingsButtonClicked();

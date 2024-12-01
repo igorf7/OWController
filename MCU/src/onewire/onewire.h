@@ -1,5 +1,10 @@
-#ifndef __OW_H
-#define __OW_H
+/*!
+ \file   onewire.h
+ \date   November-2024 (created)
+ \brief  1-wire abstract device driver header file
+ */
+#ifndef __ONEWIRE_H
+#define __ONEWIRE_H
 
 #include "stm32f10x.h"
 #include "stdbool.h"
@@ -63,4 +68,4 @@ void OW_MatchRom(uint8_t *address);
 bool OW_SearchRom(uint8_t *address);
 void OW_ClearSearchResult(void);
 uint8_t OW_CalcChecksum(uint8_t *data, uint8_t length);
-#endif // __OW_H
+#endif // __ONEWIRE_H

@@ -1,7 +1,7 @@
 #ifndef DS18B20_H
 #define DS18B20_H
 
-#include "cardview.h"
+#include "devicewidget.h"
 #include <QDialog>
 #include <QLineEdit>
 
@@ -9,17 +9,17 @@ namespace Ui {
 class DS18B20;
 }
 
-class DS18B20 : public CardView
+class DS18B20 : public DeviceWidget
 {
     Q_OBJECT
 
 public:
-    explicit DS18B20(CardView *parent = nullptr);
+    explicit DS18B20(DeviceWidget *parent = nullptr);
     ~DS18B20();
 
-    void showDeviceData(quint8 *data, int index);
-    void setAddress(quint64 address);
-    void setIndex(int index);
+    void showDeviceData(quint8 *data, int index) override;
+    void setAddress(quint64 address) override;
+    void setIndex(int index) override;
 
 private slots:
     void onSettingsButtonClicked();

@@ -5,8 +5,8 @@
 #include <QMessageBox>
 #include <QDebug>
 
-DS1971::DS1971(CardView *parent)
-    : CardView(parent), ui(new Ui::DS1971)
+DS1971::DS1971(DeviceWidget *parent)
+    : DeviceWidget(parent), ui(new Ui::DS1971)
 {
     ui->setupUi(this);
 
@@ -70,6 +70,10 @@ void DS1971::onSettingsButtonClicked()
     settingsWindow->setWindowFlags((settingsWindow->windowFlags())
                                    & (~Qt::WindowContextHelpButtonHint));
 
+    QPixmap pm = QPixmap(1, 1);
+    pm.fill(QColor(0, 0, 0, 0));
+    settingsWindow->setWindowIcon(QIcon(pm));
+
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
     settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
@@ -82,11 +86,11 @@ void DS1971::onSettingsButtonClicked()
     descrLabel->setStyleSheet("color: green");
 
     memEdit = new QPlainTextEdit;
-    QLabel *memLabel = new QLabel("Device memory (can be edited and rewritten):");
+    QLabel *memLabel = new QLabel(tr("Device memory (can be edited and rewritten):"));
 
-    QPushButton *writeButton = new QPushButton("Write");
-    QPushButton *readButton = new QPushButton("Read");
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *writeButton = new QPushButton(tr("Write"));
+    QPushButton *readButton = new QPushButton(tr("Read"));
+    QPushButton *closeButton = new QPushButton(tr("Close"));
     QHBoxLayout *hbtnLayout = new QHBoxLayout;
 
     hbtnLayout->addWidget(writeButton);

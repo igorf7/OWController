@@ -1,8 +1,16 @@
+/*!
+ \file   ds18b20.c
+ \date   November-2024 (created)
+ \brief  DS18B20 device driver
+ */
 #include "ds18b20.h"
 
+uint32_t ui_nan = 0x7FA00000;
+float *fp_nan = (float*)&ui_nan;
 static uint8_t rxDataBuffer[DS18B20_SCRATCHPAD_SIZE + 1];
 
 /*!
+ \brief Starts temperature conversion
  */
 void DS18B20_Convert(void)
 {
@@ -10,8 +18,11 @@ void DS18B20_Convert(void)
 }
 
 /*!
+ \brief Reads DS18B20 Scratchpad data
+ \param pointer to DS18B20 data structure
+ \retval true if successful, otherwise false
  */
-OW_Status_t DS18B20_ReadScratchpad(DS18B20_t *mem)
+bool DS18B20_ReadScratchpad(DS18B20_t *mem)
 {
     uint16_t temperature, sign;
     
@@ -26,7 +37,8 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20_t *mem)
     
     if (checkSum != rxDataBuffer[DS18B20_SCRATCHPAD_SIZE])
     {
-        return OW_ERROR;
+        mem->value = *fp_nan;
+        return false;
     }
     
     temperature = (rxDataBuffer[1] << 8) | rxDataBuffer[0];
@@ -63,10 +75,13 @@ OW_Status_t DS18B20_ReadScratchpad(DS18B20_t *mem)
     
     mem->value = (float)temperature * 0.0625f;
     if (sign != 0) mem->value *= (-1);
-    return OW_OK;
+    
+    return true;
 }
 
 /*!
+ \brief Writes DS18B20 Scratchpad data
+ \param data to write
  */
 void DS18B20_WriteScratchpad(uint8_t *data)
 {
@@ -79,6 +94,7 @@ void DS18B20_WriteScratchpad(uint8_t *data)
 }
 
 /*!
+ \brief Copies the scratchpad into the EEPROM
  */
 void DS18B20_CopyScratchpad(void)
 {

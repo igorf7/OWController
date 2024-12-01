@@ -1,3 +1,8 @@
+/*!
+ \file   scheduler.h
+ \date   December-2022 (created)
+ \brief  task scheduler module header file
+*/
 #ifndef __SCHEDULER_H
 #define __SCHEDULER_H
 

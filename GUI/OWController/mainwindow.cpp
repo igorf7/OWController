@@ -62,7 +62,7 @@ void MainWindow::onConnectButtonClicked()
         this->deinitWidgets();
 
         ui->connectPushButton->setIcon(QIcon(":/images/switch-off.png"));
-        statusBar()->showMessage(tr("USB порт закрыт"));
+        statusBar()->showMessage(tr("No USB connection"));
     }
     else {
         isConnected = hidDevice->Connect(ProductString);
@@ -70,14 +70,14 @@ void MainWindow::onConnectButtonClicked()
         if (!isConnected) {
             this->deinitWidgets();
             ui->connectPushButton->setIcon(QIcon(":/images/switch-off.png"));
-            statusBar()->showMessage(tr("USB устройство не обнаружено"));
+            statusBar()->showMessage(tr("USB device not found"));
             return;
         }
 
         ui->searchPushButton->setEnabled(true);
         ui->clockPushButton->setEnabled(true);
         ui->connectPushButton->setIcon(QIcon(":/images/switch-on.png"));
-        statusBar()->showMessage(tr("USB порт открыт"));
+        statusBar()->showMessage(tr("USB device connected"));
         this->startUsbPolling();
         this->onSearchButtonClicked();
     }
@@ -91,7 +91,7 @@ void MainWindow::onSearchButtonClicked()
     allDeviceAddressList.clear();
 
     ui->searchPushButton->setEnabled(false);
-    this->sendOneWireCommand(eSearchCmd, nullptr, 0);
+    this->onSendCommand(eSearchCmd, nullptr, 0);
 }
 
 /**
@@ -114,11 +114,11 @@ void MainWindow::onClockButtonClicked()
 }
 
 /**
- * @brief MainWindow::sendOneWireCommand
+ * @brief MainWindow::onSendCommand
  * @param opcode
  * @param dev_type
  */
-void MainWindow::sendOneWireCommand(TOpcode opcode, quint8 *data, quint8 data_len)
+void MainWindow::onSendCommand(TOpcode opcode, quint8 *data, int data_len)
 {
     if (!isConnected) return;
 
@@ -127,7 +127,7 @@ void MainWindow::sendOneWireCommand(TOpcode opcode, quint8 *data, quint8 data_le
     tx_packet->rep_id = eRepId_3;
     tx_packet->opcode = opcode;
     tx_packet->size = 0;
-    for (auto i = 0; i < data_len; i++) {
+    for (int i = 0; i < data_len; i++) {
         tx_packet->data[i] = data[i];
     }
 
@@ -187,7 +187,7 @@ void MainWindow::initDeviceComboBox()
 
     QStringList ComboBoxItems;
 
-    for (auto i = 0; i < allDeviceAddressList.size(); ++i) {
+    for (int i = 0; i < allDeviceAddressList.size(); ++i) {
         quint8 dev_family = allDeviceAddressList.at(i) & 0xFF;
         QString name = OWDevice::getName(dev_family);
         if (!ComboBoxItems.contains(name)) {
@@ -211,19 +211,18 @@ void MainWindow::onDeviceComboBoxChanged(int index)
     isShowClockEnabled = false;
     selDevices.clear();
 
-    int dev_num = 0;
     quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
 
-    for (int i = 0; i < allDeviceAddressList.size(); ++i) {
+    for (int i = 0, j = 0; i < allDeviceAddressList.size(); ++i) {
         if (dev_family == (allDeviceAddressList.at(i) & 0xFF)) {
-            selDevices.insert(allDeviceAddressList.at(i), dev_num++);
+            selDevices.insert(allDeviceAddressList.at(i), j++);
         }
     }
 
     ui->deviceCountLabel->setText(QString::number(selDevices.size()));
 
     this->createWidgetsLayout(selDevices.size());
-    this->sendOneWireCommand(eReadCmd, &dev_family, sizeof(dev_family));
+    this->onSendCommand(eReadCmd, &dev_family, sizeof(dev_family));
 }
 
 /**
@@ -249,8 +248,8 @@ void MainWindow::createWidgetsLayout(int count)
     deviceViewLayout = new QVBoxLayout;
 
     if (isShowClockEnabled) {
-        deviceWidget << new ClockView;
-        deviceViewLayout->addWidget(deviceWidget.at(0));
+        clockWidget = new ClockView;
+        deviceViewLayout->addWidget(clockWidget);
     }
     else {
         quint8 device_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
@@ -276,8 +275,8 @@ void MainWindow::createWidgetsLayout(int count)
             deviceWidget.at(i)->setAddress(dev_address);
             int index = selDevices.value(dev_address);
             deviceWidget.at(i)->setIndex(index + 1);
-            connect(deviceWidget.at(i), &CardView::sendCommand,
-                    this, &MainWindow::sendOneWireCommand);
+            connect(deviceWidget.at(i), &DeviceWidget::sendCommand,
+                                  this, &MainWindow::onSendCommand);
             deviceViewLayout->addWidget(deviceWidget.at(i));
         }
     }
@@ -307,8 +306,10 @@ void MainWindow::handleReceivedPacket()
             if ((allDeviceAddressList.size() == 0) && (!isShowClockEnabled)) {
                 this->onClockButtonClicked();
             }
-            statusBar()->showMessage(tr("Обнаружено 1-Wre устройств: ") +
-                                         QString::number(allDeviceAddressList.size()), 5000);
+            else {
+                statusBar()->showMessage(tr("Total 1-Wre devices found: ") +
+                                            QString::number(allDeviceAddressList.size()), 5000);
+            }
             break;
         case eReadCmd:
             if (!isShowClockEnabled && !deviceWidget.isEmpty()) {
@@ -321,13 +322,13 @@ void MainWindow::handleReceivedPacket()
         case eGetRtcCmd:
             if (isShowClockEnabled) {
                 timeStamp = *((quint32*)rx_packet->data);
+
                 if (qAbs(QDateTime::currentSecsSinceEpoch() - timeStamp) > 1) {
                     timeStamp = QDateTime::currentSecsSinceEpoch() + 1;
-                    this->sendOneWireCommand(eSyncRtcCmd, (quint8*)&timeStamp, sizeof(timeStamp));
+                    this->onSendCommand(eSyncRtcCmd, (quint8*)&timeStamp, sizeof(timeStamp));
                 }
                 else {
-                    clockView = (ClockView*)deviceWidget.at(0);
-                    clockView->showDeviceData(timeStamp);
+                    clockWidget->showDateTime(timeStamp);
                 }
             }
             break;
@@ -343,6 +344,9 @@ void MainWindow::handleReceivedPacket()
  */
 void MainWindow::deinitWidgets()
 {
+    if (clockWidget != nullptr) {
+        clockWidget->close();
+    }
     for (auto &it : deviceWidget) {
         if (it != nullptr) it->close();
     }

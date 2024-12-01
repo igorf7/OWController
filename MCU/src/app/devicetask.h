@@ -1,3 +1,8 @@
+/*!
+ \file   devicetask.h
+ \date   November-2024 (created)
+ \brief  device task handlers header file
+*/
 #ifndef __DEVIETASK_H
 #define __DEVIETASK_H
 
@@ -9,7 +14,7 @@
 #include "usb_hw_config.h"
 #include "usb_lib.h"
 
-/*  */
+/* API */
 void DeviceSearchTask(void *prm);
 void DeviceEnumerate(void *prm);
 void DeviceReadTask(void *prm);

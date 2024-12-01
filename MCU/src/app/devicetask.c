@@ -1,3 +1,8 @@
+/*!
+ \file   devicetask.c
+ \date   November-2024 (created)
+ \brief  device task handlers
+*/
 #include "devicetask.h"
 #include "onewire.h"
 #include "ds18b20.h"
@@ -19,7 +24,6 @@ static bool isThermometer = false;
 void DeviceSearchTask(void *prm)
 {
     uint8_t i;
-    
     deviceCount = 0;
     
     // Clear properties
@@ -36,12 +40,12 @@ void DeviceSearchTask(void *prm)
         
         if (!owDevice[i].connected)
             break;
-        else
+        else {
             deviceCount++;
+        }
     }
     
     OW_ClearSearchResult();
-    
     DeviceEnumerate(NULL);
 }
 
@@ -88,9 +92,6 @@ void DeviceReadTask(void *prm)
                     DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
                     USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_EEPROM_SIZE, dataBuffer);
                     break;
-                
-//                case DS18S20:
-//                    break;
                 
                 case DS18B20:
                     isThermometer = true;

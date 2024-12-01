@@ -1,3 +1,8 @@
+/*!
+ \file   main.c
+ \date   November-2024 (created)
+ \brief  main application module
+*/
 #include "main.h"
 #include "scheduler.h"
 #include "devicetask.h"
@@ -10,10 +15,12 @@ static bool isOnewireReadEnabled = false;
 static uint8_t devType = DS1971;
 static uint8_t usbRxBuffer[wMaxPacketSize];
 
-/* Program entry point */
+/*!
+ \brief Program entry point
+*/
 int main(void)
 {
-    // Initialize the USB hardware
+    /* Initialize the USB hardware */
     Wait_ticks(1500000); // to sinc with host
     hidEndp.rx_buffer = usbRxBuffer;
     hidEndp.rx_handler = USB_HandleRxData;
@@ -25,30 +32,27 @@ int main(void)
     Set_USBClock();
     USB_Init();
     
-    // Program startup indicator
+    /* Program startup indicator */
     LED_Init(LED1_PORT, LED1_PIN);
     LED_Blink(LED1_PORT, LED1_PIN, 1000000);
     
-    // Initialize the task scheduler
+    /* Initialize the task scheduler */
     InitTaskSheduler(&BackgroundTask);
         
-    // Initialize the 1-Wire Bus
+    /* Initialize the 1-Wire Bus */
     OW_InitBus(USART2);
     
-    // Initialize the RTC hardware
+    /* Initialize the RTC hardware */
     rtcEvents.secondEvent = onSecondEvent;
     rtc_init(&rtcEvents);
     rtc_set_irq(RTC_IT_SEC);
     
-    // Search 1-Wire devices
-    //DeviceSearchTask(NULL);
+    /* Enable Watchdog */
+    #ifndef DEBUG
+    InitWatchdog();
+    #endif
     
-//    // Enable Watchdog
-//    #ifndef DEBUG
-//    InitWatchdog();
-//    #endif
     
-    //isOnewireReadEnabled = true;
 
     __enable_irq();
     
@@ -64,30 +68,29 @@ int main(void)
 */
 static void BackgroundTask(void)
 {
-//    #ifndef DEBUG
-//    WatchdogReload(KR_KEY_Reload);
-//    #endif
+    #ifndef DEBUG
+    WatchdogReload(KR_KEY_Reload);
+    #endif
 }
 
-/* On RTC event callback function */
 /*!
  \brief RTC second event callback function
 */
 void onSecondEvent(void)
-{    
+{
     rtcCounter = RTC_GetCounter();
     
-    // Send RTC value
+    /* Send RTC value */
     USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
     
-    // Schedule a task to read a 1-wire devices
+    /* Start periodic polling of the 1-Wire bus */
     if (isOnewireReadEnabled) {
         PutTask(DeviceReadTask, &devType);
     }
 }
 
 /*!
- \brief
+ \brief Processing received USB packets
 */
 void USB_HandleRxData(void)
 {

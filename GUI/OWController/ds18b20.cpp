@@ -2,9 +2,10 @@
 #include "ui_ds18b20.h"
 #include "owdevice.h"
 #include <QValidator>
+#include <QDebug>
 
-DS18B20::DS18B20(CardView *parent) :
-    CardView(parent), ui(new Ui::DS18B20)
+DS18B20::DS18B20(DeviceWidget *parent) :
+    DeviceWidget(parent), ui(new Ui::DS18B20)
 {
     ui->setupUi(this);
 
@@ -58,7 +59,11 @@ void DS18B20::showDeviceData(quint8 *data, int index)
         break;
     }
 
-    if (deviceData < 0.0f) {
+    if (qIsNaN(deviceData)) {
+        ui->temperValueLabel->setText(tr("FAILURE"));
+        return;
+    }
+    else if (deviceData < 0.0f) {
         ui->temperValueLabel->setStyleSheet("color: blue");
     }
     else {
@@ -110,9 +115,9 @@ void DS18B20::onSettingsButtonClicked()
     QLabel *addressLabel = new QLabel;
     QLabel *descrLabel = new QLabel;
     descrLabel->setStyleSheet("color: green");
-    QLabel *almHighLabel = new QLabel("Alarm High, °C");
-    QLabel *almLowLabel = new QLabel("Alarm Low, °C");
-    QLabel *resolutionLabel = new QLabel("Resolution, bit");
+    QLabel *almHighLabel = new QLabel(tr("Alarm High, °C"));
+    QLabel *almLowLabel = new QLabel(tr("Alarm Low, °C"));
+    QLabel *resolutionLabel = new QLabel(tr("Resolution, bit"));
     almHighLineEdit = new QLineEdit;
     almLowLineEdit = new QLineEdit;
     resolutionLineEdit = new QLineEdit;
@@ -129,9 +134,9 @@ void DS18B20::onSettingsButtonClicked()
     editLayout->addWidget(resolutionLabel, 2, 0);
     editLayout->addWidget(resolutionLineEdit, 2, 1);
 
-    QPushButton *writeButton = new QPushButton("Write");
-    QPushButton *readButton = new QPushButton("Read");
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *writeButton = new QPushButton(tr("Write"));
+    QPushButton *readButton = new QPushButton(tr("Read"));
+    QPushButton *closeButton = new QPushButton(tr("Close"));
     QHBoxLayout *hbtnLayout = new QHBoxLayout;
 
     hbtnLayout->addWidget(writeButton);

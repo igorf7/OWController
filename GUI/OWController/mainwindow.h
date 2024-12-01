@@ -32,7 +32,7 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 public slots:
-    void sendOneWireCommand(TOpcode opcode, quint8 *data, quint8 data_len);
+    void onSendCommand(TOpcode opcode, quint8 *data, int data_len);
 
 private slots:
     void onConnectButtonClicked();
@@ -49,15 +49,11 @@ private:
 
     CustomHid *hidDevice = nullptr;
 
+    ClockView *clockWidget;
     QVBoxLayout *deviceViewLayout = nullptr;
-    QList<CardView*> deviceWidget;
+    QList<DeviceWidget*> deviceWidget;
     QList<quint64> allDeviceAddressList;
     QHash<quint64, int> selDevices;
-
-    ClockView *clockView;
-    DS18B20   *ds18b20View;
-    DS1971    *ds1971View;
-    DS_OTHER  *dsOtherView;
 
     quint32 timeStamp;
 

@@ -1,3 +1,8 @@
+/*!
+ \file   onewire.c
+ \date   November-2024 (created)
+ \brief  1-wire abstract device driver
+ */
 #include "onewire.h"
 #include "usart.h"
 
@@ -8,6 +13,8 @@ static uint8_t LastDiscrepancy;
 static uint8_t ROM_NO[8];
 
 /*!
+ \brief Initializes the 1-Wire bus
+ \param USARTx - used USART module for 1-Wire bus
  */
 void OW_InitBus(USART_TypeDef *USARTx)
 {
@@ -16,6 +23,9 @@ void OW_InitBus(USART_TypeDef *USARTx)
 }
 
 /*!
+ \brief Set/Reset bit on the 1-Wire bus
+ \param bit - may be 0 or 1
+ \retval bus state
  */
 uint8_t OW_SendReceiveBit(uint8_t bit)
 {
@@ -24,6 +34,9 @@ uint8_t OW_SendReceiveBit(uint8_t bit)
 }
 
 /*!
+ \brief Write/Read a byte of data on the 1-Wire bus
+ \param byte to Wrire
+ \retval Received data byte
  */
 uint8_t OW_SendReceiveByte(uint8_t byte)
 {
@@ -43,6 +56,8 @@ uint8_t OW_SendReceiveByte(uint8_t byte)
 }
 
 /*!
+ \brief Performs the RESET function on the 1-Wire bus
+ \retval operation status
  */
 OW_Status_t OW_Reset(void)
 {
@@ -65,6 +80,9 @@ OW_Status_t OW_Reset(void)
 }
 
 /*!
+ \brief Performs the READ ROM function on the 1-Wire bus
+ \param data_dst - pointer to a buffer for copying ROM data
+ \retval operation status
  */
 OW_Status_t OW_ReadRom(uint8_t *data_dst)
 {
@@ -88,6 +106,7 @@ OW_Status_t OW_ReadRom(uint8_t *data_dst)
 }
 
 /*!
+ \brief Performs the SKIP ROM function on the 1-Wire bus
  */
 void OW_SkipRom(void)
 {   
@@ -95,6 +114,8 @@ void OW_SkipRom(void)
 }
 
 /*!
+ \brief Performs the MATCH ROM function on the 1-Wire bus
+ \param 1-Wire device address
  */
 void OW_MatchRom(uint8_t *address)
 {   
@@ -107,6 +128,9 @@ void OW_MatchRom(uint8_t *address)
 }
 
 /*!
+ \brief Performs the MATCH ROM function on the 1-Wire bus
+ \param pointer to a buffer for writing the found device address
+ \retval true if successful, otherwise false
  */
 bool OW_SearchRom(uint8_t *address)
 {
@@ -207,6 +231,7 @@ bool OW_SearchRom(uint8_t *address)
 }
 
 /*!
+ \brief Clears the specified variables after searching
  */
 void OW_ClearSearchResult(void)
 {
@@ -219,6 +244,10 @@ void OW_ClearSearchResult(void)
 }
 
 /*!
+ \brief Calculates the CRC8 checksum for the specified data
+ \param pointer to data buffer for CRC8 calculation
+ \param size of data buffer
+ \retval CRC8 calculated value
  */
 uint8_t OW_CalcChecksum(uint8_t *data, uint8_t len)
 {

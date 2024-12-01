@@ -1,8 +1,15 @@
+/*!
+ \file   usart.c
+ \date   November-2024 (created)
+ \brief  USART driver
+ */
 #include "usart.h"
 
 static USART_InitTypeDef USART_InitStruct;
 
 /*!
+ \brief Initializes the USART module
+ \param USARTx - USART module
  */
 void InitUsart(USART_TypeDef *USARTx)
 {
@@ -43,42 +50,66 @@ void InitUsart(USART_TypeDef *USARTx)
 }
 
 /*!
+ \brief Sets the USART baud rate
+ \param USARTx - USART module
+ \param baudrate - USART baud rate, bit/sec
  */
 void UsartSetBaudrate(USART_TypeDef *USARTx, uint32_t baudrate)
-{ 
-    /* Write to USART BRR */
-    USARTx->BRR = SystemCoreClock / baudrate;
-}
-
-/*!
- */
-void UsartTransmit(USART_TypeDef *USARTx, uint8_t *data, int16_t len, uint32_t timeout)
-{    
-    while (len--)
-    {
-        while(!(USARTx->SR & USART_FLAG_TXE))
-        {
-            if (--timeout == 0) break;
-        }
-        USARTx->DR = *data++;
-    }
-}
-
-/*!
- */
-void UsartReceive(USART_TypeDef *USARTx, uint8_t *data, int16_t len, uint32_t timeout)
 {
-    while (len--)
+    uint32_t integerdivider = 0x00;
+    uint32_t fractionaldivider = 0x00;
+    uint32_t tmpreg = 0x00, apbclock = 0x00;
+    RCC_ClocksTypeDef RCC_ClocksStatus;
+    
+    uint32_t usartxbase = (uint32_t)USARTx;
+    
+    RCC_GetClocksFreq(&RCC_ClocksStatus);
+    
+    if (usartxbase == USART1_BASE)
     {
-        while(!(USARTx->SR & USART_FLAG_RXNE))
-        {
-            if (--timeout == 0) break;
-        }
-        *data++ = USARTx->DR;
+        apbclock = RCC_ClocksStatus.PCLK2_Frequency;
     }
+    else
+    {
+        apbclock = RCC_ClocksStatus.PCLK1_Frequency;
+    }
+  
+    /* Determine the integer part */
+    if ((USARTx->CR1 & CR1_OVER8_Set) != 0)
+    {
+        /* Integer part computing in case Oversampling mode is 8 Samples */
+        integerdivider = ((25 * apbclock) / (2 * baudrate));    
+    }
+    else /* if ((USARTx->CR1 & CR1_OVER8_Set) == 0) */
+    {
+        /* Integer part computing in case Oversampling mode is 16 Samples */
+        integerdivider = ((25 * apbclock) / (4 * baudrate));    
+    }
+    tmpreg = (integerdivider / 100) << 4;
+
+    /* Determine the fractional part */
+    fractionaldivider = integerdivider - (100 * (tmpreg >> 4));
+
+    /* Implement the fractional part in the register */
+    if ((USARTx->CR1 & CR1_OVER8_Set) != 0)
+    {
+        tmpreg |= ((((fractionaldivider * 8) + 50) / 100)) & ((uint8_t)0x07);
+    }
+    else /* if ((USARTx->CR1 & CR1_OVER8_Set) == 0) */
+    {
+        tmpreg |= ((((fractionaldivider * 16) + 50) / 100)) & ((uint8_t)0x0F);
+    }
+  
+    /* Write to USART BRR */
+    USARTx->BRR = (uint16_t)tmpreg;
 }
 
 /*!
+ \brief Transmits/Receives data byte via USART
+ \param USARTx - USART module
+ \param data_byte - data byte to transmit
+ \param timeout - timeout waiting for ready flag
+ \retval received data byte
  */
 uint8_t UsartTxRxByte(USART_TypeDef *USARTx, uint8_t data_byte, uint32_t timeout)
 {

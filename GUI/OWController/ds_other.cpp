@@ -2,8 +2,8 @@
 #include "ui_ds_other.h"
 #include "owdevice.h"
 
-DS_OTHER::DS_OTHER(CardView *parent)
-    : CardView(parent), ui(new Ui::DS_OTHER)
+DS_OTHER::DS_OTHER(DeviceWidget *parent)
+    : DeviceWidget(parent), ui(new Ui::DS_OTHER)
 {
     ui->setupUi(this);
 
@@ -82,7 +82,7 @@ void DS_OTHER::onSettingsButtonClicked()
     vdlgLayout->addWidget(descrLabel);
     settingsWindow->setLayout(vdlgLayout);
 
-    addressLabel->setText("Address: " + QString::number(myAddress, 16).toUpper());
+    addressLabel->setText(tr("Address: ") + QString::number(myAddress, 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     settingsWindow->show();

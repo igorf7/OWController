@@ -1,6 +1,8 @@
-/**
- * led.h
- */
+/*!
+ \file   led.h
+ \date   November-2024 (created)
+ \brief  LED driver header file
+*/
 #ifndef __LED_H
 #define __LED_H
 

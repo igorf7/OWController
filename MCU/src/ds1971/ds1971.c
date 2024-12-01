@@ -1,6 +1,14 @@
+/*!
+ \file   ds1971.c
+ \date   November-2024 (created)
+ \brief  DS1971/DS2430A device driver
+ */
 #include "ds1971.h"
 
 /*!
+ \brief Reads DS1971/DS2430A Scratchpad data
+ \param pointer to data buffer
+ \retval true if successful, otherwise false
  */
 bool DS1971_ReadScratchpad(uint8_t *data)
 {
@@ -16,6 +24,8 @@ bool DS1971_ReadScratchpad(uint8_t *data)
 }
 
 /*!
+ \brief Reads DS1971/DS2430A EEPROM data
+ \param pointer to data buffer
  */
 void DS1971_ReadEeprom(uint8_t *data)
 {
@@ -29,6 +39,8 @@ void DS1971_ReadEeprom(uint8_t *data)
 }
 
 /*!
+ \brief Writes DS1971/DS2430A Scratchpad data
+ \param data to write
  */
 void DS1971_WriteScratchpad(uint8_t *data)
 {
@@ -42,6 +54,7 @@ void DS1971_WriteScratchpad(uint8_t *data)
 }
 
 /*!
+ \brief Copies the scratchpad into the EEPROM
  */
 void DS1971_CopyScratchpad(void)
 {

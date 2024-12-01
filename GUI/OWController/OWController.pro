@@ -12,6 +12,7 @@ SOURCES += \
     cardview.cpp \
     clockview.cpp \
     customhid.cpp \
+    devicewidget.cpp \
     ds18b20.cpp \
     ds1971.cpp \
     ds_other.cpp \
@@ -23,6 +24,7 @@ HEADERS += \
     cardview.h \
     clockview.h \
     customhid.h \
+    devicewidget.h \
     ds18b20.h \
     ds1971.h \
     ds_other.h \

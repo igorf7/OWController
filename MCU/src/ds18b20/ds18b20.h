@@ -1,3 +1,8 @@
+/*!
+ \file   ds18b20.h
+ \date   November-2024 (created)
+ \brief  DS18B20 device driver header file
+ */
 #ifndef __DS18B20_H
 #define __DS18B20_H
 
@@ -37,15 +42,9 @@ typedef struct
     Config_t conf;
 } DS18B20_t;
 
-//typedef struct
-//{
-//    uint64_t address;
-//    Config_t conf;
-//} WriteData_t;
-
 /* API */
 void DS18B20_Convert(void);
-OW_Status_t DS18B20_ReadScratchpad(DS18B20_t *mem);
+bool DS18B20_ReadScratchpad(DS18B20_t *mem);
 void DS18B20_WriteScratchpad(uint8_t *data);
 void DS18B20_CopyScratchpad(void);
 #endif // __DS18B20_H

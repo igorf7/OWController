@@ -1,7 +1,7 @@
 #ifndef DS1971_H
 #define DS1971_H
 
-#include "cardview.h"
+#include "devicewidget.h"
 #include <QDialog>
 #include <QPlainTextEdit>
 
@@ -9,17 +9,17 @@ namespace Ui {
 class DS1971;
 }
 
-class DS1971 : public CardView
+class DS1971 : public DeviceWidget
 {
     Q_OBJECT
 
 public:
-    explicit DS1971(CardView *parent = nullptr);
+    explicit DS1971(DeviceWidget *parent = nullptr);
     ~DS1971();
 
-    void showDeviceData(quint8 *data, int index);
-    void setAddress(quint64 address);
-    void setIndex(int index);
+    void showDeviceData(quint8 *data, int index) override;
+    void setAddress(quint64 address) override;
+    void setIndex(int index) override;
 
 private slots:
     void onSettingsButtonClicked();

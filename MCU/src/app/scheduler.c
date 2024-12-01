@@ -1,9 +1,8 @@
 /*!
- \file      scheduler.c
- \author    Igor Filippov
- \brief     This scheduler is used to organize
-            cooperative multitasking without priorities.
- */
+ \file   scheduler.c
+ \date   December-2022 (created)
+ \brief  task scheduler module
+*/
 #include "scheduler.h"
 
 /* Task queue */

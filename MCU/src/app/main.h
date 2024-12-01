@@ -1,3 +1,8 @@
+/*!
+ \file   main.h
+ \date   November-2024 (created)
+ \brief  main application module header file
+*/
 #ifndef __MAIN_H
 #define __MAIN_H
 

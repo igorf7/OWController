@@ -1,3 +1,8 @@
+/*!
+ \file   ds1971.h
+ \date   November-2024 (created)
+ \brief  DS1971/DS2430A device driver header file
+ */
 #ifndef __DS1971_H
 #define __DS1971_H
 

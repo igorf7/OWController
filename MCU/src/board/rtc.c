@@ -1,4 +1,8 @@
-#include <stdio.h>
+/*!
+ \file   rtc.c
+ \date   November-2024 (created)
+ \brief  RTC driver
+ */
 #include "rtc.h"
 
 static RtcEvents_t *rtcEvents;
@@ -92,4 +96,4 @@ void RTC_IRQHandler(void)
         }
     }
 }
-//eof
+
