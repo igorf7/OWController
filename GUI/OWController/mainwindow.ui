@@ -18,10 +18,10 @@
     <item>
      <widget class="QFrame" name="frame">
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Plain</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -52,7 +52,7 @@
          <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -91,7 +91,7 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -116,7 +116,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>RTC</string>
+            <string>Show RTC</string>
            </property>
            <property name="text">
             <string/>
@@ -136,7 +136,7 @@
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -192,16 +192,16 @@
     <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Plain</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
