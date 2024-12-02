@@ -2,6 +2,7 @@
 Version 1.0.1
 ## Description
 The lower level of OWController is implemented on the STM32F103CB microcontroller (Blue Pill Plus board).
+The TXD line of USART1 or the TXD line of USART2 is used as a 1-Wire bus.
 The upper level of OWController is implemented as a PC program.
 The USB interface (USB Custom HID Device Class) is used for data exchange.
 ## Contents
