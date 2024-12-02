@@ -14,6 +14,7 @@ GUI/BIN — contains the executable file of the OWController application for Win
 ![DS18B20](https://github.com/user-attachments/assets/ed8bc947-ffed-4f19-a865-b1b02e74d2a5)
 
 DS18B20 - measuring and displaying temperature, reading and writing to the configuration register, displaying the device description.
+
 ![DS1971_memory](https://github.com/user-attachments/assets/cc3b78bf-cfa1-436e-89a5-44c903f55090)
 
 DS1971/DS2430A - reading, editing and writing to EEPROM memory, displaying the device description.
