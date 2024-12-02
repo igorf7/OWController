@@ -22,5 +22,5 @@ DS1971/DS2430A - reading, editing and writing to EEPROM memory, displaying the d
 All other devices can read and display ROM contents, display the device description.
 Support for any device can be easily added by analogy with the existing implementation.
 ## P.S.
-A 4.7 kOhm pull-up resistor is required between PA9 and VCC if USART1 is used as a 1-Wire bus.
-A 4.7 kOhm pull-up resistor is required between PA2 and VCC if USART2 is used as a 1-Wire bus.
+A 4.7k pull-up resistor is required between PA9 and VCC if USART1 is used as a 1-Wire bus.
+A 4.7k pull-up resistor is required between PA2 and VCC if USART2 is used as a 1-Wire bus.
