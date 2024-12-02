@@ -75,8 +75,8 @@ void DS18B20::showDeviceData(quint8 *data, int index)
     ui->deviceIndexLabel->setText(QString::number(myIndex));
     ui->temperValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
 
-    if (secCounter == 0) this->writeCsvFile();
-    if (++secCounter > 59) secCounter = 0;
+    if (cycleCounter == 0) this->writeCsvFile();
+    if (++cycleCounter > 59) cycleCounter = 0;
 }
 
 /**

@@ -44,7 +44,7 @@ private:
     qint8 devAlarmHigh = 0;
     qint8 devAlarmLow = 0;
     quint8 devResolution = 0;
-    quint8 secCounter = 0;
+    quint8 cycleCounter = 0;
 
     char column_sep = ';';
 
