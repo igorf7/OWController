@@ -153,7 +153,6 @@ void DeviceWriteTask(void *prm)
                    to provide energy for copying data from the scratchpad to EEPROM */
                 Wait_ticks(1500000);
             }
-            __nop();
     		break;
         
     	default:
