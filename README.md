@@ -9,10 +9,10 @@ The USB interface (USB Custom HID Device Class) is used for data exchange.
 A 4.7k pull-up resistor is required between PA9 and VCC if USART1 is used as a 1-Wire bus.
 A 4.7k pull-up resistor is required between PA2 and VCC if USART2 is used as a 1-Wire bus.
 ## Contents
-MCU — contains the project and source files for the STM32F103CB microcontroller. Keil v5 IDE was used.\n
-MCU/keil/Binary — contains the firmware file.\n
-GUI/OWController — contains the project and source files for building the OWController application. Qt Creator IDE and Qt 5.15.2 was used.\n
-GUI/BIN — contains the executable file of the OWController application for Windows OS.\n
+MCU — contains the project and source files for the STM32F103CB microcontroller. Keil v5 IDE was used.\
+MCU/keil/Binary — contains the firmware file.\
+GUI/OWController — contains the project and source files for building the OWController application. Qt Creator IDE and Qt 5.15.2 was used.\
+GUI/BIN — contains the executable file of the OWController application for Windows OS.\
 ## Supported devices
 ![DS18B20](https://github.com/user-attachments/assets/ed8bc947-ffed-4f19-a865-b1b02e74d2a5)
 
