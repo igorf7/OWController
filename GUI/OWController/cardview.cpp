@@ -25,6 +25,6 @@ void CardView::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setPen(QPen(color));
     painter.setBrush(QBrush(color));
-    painter.drawRoundedRect(QRect(1, 1, this->width()-3,
-                                  this->height()-3), 11, 11);
+    painter.drawRoundedRect(QRect(1, 1, this->width()-1,
+                            this->height()-1), 12, 12);
 }

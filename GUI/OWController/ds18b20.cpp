@@ -2,7 +2,10 @@
 #include "ui_ds18b20.h"
 #include "owdevice.h"
 #include <QValidator>
-#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QDateTime>
 
 DS18B20::DS18B20(DeviceWidget *parent) :
     DeviceWidget(parent), ui(new Ui::DS18B20)
@@ -35,8 +38,8 @@ void DS18B20::showDeviceData(quint8 *data, int index)
 
     pData += sizeof(myAddress);
 
-    deviceData = *((float*)pData);
-    pData += sizeof(deviceData);
+    temperValue = *((float*)pData);
+    pData += sizeof(temperValue);
 
     devAlarmHigh = *(pData + 0);
     devAlarmLow = *(pData + 1);
@@ -59,18 +62,21 @@ void DS18B20::showDeviceData(quint8 *data, int index)
         break;
     }
 
-    if (qIsNaN(deviceData)) {
+    if (qIsNaN(temperValue)) {
         ui->temperValueLabel->setText(tr("FAILURE"));
         return;
     }
-    else if (deviceData < 0.0f) {
+    else if (temperValue < 0.0f) {
         ui->temperValueLabel->setStyleSheet("color: blue");
     }
     else {
         ui->temperValueLabel->setStyleSheet("color: red");
     }
     ui->deviceIndexLabel->setText(QString::number(myIndex));
-    ui->temperValueLabel->setText(QString::number(deviceData, 'f', 1) + " °C");
+    ui->temperValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
+
+    if (secCounter == 0) this->writeCsvFile();
+    if (++secCounter > 59) secCounter = 0;
 }
 
 /**
@@ -254,4 +260,35 @@ void DS18B20::onCloseButtonClicked()
         settingsWindow->close();
         delete settingsWindow;
     }
+}
+
+/**
+ * @brief DS18B20::writeCsvFile
+ */
+void DS18B20::writeCsvFile()
+{
+    QString folderPath = QDir::currentPath() + "/DS18B20_CSV";
+    QDir folder = folderPath;
+    if (!folder.exists()) folder.mkdir(folderPath);
+
+    QString filename = (folderPath + "/sensor" + QString::number(myIndex) +
+                        "_" + QDate::currentDate().toString("yyyy-MM-dd").append(".csv"));
+
+    QFile file(filename);
+    QTextStream ts(&file);
+    ts.setDevice(&file);
+
+    if (!file.exists()) {
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            // Write header for new csv file
+            ts << "sep=" << column_sep << Qt::endl
+               << "Time" << column_sep << "t, C" << Qt::endl;
+            file.close();
+        }
+    }
+    // Write data to csv file
+    file.open(QIODevice::Append | QIODevice::Text);
+    ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
+       << QString::number(temperValue, 'f', 1) << Qt::endl;
+    file.close();
 }

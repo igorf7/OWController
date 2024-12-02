@@ -39,11 +39,16 @@ private:
     quint64 myAddress = 0;
     int myIndex = 0;
 
-    float deviceData = 0.0f;
+    float temperValue = 0.0f;
 
     qint8 devAlarmHigh = 0;
     qint8 devAlarmLow = 0;
     quint8 devResolution = 0;
+    quint8 secCounter = 0;
+
+    char column_sep = ';';
+
+    void writeCsvFile();
 };
 
 #endif // DS18B20_H
