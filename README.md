@@ -12,7 +12,7 @@ A 4.7k pull-up resistor is required between PA2 and VCC if USART2 is used as a 1
 MCU — contains the project and source files for the STM32F103CB microcontroller. Keil v5 IDE was used.\
 MCU/keil/Binary — contains the firmware file.\
 GUI/OWController — contains the project and source files for building the OWController application. Qt Creator IDE and Qt 5.15.2 was used.\
-GUI/BIN — contains the executable file of the OWController application for Windows OS.\
+GUI/BIN — contains the executable file of the OWController application for Windows OS.
 ## Supported devices
 ![DS18B20](https://github.com/user-attachments/assets/ed8bc947-ffed-4f19-a865-b1b02e74d2a5)
 
