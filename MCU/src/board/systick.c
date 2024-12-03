@@ -2,7 +2,6 @@
  \file   systick.c
  \date   October-2024 (created)
  \brief  SysTick driver implementation
- \author alcont application team
 */
 #include "systick.h"
 
