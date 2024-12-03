@@ -280,13 +280,13 @@ void DS18B20::writeCsvFile()
 
     if (!file.exists()) {
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            // Write header for new csv file
+            /* Write header for new csv file */
             ts << "sep=" << column_sep << Qt::endl
-               << "Time" << column_sep << "t, C" << Qt::endl;
+               << "Time" << column_sep << "t, " << QChar(176) << 'C' << Qt::endl;
             file.close();
         }
     }
-    // Write data to csv file
+    /* Write data to csv file */
     file.open(QIODevice::Append | QIODevice::Text);
     ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
        << QString::number(temperValue, 'f', 1) << Qt::endl;
