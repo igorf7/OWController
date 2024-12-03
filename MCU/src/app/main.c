@@ -45,7 +45,7 @@ int main(void)
     OW_InitBus(USART2);
     
     /* Initialize the RTC hardware */
-    rtcEvents.secondEvent = onSecondEvent;
+    rtcEvents.secondEvent = RTC_SecondEvent;
     rtc_init(&rtcEvents);
     rtc_set_irq(RTC_IT_SEC);
     
@@ -79,7 +79,7 @@ static void BackgroundTask(void)
         /* Send RTC value */
         USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
         StartSystickTimer(HEARTBEAT_PERIOD);
-        
+        /* Reload watchdog */
         #ifndef DEBUG
         WatchdogReload(KR_KEY_Reload);
         #endif
@@ -89,16 +89,17 @@ static void BackgroundTask(void)
 /*!
  \brief RTC second event callback function
 */
-void onSecondEvent(void)
+void RTC_SecondEvent(void)
 {
     /* Start periodic polling of the 1-Wire bus */
     if (isOnewireReadEnabled) {
+        // Schedule a task to read from 1-wire devices
         PutTask(DeviceReadTask, &devType);
     }
 }
 
 /*!
- \brief SysTick Callback Routine
+ \brief SysTick callback function
 */
 void SysTick_Callback(void)
 {
@@ -106,7 +107,7 @@ void SysTick_Callback(void)
 }
 
 /*!
- \brief Processing received USB packets
+ \brief USB receive callback function
 */
 void USB_HandleRxData(void)
 {
@@ -125,7 +126,7 @@ void USB_HandleRxData(void)
                 isOnewireReadEnabled = true;
         		break;
             case eWriteCmd:
-                //isOnewireReadEnabled = false;
+                // Schedule a task to write at 1-wire devices
                 PutTask(DeviceWriteTask, rx_packet->data);
         		break;
             case eSyncRtcCmd:

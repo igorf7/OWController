@@ -12,7 +12,7 @@
 #include "rtc.h"
 #include "usart.h"
 
-#define HEARTBEAT_PERIOD    100U
+#define HEARTBEAT_PERIOD    100U // 100 ms
 
 #define IWDG_WA_Enable      ((uint16_t)0x5555)
 #define IWDG_WA_Disable     ((uint16_t)0x0000)
@@ -32,8 +32,8 @@ __STATIC_INLINE void InitWatchdog(void)
 /* Private functions prototypes */
 static void BackgroundTask(void);
 
-/*  */
-void onSecondEvent(void);
+/* Callbacks */
+void RTC_SecondEvent(void);
 void USB_HandleRxData(void);
 void SysTick_Callback(void);
 #endif  // __MAIN_H
