@@ -418,6 +418,11 @@
               <FilePath>..\src\board\stm32_it.c</FilePath>
             </File>
             <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\systick.c</FilePath>
+            </File>
+            <File>
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\usart.c</FilePath>
@@ -927,6 +932,11 @@
               <FileName>stm32_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\stm32_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\systick.c</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>

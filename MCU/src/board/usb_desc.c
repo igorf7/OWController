@@ -114,7 +114,7 @@ const uint8_t RHID_ConfigDescriptor[RHID_SIZ_CONFIG_DESC] =
         0x81,          // bEndpointAddress: адрес конечной точки и направление 1(IN)
         0x03,          // bmAttributes: тип конечной точки - Interrupt endpoint
         wMaxPacketSize, 0x00,    // wMaxPacketSize:  Bytes max
-        0x0A,//0x20,          // bInterval: Polling Interval (32 ms)
+        0x20,          // bInterval: Polling Interval (32 ms)
 
         0x07,	/* bLength: Endpoint Descriptor size */
         USB_ENDPOINT_DESCRIPTOR_TYPE,	/* bDescriptorType: */
@@ -124,7 +124,7 @@ const uint8_t RHID_ConfigDescriptor[RHID_SIZ_CONFIG_DESC] =
         0x03,	/* bmAttributes: Interrupt endpoint */
         wMaxPacketSize,	/* wMaxPacketSize:  Bytes max  */
         0x00,
-        0x0A,//0x20,	/* bInterval: Polling Interval (32 ms) */
+        0x20,	/* bInterval: Polling Interval (32 ms) */
 }; /* RHID_ConfigDescriptor */
 
 const uint8_t RHID_ReportDescriptor[RHID_SIZ_REPORT_DESC] =

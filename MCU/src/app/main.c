@@ -5,6 +5,7 @@
 */
 #include "main.h"
 #include "scheduler.h"
+#include "systick.h"
 #include "devicetask.h"
 
 static HidProp_t hidProp;
@@ -12,6 +13,7 @@ static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcCounter;
 static bool isOnewireReadEnabled = false;
+static bool isHeartbeat = false;
 static uint8_t devType = DS1971;
 static uint8_t usbRxBuffer[wMaxPacketSize];
 
@@ -47,12 +49,14 @@ int main(void)
     rtc_init(&rtcEvents);
     rtc_set_irq(RTC_IT_SEC);
     
+    /* Initializing the SysTick Timer */
+    InitSystickTimer(SysTick_Callback);
+    StartSystickTimer(HEARTBEAT_PERIOD);
+    
     /* Enable Watchdog */
     #ifndef DEBUG
     InitWatchdog();
     #endif
-    
-    
 
     __enable_irq();
     
@@ -71,6 +75,15 @@ static void BackgroundTask(void)
     #ifndef DEBUG
     WatchdogReload(KR_KEY_Reload);
     #endif
+    
+    if (isHeartbeat) {
+        isHeartbeat = false;
+        StopSystickTimer();
+        rtcCounter = RTC_GetCounter();
+        /* Send RTC value */
+        USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
+        StartSystickTimer(HEARTBEAT_PERIOD);
+    }
 }
 
 /*!
@@ -78,15 +91,18 @@ static void BackgroundTask(void)
 */
 void onSecondEvent(void)
 {
-    rtcCounter = RTC_GetCounter();
-    
-    /* Send RTC value */
-    USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
-    
     /* Start periodic polling of the 1-Wire bus */
     if (isOnewireReadEnabled) {
         PutTask(DeviceReadTask, &devType);
     }
+}
+
+/*!
+ \brief SysTick Callback Routine
+*/
+void SysTick_Callback(void)
+{
+    isHeartbeat = true;
 }
 
 /*!

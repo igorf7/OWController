@@ -146,7 +146,7 @@ void MainWindow::startUsbPolling()
 
     if (!isPollingRunning) {
         isPollingRunning = true;
-        pollingEvent = startTimer(50);
+        pollingEvent = startTimer(10);
     }
 }
 
