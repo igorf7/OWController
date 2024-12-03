@@ -1,7 +1,7 @@
 /*!
  \file   systick.c
  \date   October-2024 (created)
- \brief  SysTick driver implementation
+ \brief  SysTick driver
 */
 #include "systick.h"
 
