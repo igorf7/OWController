@@ -2,7 +2,6 @@
  \file   systick.h
  \date   October-2024 (created)
  \brief  SysTick driver interface
- \author alcont application team
 */
 #ifndef SYSTICK_H
 #define SYSTICK_H
