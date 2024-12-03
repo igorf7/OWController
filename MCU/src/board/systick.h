@@ -1,6 +1,6 @@
 /*!
  \file   systick.h
- \date   October-2024 (created)
+ \date   November-2024 (created)
  \brief  SysTick driver header file
 */
 #ifndef SYSTICK_H
