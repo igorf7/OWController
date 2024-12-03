@@ -72,10 +72,6 @@ int main(void)
 */
 static void BackgroundTask(void)
 {
-    #ifndef DEBUG
-    WatchdogReload(KR_KEY_Reload);
-    #endif
-    
     if (isHeartbeat) {
         isHeartbeat = false;
         StopSystickTimer();
@@ -83,6 +79,10 @@ static void BackgroundTask(void)
         /* Send RTC value */
         USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
         StartSystickTimer(HEARTBEAT_PERIOD);
+        
+        #ifndef DEBUG
+        WatchdogReload(KR_KEY_Reload);
+        #endif
     }
 }
 

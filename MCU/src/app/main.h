@@ -12,7 +12,7 @@
 #include "rtc.h"
 #include "usart.h"
 
-#define HEARTBEAT_PERIOD    25U
+#define HEARTBEAT_PERIOD    100U
 
 #define IWDG_WA_Enable      ((uint16_t)0x5555)
 #define IWDG_WA_Disable     ((uint16_t)0x0000)
