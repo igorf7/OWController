@@ -9,12 +9,15 @@
 #include "ds1971.h"
 #include "string.h"
 
-#define DEVICE_GANG_SIZE    32 // Maximum number of devices on a 1-wire bus
+#define DEVICE_GANG_SIZE    16 // Maximum number of devices on a 1-wire bus
+
+//extern volatile bool isPollingEnabled;
 
 static OW_Device_t owDevice[DEVICE_GANG_SIZE];
 static DS18B20_t ds18B20;
-static uint8_t dataBuffer[64];
 static uint8_t deviceCount = 0;
+static uint8_t deviceIndex = 0;
+static uint8_t dataBuffer[64];
 
 /*!
  \brief Search for devices on the 1-Wire bus
@@ -66,50 +69,57 @@ void DeviceEnumerate(void *prm)
 }
 
 /*!
+ \brief
+ \retval
+*/
+uint8_t DeviceGetCount(void)
+{
+    deviceIndex = 0;
+    return deviceCount;
+}
+
+/*!
  \brief Read devices memory
  \param optional parameter (here is the device family code)
 */
 void DeviceReadTask(void *prm)
 {
-    uint8_t dev_family = *((uint8_t*)prm);
+    uint16_t data_size = 0;
+    uint8_t my_dev_family = 0;
+    uint8_t sel_dev_family = *((uint8_t*)prm);
         
-    for (uint8_t i = 0; i < deviceCount; i++)
+    if ((owDevice[deviceIndex].address != 0) && (deviceIndex < deviceCount))
     {
-        if (owDevice[i].address == 0) break; // no more devices, leave cycle
-        
-        if (owDevice[i].connected && ((owDevice[i].address & FAMILY_CODE_MASK) == dev_family))
+        my_dev_family = owDevice[deviceIndex].address & FAMILY_CODE_MASK;
+        if (owDevice[deviceIndex].connected && (my_dev_family == sel_dev_family))
         {
             OW_Reset();
-            OW_MatchRom(((uint8_t*)&owDevice[i].address));
+            OW_MatchRom(((uint8_t*)&owDevice[deviceIndex].address));
             
-            switch (dev_family)
+            switch (sel_dev_family)
             {
-                case DS1971:
-                    memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
-                    DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + DS1971_EEPROM_SIZE, dataBuffer);
-                    break;
-                
-                case DS18B20:
-                    DS18B20_ReadScratchpad(&ds18B20);
-                    memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
-                    memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE + sizeof(ds18B20), dataBuffer);
-                    /// ShowTemperature(ds18B20.value, dev_index); // for example, output to LCD display
-                    break;
-                
-                default:    // for all other devices show only the address
-                    memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
-                    USB_SendToHost(eReadCmd, OW_ROM_SIZE, dataBuffer);
-                    continue;
+            case DS1971:
+                memcpy(dataBuffer, (uint8_t*)&owDevice[deviceIndex].address, OW_ROM_SIZE);
+                DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
+                data_size = OW_ROM_SIZE + DS1971_EEPROM_SIZE;
+                break;
+            case DS18B20:
+                DS18B20_ReadScratchpad(&ds18B20);
+                memcpy(dataBuffer, (uint8_t*)&owDevice[deviceIndex].address, OW_ROM_SIZE);
+                memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
+                data_size = OW_ROM_SIZE + sizeof(ds18B20);
+                OW_Reset();
+                OW_MatchRom(((uint8_t*)&owDevice[deviceIndex].address));
+                DS18B20_Convert();  // start new conversion
+                break;
+            default:
+                memcpy(dataBuffer, (uint8_t*)&owDevice[deviceIndex].address, OW_ROM_SIZE);
+                data_size = OW_ROM_SIZE;
+                break;
             }
+            USB_SendToHost(eReadCmd, data_size, dataBuffer);
         }
-    }
-    if (dev_family == DS18B20)
-    {
-        OW_Reset();
-        OW_SkipRom();
-        DS18B20_Convert();  // start new conversion for all thermometers
+        deviceIndex++;
     }
 }
 

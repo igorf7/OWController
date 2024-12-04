@@ -49,7 +49,7 @@ private:
 
     CustomHid *hidDevice = nullptr;
 
-    ClockView *clockWidget;
+    ClockView *clockWidget = nullptr;
     QVBoxLayout *deviceViewLayout = nullptr;
     QList<DeviceWidget*> deviceWidget;
     QList<quint64> allDeviceAddressList;

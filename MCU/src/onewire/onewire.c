@@ -30,7 +30,7 @@ void OW_InitBus(USART_TypeDef *USARTx)
 uint8_t OW_SendReceiveBit(uint8_t bit)
 {
     uint8_t txData = (bit == 0) ? 0x00 : 0xFF;
-    return (UsartTxRxByte(OneWireBus, txData, 1500000) == 0xFF) ? 1 : 0;
+    return (UsartTxRxByte(OneWireBus, txData) == 0xFF) ? 1 : 0;
 }
 
 /*!
@@ -67,7 +67,7 @@ OW_Status_t OW_Reset(void)
 
     UsartSetBaudrate(OneWireBus, 9600);
     
-    rxByte = UsartTxRxByte(OneWireBus, txByte, 1500000);
+    rxByte = UsartTxRxByte(OneWireBus, txByte);
 
     UsartSetBaudrate(OneWireBus, 115200);
 

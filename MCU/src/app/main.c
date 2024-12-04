@@ -11,10 +11,14 @@
 static HidProp_t hidProp;
 static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
-static uint32_t rtcCounter;
+static uint32_t rtcValue;
+static uint32_t systickIntervalCnt = 0;
 static bool isOnewireReadEnabled = false;
-static bool isHeartbeat = false;
+static bool isRtcSendEnabled = false;
+volatile bool isPollingEnabled = false;
 static uint8_t devType = DS1971;
+static uint8_t totalDevCount = 0;
+static uint8_t currDevIndex = 0;
 static uint8_t usbRxBuffer[wMaxPacketSize];
 
 /*!
@@ -51,7 +55,7 @@ int main(void)
     
     /* Initializing the SysTick Timer */
     InitSystickTimer(SysTick_Callback);
-    StartSystickTimer(HEARTBEAT_PERIOD);
+    StartSystickTimer(SYSTICK_INTERVAL);
     
     /* Enable Watchdog */
     #ifndef DEBUG
@@ -72,17 +76,16 @@ int main(void)
 */
 static void BackgroundTask(void)
 {
-    if (isHeartbeat) {
-        isHeartbeat = false;
-        StopSystickTimer();
-        rtcCounter = RTC_GetCounter();
+    /* Reload watchdog */
+    #ifndef DEBUG
+    WatchdogReload(KR_KEY_Reload);
+    #endif
+    
+    if (isRtcSendEnabled) {
+        isRtcSendEnabled = false;
+        rtcValue = RTC_GetCounter();
         /* Send RTC value */
-        USB_SendToHost(eGetRtcCmd, sizeof(rtcCounter), (uint8_t*)&rtcCounter);
-        StartSystickTimer(HEARTBEAT_PERIOD);
-        /* Reload watchdog */
-        #ifndef DEBUG
-        WatchdogReload(KR_KEY_Reload);
-        #endif
+        USB_SendToHost(eGetRtcCmd, sizeof(rtcValue), (uint8_t*)&rtcValue);
     }
 }
 
@@ -91,10 +94,14 @@ static void BackgroundTask(void)
 */
 void RTC_SecondEvent(void)
 {
-    /* Start periodic polling of the 1-Wire bus */
+    systickIntervalCnt = 0;
+    
+    totalDevCount = DeviceGetCount();
+    
+    /* Enable 1-Wire bus polling */
     if (isOnewireReadEnabled) {
-        // Schedule a task to read from 1-wire devices
-        PutTask(DeviceReadTask, &devType);
+        isPollingEnabled = true;
+        currDevIndex = 0;
     }
 }
 
@@ -103,7 +110,20 @@ void RTC_SecondEvent(void)
 */
 void SysTick_Callback(void)
 {
-    isHeartbeat = true;
+    if (systickIntervalCnt % 2) {
+        isRtcSendEnabled = true;
+    }
+    else {
+        isRtcSendEnabled = false;
+        if (isPollingEnabled) {
+            PutTask(DeviceReadTask, &devType); // Schedule a task to read from 1-wire devices
+            currDevIndex++;
+            if (currDevIndex >= totalDevCount) {
+                isPollingEnabled = false;
+            }
+        }
+    }
+    systickIntervalCnt++;
 }
 
 /*!
@@ -118,21 +138,19 @@ void USB_HandleRxData(void)
         switch (rx_packet->opcode)      // Check command code
         {
         	case eSearchCmd:
-                // Schedule a task to search a 1-wire devices
-                PutTask(DeviceSearchTask, NULL);
+                PutTask(DeviceSearchTask, NULL); // Schedule a task to search a 1-wire devices
         		break;
             case eReadCmd:
                 devType = rx_packet->data[0];
                 isOnewireReadEnabled = true;
         		break;
             case eWriteCmd:
-                // Schedule a task to write at 1-wire devices
-                PutTask(DeviceWriteTask, rx_packet->data);
+                PutTask(DeviceWriteTask, rx_packet->data); // Schedule a task to write at 1-wire devices
         		break;
             case eSyncRtcCmd:
                 disableRtcInterrupt(RTC_IT_SEC);
-                rtcCounter = *((uint32_t*)rx_packet->data);
-                presetDateTime(rtcCounter);
+                rtcValue = *((uint32_t*)rx_packet->data);
+                presetDateTime(rtcValue);
                 enableRtcInterrupt(RTC_IT_SEC);
                 break;
         	default:

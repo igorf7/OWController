@@ -12,7 +12,7 @@
 #include "rtc.h"
 #include "usart.h"
 
-#define HEARTBEAT_PERIOD    100U // 100 ms
+#define SYSTICK_INTERVAL    50U // half period
 
 #define IWDG_WA_Enable      ((uint16_t)0x5555)
 #define IWDG_WA_Disable     ((uint16_t)0x0000)

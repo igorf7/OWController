@@ -14,5 +14,5 @@
 /* API */
 void InitUsart(USART_TypeDef *USARTx);
 void UsartSetBaudrate(USART_TypeDef *USARTx, uint32_t baudrate);
-uint8_t UsartTxRxByte(USART_TypeDef *USARTx, uint8_t data_byte, uint32_t timeout);
+uint8_t UsartTxRxByte(USART_TypeDef *USARTx, uint8_t data_byte);
 #endif  // __USART_H

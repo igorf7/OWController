@@ -322,9 +322,10 @@ void MainWindow::handleReceivedPacket()
         case eGetRtcCmd:
             if (isShowClockEnabled) {
                 timeStamp = *((quint32*)rx_packet->data);
-
-                if (qAbs(QDateTime::currentSecsSinceEpoch() - timeStamp) > 1) {
-                    timeStamp = QDateTime::currentSecsSinceEpoch() + 1;
+                quint64 unixtime = QDateTime::currentSecsSinceEpoch();
+                qint64 dif = (qint64)(unixtime - timeStamp);
+                if (qAbs(dif) > 2) {
+                    timeStamp = unixtime + 1;
                     this->onSendCommand(eSyncRtcCmd, (quint8*)&timeStamp, sizeof(timeStamp));
                 }
                 else {

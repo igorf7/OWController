@@ -19,4 +19,5 @@ void DeviceSearchTask(void *prm);
 void DeviceEnumerate(void *prm);
 void DeviceReadTask(void *prm);
 void DeviceWriteTask(void *prm);
+uint8_t DeviceGetCount(void);
 #endif // __DEVIETASK_H
