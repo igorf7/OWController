@@ -26,5 +26,5 @@ void CardView::paintEvent(QPaintEvent*)
     painter.setPen(QPen(color));
     painter.setBrush(QBrush(color));
     painter.drawRoundedRect(QRect(1, 1, this->width()-2,
-                            this->height()-2), 12, 12);
+                            this->height()-2), 11, 11);
 }
