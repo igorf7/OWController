@@ -31,7 +31,7 @@ typedef struct
     quint8 rep_id;
     quint8 opcode;
     quint8 size;
-    quint8 data[1];
+    quint8 data[60];
 } TAppLayerPacket;
 
 typedef QMap<QString, quint8> TDeviceMap;

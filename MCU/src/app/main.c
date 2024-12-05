@@ -13,10 +13,9 @@ static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcValue;
 static uint32_t systickIntervalCnt = 0;
-static bool isOnewireReadEnabled = false;
 static bool isRtcSendEnabled = false;
 volatile bool isPollingEnabled = false;
-static uint8_t devType = DS1971;
+static uint8_t devType = DS18B20;
 static uint8_t totalDevCount = 0;
 static uint8_t currDevIndex = 0;
 static uint8_t usbRxBuffer[wMaxPacketSize];
@@ -57,6 +56,9 @@ int main(void)
     InitSystickTimer(SysTick_Callback);
     StartSystickTimer(SYSTICK_INTERVAL);
     
+    /* Search devices task */
+    PutTask(DeviceSearchTask, NULL);
+    
     /* Enable Watchdog */
     #ifndef DEBUG
     InitWatchdog();
@@ -81,32 +83,28 @@ static void BackgroundTask(void)
     WatchdogReload(KR_KEY_Reload);
     #endif
     
+    /* Send RTC value */
     if (isRtcSendEnabled) {
         isRtcSendEnabled = false;
         rtcValue = RTC_GetCounter();
-        /* Send RTC value */
         USB_SendToHost(eGetRtcCmd, sizeof(rtcValue), (uint8_t*)&rtcValue);
     }
 }
 
 /*!
- \brief RTC second event callback function
+ \brief RTC Second Event callback function
 */
 void RTC_SecondEvent(void)
 {
     systickIntervalCnt = 0;
-    
     totalDevCount = DeviceGetCount();
-    
     /* Enable 1-Wire bus polling */
-    if (isOnewireReadEnabled) {
-        isPollingEnabled = true;
-        currDevIndex = 0;
-    }
+    isPollingEnabled = true;
+    currDevIndex = 0;
 }
 
 /*!
- \brief SysTick callback function
+ \brief SysTick Event callback function
 */
 void SysTick_Callback(void)
 {
@@ -142,9 +140,10 @@ void USB_HandleRxData(void)
         		break;
             case eReadCmd:
                 devType = rx_packet->data[0];
-                isOnewireReadEnabled = true;
         		break;
             case eWriteCmd:
+                isPollingEnabled = false;
+                isRtcSendEnabled = false;
                 PutTask(DeviceWriteTask, rx_packet->data); // Schedule a task to write at 1-wire devices
         		break;
             case eSyncRtcCmd:

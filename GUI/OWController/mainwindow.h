@@ -28,7 +28,8 @@ public:
     ~MainWindow();
 
 protected:
-    qint32 pollingEvent = 0;
+    qint32 pollingPeriod = 0;
+    qint32 secCounterEvent = 0;
     void timerEvent(QTimerEvent *event);
 
 public slots:
@@ -56,10 +57,15 @@ private:
     QHash<quint64, int> selDevices;
 
     quint32 timeStamp;
+    quint32 secCounter = 0;
 
     bool isConnected = false;
     bool isPollingRunning = false;
     bool isShowClockEnabled = false;
+
+    quint8 writedDevice = 0;
+
+    char column_sep = ';';
 
     unsigned char rxUsbBuffer[USB_BUFF_SIZE];
     unsigned char txUsbBuffer[USB_BUFF_SIZE];
@@ -70,5 +76,7 @@ private:
     void createWidgetsLayout(int count);
     void handleReceivedPacket();
     void initDeviceComboBox();
+    void deleteDeviceLayout();
+    void writeCsvFile(float value, int index);
 };
 #endif // MAINWINDOW_H

@@ -11,8 +11,6 @@
 
 #define DEVICE_GANG_SIZE    16 // Maximum number of devices on a 1-wire bus
 
-//extern volatile bool isPollingEnabled;
-
 static OW_Device_t owDevice[DEVICE_GANG_SIZE];
 static DS18B20_t ds18B20;
 static uint8_t deviceCount = 0;
@@ -52,7 +50,7 @@ void DeviceSearchTask(void *prm)
 }
 
 /*!
- \brief Enumerates all found devices
+ \brief Enumerates all found devices on the 1-Wire bus
  \param optional parameter
 */
 void DeviceEnumerate(void *prm)
@@ -69,8 +67,8 @@ void DeviceEnumerate(void *prm)
 }
 
 /*!
- \brief
- \retval
+ \brief Returns the number of devices found on the 1-Wire bus
+ \retval number of devices
 */
 uint8_t DeviceGetCount(void)
 {
@@ -87,7 +85,7 @@ void DeviceReadTask(void *prm)
     uint16_t data_size = 0;
     uint8_t my_dev_family = 0;
     uint8_t sel_dev_family = *((uint8_t*)prm);
-        
+    
     if ((owDevice[deviceIndex].address != 0) && (deviceIndex < deviceCount))
     {
         my_dev_family = owDevice[deviceIndex].address & FAMILY_CODE_MASK;

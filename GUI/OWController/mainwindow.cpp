@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDir>
+#include <QFile>
+#include <QDateTime>
 #include <QDebug>
 
 using namespace std;
@@ -146,7 +149,8 @@ void MainWindow::startUsbPolling()
 
     if (!isPollingRunning) {
         isPollingRunning = true;
-        pollingEvent = startTimer(10);
+        pollingPeriod = startTimer(10);
+        secCounterEvent = startTimer(1000);
     }
 }
 
@@ -155,8 +159,8 @@ void MainWindow::startUsbPolling()
  */
 void MainWindow::stopUsbPolling()
 {
-    killTimer(pollingEvent);
-    pollingEvent = 0;
+    killTimer(pollingPeriod);
+    pollingPeriod = 0;
     isPollingRunning = false;
 }
 
@@ -166,7 +170,7 @@ void MainWindow::stopUsbPolling()
  */
 void MainWindow::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == pollingEvent) {
+    if (event->timerId() == pollingPeriod) {
         int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
         if (len < 0) { // Lost connection
             if (isConnected) this->onConnectButtonClicked();
@@ -174,6 +178,12 @@ void MainWindow::timerEvent(QTimerEvent *event)
         }
         else if (len != 0) {
             handleReceivedPacket();
+        }
+    }
+    if (event->timerId() == secCounterEvent) {
+        if (++secCounter > 59) {
+            secCounter = 0;
+            writedDevice = 0;
         }
     }
 }
@@ -235,14 +245,7 @@ void MainWindow::createWidgetsLayout(int count)
     deviceWidget.clear();
 
     /* Delete previous layout if exist */
-    if (deviceViewLayout != nullptr) {
-        while (QLayoutItem* item = deviceViewLayout->takeAt(0)) {
-            delete item->widget();
-            delete item;
-        }
-        delete deviceViewLayout;
-        deviceViewLayout = nullptr;
-    }
+    this->deleteDeviceLayout();
 
     /* Create new layout */
     deviceViewLayout = new QVBoxLayout;
@@ -277,6 +280,7 @@ void MainWindow::createWidgetsLayout(int count)
             deviceWidget.at(i)->setIndex(index + 1);
             connect(deviceWidget.at(i), &DeviceWidget::sendCommand,
                                   this, &MainWindow::onSendCommand);
+
             deviceViewLayout->addWidget(deviceWidget.at(i));
         }
     }
@@ -298,9 +302,11 @@ void MainWindow::handleReceivedPacket()
         {
         case eSearchCmd:
             break;
+
         case eEnumerate:
             allDeviceAddressList.append(dev_addr);
             break;
+
         case eEnumerateDone:
             this->initDeviceComboBox();
             if ((allDeviceAddressList.size() == 0) && (!isShowClockEnabled)) {
@@ -311,14 +317,22 @@ void MainWindow::handleReceivedPacket()
                                             QString::number(allDeviceAddressList.size()), 5000);
             }
             break;
+
         case eReadCmd:
             if (!isShowClockEnabled && !deviceWidget.isEmpty()) {
                 int index = selDevices.value(dev_addr);
                 deviceWidget.at(index)->showDeviceData(rx_packet->data, index + 1);
             }
+            if (ui->deviceComboBox->currentText() == "DS18B20") {
+                int index = selDevices.value(dev_addr);
+                float value = *((float*)(rx_packet->data + sizeof(dev_addr)));
+                this->writeCsvFile(value, index+1);
+            }
             break;
+
         case eWriteCmd:
             break;
+
         case eGetRtcCmd:
             if (isShowClockEnabled) {
                 timeStamp = *((quint32*)rx_packet->data);
@@ -333,10 +347,59 @@ void MainWindow::handleReceivedPacket()
                 }
             }
             break;
+
         default:
-            // wrong command
             break;
         }
+    }
+}
+
+/**
+ * @brief MainWindow::writeCsvFile
+ */
+void MainWindow::writeCsvFile(float value, int index)
+{
+    if (writedDevice < selDevices.size()) {
+        QString folderPath = QDir::currentPath() + "/DS18B20_CSV";
+        QDir folder = folderPath;
+        if (!folder.exists()) folder.mkdir(folderPath);
+
+        QString filename = (folderPath + "/sensor" + QString::number(index) +
+                            QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));
+
+        QFile file(filename);
+        QTextStream ts(&file);
+
+        if (!file.exists()) {
+            /* Write header for new csv file */
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                ts << "sep=" << column_sep << Qt::endl
+                   << "Time" << column_sep << "t, " << QChar(176) << 'C' << Qt::endl;
+                file.close();
+            }
+        }
+
+        /* Write data to csv file */
+        file.open(QIODevice::Append | QIODevice::Text);
+        ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
+           << QString::number(value, 'f', 1) << Qt::endl;
+        file.close();
+        writedDevice++;
+    }
+}
+
+/**
+ * @brief MainWindow::deleteDeviceLayout
+ */
+void MainWindow::deleteDeviceLayout()
+{
+    if (deviceViewLayout != nullptr) {
+        while (QLayoutItem* item = deviceViewLayout->takeAt(0)) {
+            delete item->widget();
+            delete item;
+        }
+        delete deviceViewLayout;
+        deviceViewLayout = nullptr;
     }
 }
 
@@ -345,12 +408,7 @@ void MainWindow::handleReceivedPacket()
  */
 void MainWindow::deinitWidgets()
 {
-    if (clockWidget != nullptr) {
-        clockWidget->close();
-    }
-    for (auto &it : deviceWidget) {
-        if (it != nullptr) it->close();
-    }
+    this->deleteDeviceLayout();
     ui->deviceCountLabel->setText("0");
     ui->deviceComboBox->clear();
     ui->deviceComboBox->setCurrentIndex(-1);
