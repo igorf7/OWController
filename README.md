@@ -6,9 +6,6 @@ The lower level of OWController is implemented on the STM32F103CB microcontrolle
 The TXD line of USART1 or the TXD line of USART2 is used as a 1-Wire bus.\
 The upper level of OWController is implemented as a PC program.\
 The USB interface (USB Custom HID Device Class) is used for data exchange.
-## P.S.
-A 4.7k pull-up resistor is required between PA9 and VCC if USART1 is used as a 1-Wire bus.\
-A 4.7k pull-up resistor is required between PA2 and VCC if USART2 is used as a 1-Wire bus.
 ## Contents
 MCU — contains the project and source files for the STM32F103CB microcontroller. Keil v5 IDE was used.\
 MCU/keil/Binary — contains the firmware file.\
@@ -28,3 +25,6 @@ Support for any device can be easily added by analogy with the existing implemen
 ## Additional features
 Recording temperature measurements from DS18B20 sensors to a CSV file. The file recording period is set in the program settings.\
 Read and display date/time received from MCU RTC. Synchronization with the PC system time occurs automatically at startup.
+## P.S.
+A 4.7k pull-up resistor is required between PA9 and VCC if USART1 is used as a 1-Wire bus.\
+A 4.7k pull-up resistor is required between PA2 and VCC if USART2 is used as a 1-Wire bus.
