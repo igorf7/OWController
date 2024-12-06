@@ -76,11 +76,15 @@ void DS_OTHER::onSettingsButtonClicked()
     QVBoxLayout *vdlgLayout = new QVBoxLayout;
     QLabel *addressLabel = new QLabel;
     QLabel *descrLabel = new QLabel;
+    QPushButton *closeButton = new QPushButton(tr("Close"));
     descrLabel->setStyleSheet("color: green");
 
     vdlgLayout->addWidget(addressLabel);
     vdlgLayout->addWidget(descrLabel);
+    vdlgLayout->addWidget(closeButton);
     settingsWindow->setLayout(vdlgLayout);
+
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
 
     addressLabel->setText(tr("Address: ") + QString::number(myAddress, 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));

@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QFile>
 #include <QDateTime>
+#include <QTextStream>
 #include <QDebug>
 
 using namespace std;
@@ -29,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(onClockButtonClicked()));
     connect(ui->deviceComboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onDeviceComboBoxChanged(int)));
+    connect(ui->settingsPushButton, SIGNAL(clicked()),
+            this, SLOT(onSettingsButtonClicked()));
 
     /* Activate status bar */
     QFont font;
@@ -117,6 +120,85 @@ void MainWindow::onClockButtonClicked()
 }
 
 /**
+ * @brief MainWindow::onSettingsButtonClicked
+ */
+void MainWindow::onSettingsButtonClicked()
+{
+    settingsWindow = new QDialog(this);
+
+    settingsWindow->setWindowFlags((settingsWindow->windowFlags())
+                                   & (~Qt::WindowContextHelpButtonHint));
+
+    QPixmap pm = QPixmap(1, 1);
+    pm.fill(QColor(0, 0, 0, 0));
+    settingsWindow->setWindowIcon(QIcon(pm));
+
+    settingsWindow->resize(this->window()->width(), 200);
+    settingsWindow->setModal(true);
+
+    settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
+
+    QVBoxLayout *vdlgLayout = new QVBoxLayout;
+    QCheckBox *writeFileCheckbox = new QCheckBox(tr("Write CSV file"));
+    writeFileCheckbox->setChecked(true);
+    QSpinBox *writeFilePeriodSpinbox = new QSpinBox;
+    writeFilePeriodSpinbox->setRange(1, 300);
+    writeFilePeriodSpinbox->setSingleStep(1);
+    writeFilePeriodSpinbox->setValue(writeFilePeriod);
+    writeFilePeriodSpinbox->setSuffix(tr(" sec"));
+    QLabel *writePeriodLabel = new QLabel(tr("Write Period"));
+    QPushButton *closeButton = new QPushButton(tr("Close"));
+    QHBoxLayout *hLayout = new QHBoxLayout;
+
+    hLayout->addWidget(writeFileCheckbox);
+    hLayout->addStretch();
+    hLayout->addWidget(writePeriodLabel);
+    hLayout->addWidget(writeFilePeriodSpinbox);
+
+    vdlgLayout->addLayout(hLayout);
+    vdlgLayout->addWidget(closeButton);
+    settingsWindow->setLayout(vdlgLayout);
+
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseSettingsClicked()));
+    connect(writeFileCheckbox, SIGNAL(toggled(bool)), this, SLOT(onWriteFileCheckboxToggled(bool)));
+    connect(writeFilePeriodSpinbox, SIGNAL(valueChanged(int)), this, SLOT(onWriteFilePeriodChanged(int)));
+
+    settingsWindow->show();
+}
+
+/**
+ * @brief MainWindow::onWriteFileCheckboxToggled
+ * @param checked
+ */
+void MainWindow::onWriteFileCheckboxToggled(bool checked)
+{
+    isWriteFileEnabled = checked;
+}
+
+/**
+ * @brief MainWindow::onWriteFilePeriodChanged
+ * @param value
+ */
+void MainWindow::onWriteFilePeriodChanged(int value)
+{
+    if (value < writeFilePeriod) {
+        secCounter = 0;
+    }
+    writeFilePeriod = value;
+}
+
+/**
+ * @brief MainWindow::onCloseButtonClicked
+ */
+void MainWindow::onCloseSettingsClicked()
+{
+    if (settingsWindow != nullptr) {
+        settingsWindow->close();
+        delete settingsWindow;
+    }
+}
+
+/**
  * @brief MainWindow::onSendCommand
  * @param opcode
  * @param dev_type
@@ -181,7 +263,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
         }
     }
     if (event->timerId() == secCounterEvent) {
-        if (++secCounter > 59) {
+        if (++secCounter == writeFilePeriod) {
             secCounter = 0;
             writedDevice = 0;
         }
@@ -359,10 +441,13 @@ void MainWindow::handleReceivedPacket()
  */
 void MainWindow::writeCsvFile(float value, int index)
 {
-    if (writedDevice < selDevices.size()) {
+    if (isWriteFileEnabled && (writedDevice < selDevices.size()))
+    {
         QString folderPath = QDir::currentPath() + "/DS18B20_CSV";
         QDir folder = folderPath;
-        if (!folder.exists()) folder.mkdir(folderPath);
+        if (!folder.exists()) {
+            folder.mkdir(folderPath);
+        }
 
         QString filename = (folderPath + "/sensor" + QString::number(index) +
                             QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));

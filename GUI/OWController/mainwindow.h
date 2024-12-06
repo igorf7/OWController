@@ -11,6 +11,8 @@
 #include <QMainWindow>
 #include <QLayout>
 #include <QLabel>
+#include <QSpinBox>
+#include <QCheckBox>
 #include <QMap>
 
 QT_BEGIN_NAMESPACE
@@ -39,7 +41,11 @@ private slots:
     void onConnectButtonClicked();
     void onSearchButtonClicked();
     void onClockButtonClicked();
-    void onDeviceComboBoxChanged(int);
+    void onDeviceComboBoxChanged(int index);
+    void onSettingsButtonClicked();
+    void onCloseSettingsClicked();
+    void onWriteFileCheckboxToggled(bool checked);
+    void onWriteFilePeriodChanged(int value);
 
 private:
     Ui::MainWindow *ui;
@@ -48,8 +54,8 @@ private:
 
     const QString ProductString = "1-Wire Controller";
 
+    QDialog *settingsWindow = nullptr;
     CustomHid *hidDevice = nullptr;
-
     ClockView *clockWidget = nullptr;
     QVBoxLayout *deviceViewLayout = nullptr;
     QList<DeviceWidget*> deviceWidget;
@@ -57,11 +63,13 @@ private:
     QHash<quint64, int> selDevices;
 
     quint32 timeStamp;
-    quint32 secCounter = 0;
+    int secCounter = 0;
+    int writeFilePeriod = 60;
 
     bool isConnected = false;
     bool isPollingRunning = false;
     bool isShowClockEnabled = false;
+    bool isWriteFileEnabled = true;
 
     quint8 writedDevice = 0;
 
