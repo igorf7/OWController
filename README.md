@@ -26,7 +26,7 @@ DS1971/DS2430A - reading, editing and writing to EEPROM memory, displaying the d
 All other devices can read and display ROM contents, display the device description.\
 Support for any device can be easily added by analogy with the existing implementation.
 ## Additional features
-Recording temperature measurements from DS18B20 sensors to a CSV file once per minute.\
+Recording temperature measurements from DS18B20 sensors to a CSV file. The file recording period is set in the program settings.\
 Read and display date/time received from MCU RTC. Synchronization with the PC system time occurs automatically at startup.
 
 ![clock](https://github.com/user-attachments/assets/0d85610f-9bf8-4cd3-8a74-591925f5a0fb)
