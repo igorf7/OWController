@@ -103,10 +103,10 @@ void RTC_SecondEvent(void)
     systickIntervalCnt = 0;
     totalDevCount = DeviceGetCount();
     /* Enable 1-Wire bus polling */
-    if (++secCounter == pollPeriod) {
-        secCounter = 0;
+    if (secCounter == 0) {
         isPollingEnabled = true;
     }
+    secCounter = (secCounter < pollPeriod) ? secCounter + 1 : 0;
 }
 
 /*!
@@ -146,6 +146,7 @@ void USB_HandleRxData(void)
                 PutTask(DeviceSearchTask, NULL); // Schedule a task to search a 1-wire devices
         		break;
             case eReadCmd:
+                secCounter = 0;
                 devType = rx_packet->data[0];
                 pollPeriod = rx_packet->data[1];
         		break;
