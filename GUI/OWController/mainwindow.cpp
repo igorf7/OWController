@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDateTime>
 #include <QTextStream>
+#include <QSettings>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle(QApplication::applicationName());
+
+    readSettings();
 
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
@@ -48,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
+    writeSettings();
+
     if (isConnected) {
         this->onConnectButtonClicked();
     }
@@ -547,4 +552,32 @@ void MainWindow::deinitWidgets()
     ui->deviceComboBox->setCurrentIndex(-1);
     ui->searchPushButton->setEnabled(false);
     ui->clockPushButton->setEnabled(false);
+}
+
+/**
+ * @brief MainWindow::readSettings
+ */
+void MainWindow::readSettings()
+{
+    QSettings settings("settings.ini", QSettings::IniFormat);
+
+    settings.beginGroup("/Settings");
+    owPollingPeriod = settings.value("/PollPeriod", 1).toInt();
+    owPrevPollingPeriod = settings.value("/PrevPollPeriod", 1).toInt();
+    writeFilePeriod = settings.value("/WriteFilePeriod", 60).toInt();
+    settings.endGroup();
+}
+
+/**
+ * @brief MainWindow::writeSettings
+ */
+void MainWindow::writeSettings()
+{
+    QSettings settings("settings.ini", QSettings::IniFormat);
+
+    settings.beginGroup("/Settings");
+    settings.setValue("/PollPeriod", owPollingPeriod);
+    settings.setValue("/PrevPollPeriod", owPrevPollingPeriod);
+    settings.setValue("/WriteFilePeriod", writeFilePeriod);
+    settings.endGroup();
 }

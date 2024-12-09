@@ -65,9 +65,9 @@ private:
 
     quint32 timeStamp;
     int secCounter = 0;
-    int writeFilePeriod = 60;
-    int owPollingPeriod = 1;
-    int owPrevPollingPeriod = 1;
+    int writeFilePeriod;
+    int owPollingPeriod;
+    int owPrevPollingPeriod;
 
     bool isConnected = false;
     bool isPollingRunning = false;
@@ -89,5 +89,7 @@ private:
     void initDeviceComboBox();
     void deleteDeviceLayout();
     void writeCsvFile(float value, int index);
+    void readSettings();
+    void writeSettings();
 };
 #endif // MAINWINDOW_H
