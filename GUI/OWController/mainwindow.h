@@ -30,7 +30,7 @@ public:
     ~MainWindow();
 
 protected:
-    qint32 pollingPeriod = 0;
+    qint32 usbPollingPeriod = 0;
     qint32 secCounterEvent = 0;
     void timerEvent(QTimerEvent *event);
 
@@ -46,6 +46,7 @@ private slots:
     void onCloseSettingsClicked();
     void onWriteFileCheckboxToggled(bool checked);
     void onWriteFilePeriodChanged(int value);
+    void onOWPollingPeriodChanged(int value);
 
 private:
     Ui::MainWindow *ui;
@@ -65,6 +66,8 @@ private:
     quint32 timeStamp;
     int secCounter = 0;
     int writeFilePeriod = 60;
+    int owPollingPeriod = 1;
+    int owPrevPollingPeriod = 1;
 
     bool isConnected = false;
     bool isPollingRunning = false;

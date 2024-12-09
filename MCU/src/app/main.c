@@ -13,6 +13,8 @@ static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcValue;
 static uint32_t systickIntervalCnt = 0;
+uint16_t pollPeriod = 0;
+uint16_t secCounter = 0;
 static bool isRtcSendEnabled = false;
 volatile bool isPollingEnabled = false;
 static uint8_t devType = DS18B20;
@@ -59,6 +61,8 @@ int main(void)
     /* Search devices task */
     PutTask(DeviceSearchTask, NULL);
     
+    pollPeriod = 1;
+    
     /* Enable Watchdog */
     #ifndef DEBUG
     InitWatchdog();
@@ -99,8 +103,10 @@ void RTC_SecondEvent(void)
     systickIntervalCnt = 0;
     totalDevCount = DeviceGetCount();
     /* Enable 1-Wire bus polling */
-    isPollingEnabled = true;
-    currDevIndex = 0;
+    if (++secCounter == pollPeriod) {
+        secCounter = 0;
+        isPollingEnabled = true;
+    }
 }
 
 /*!
@@ -117,6 +123,7 @@ void SysTick_Callback(void)
             PutTask(DeviceReadTask, &devType); // Schedule a task to read from 1-wire devices
             currDevIndex++;
             if (currDevIndex >= totalDevCount) {
+                currDevIndex = 0;
                 isPollingEnabled = false;
             }
         }
@@ -140,6 +147,7 @@ void USB_HandleRxData(void)
         		break;
             case eReadCmd:
                 devType = rx_packet->data[0];
+                pollPeriod = rx_packet->data[1];
         		break;
             case eWriteCmd:
                 isPollingEnabled = false;

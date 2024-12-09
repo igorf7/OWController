@@ -4,7 +4,6 @@
 #include <QFile>
 #include <QDateTime>
 #include <QTextStream>
-#include <QDebug>
 
 using namespace std;
 
@@ -37,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     QFont font;
     font.setItalic(true);
     statusBar()->setFont(font);
+
+    this->resize(260, 310);
 
     /* Attempting to connect a USB device */
     onConnectButtonClicked();
@@ -146,22 +147,39 @@ void MainWindow::onSettingsButtonClicked()
     writeFilePeriodSpinbox->setSingleStep(1);
     writeFilePeriodSpinbox->setValue(writeFilePeriod);
     writeFilePeriodSpinbox->setSuffix(tr(" sec"));
-    QLabel *writePeriodLabel = new QLabel(tr("Write Period"));
-    QPushButton *closeButton = new QPushButton(tr("Close"));
-    QHBoxLayout *hLayout = new QHBoxLayout;
+    QSpinBox *pollingPeriodSpinbox = new QSpinBox;
+    pollingPeriodSpinbox->setRange(1, 60);
+    pollingPeriodSpinbox->setSingleStep(1);
+    pollingPeriodSpinbox->setValue(owPollingPeriod);
+    pollingPeriodSpinbox->setSuffix(tr(" sec"));
+    QLabel *writePeriodLabel = new QLabel(tr("Write File Period"));
+    QLabel *pollingPeriodLabel = new QLabel(tr("1-Wire Bus Polling Period"));
+    QPushButton *closeButton = new QPushButton(tr("Save and Close"));
 
-    hLayout->addWidget(writeFileCheckbox);
-    hLayout->addStretch();
-    hLayout->addWidget(writePeriodLabel);
-    hLayout->addWidget(writeFilePeriodSpinbox);
+    QHBoxLayout *h1Layout = new QHBoxLayout;
+    h1Layout->addWidget(pollingPeriodLabel);
+    h1Layout->addWidget(pollingPeriodSpinbox);
+    h1Layout->addStretch();
 
-    vdlgLayout->addLayout(hLayout);
+    QHBoxLayout *h2Layout = new QHBoxLayout;
+    h2Layout->addWidget(writeFileCheckbox);
+    h2Layout->addStretch();
+    h2Layout->addWidget(writePeriodLabel);
+    h2Layout->addWidget(writeFilePeriodSpinbox);
+
+    vdlgLayout->addLayout(h1Layout);
+    vdlgLayout->addLayout(h2Layout);
     vdlgLayout->addWidget(closeButton);
     settingsWindow->setLayout(vdlgLayout);
 
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseSettingsClicked()));
-    connect(writeFileCheckbox, SIGNAL(toggled(bool)), this, SLOT(onWriteFileCheckboxToggled(bool)));
-    connect(writeFilePeriodSpinbox, SIGNAL(valueChanged(int)), this, SLOT(onWriteFilePeriodChanged(int)));
+    connect(closeButton, SIGNAL(clicked()),
+            this, SLOT(onCloseSettingsClicked()));
+    connect(writeFileCheckbox, SIGNAL(toggled(bool)),
+            this, SLOT(onWriteFileCheckboxToggled(bool)));
+    connect(writeFilePeriodSpinbox, SIGNAL(valueChanged(int)),
+            this, SLOT(onWriteFilePeriodChanged(int)));
+    connect(pollingPeriodSpinbox, SIGNAL(valueChanged(int)),
+            this, SLOT(onOWPollingPeriodChanged(int)));
 
     settingsWindow->show();
 }
@@ -181,6 +199,10 @@ void MainWindow::onWriteFileCheckboxToggled(bool checked)
  */
 void MainWindow::onWriteFilePeriodChanged(int value)
 {
+    if (writeFilePeriod < owPollingPeriod) {
+        writeFilePeriod = owPollingPeriod;
+    }
+
     if (value < writeFilePeriod) {
         secCounter = 0;
     }
@@ -188,10 +210,32 @@ void MainWindow::onWriteFilePeriodChanged(int value)
 }
 
 /**
+ * @brief MainWindow::onOWPollingPeriodChanged
+ * @param value
+ */
+void MainWindow::onOWPollingPeriodChanged(int value)
+{
+    owPollingPeriod = value;
+
+    if (writeFilePeriod < owPollingPeriod) {
+        writeFilePeriod = owPollingPeriod;
+    }
+}
+
+/**
  * @brief MainWindow::onCloseButtonClicked
  */
 void MainWindow::onCloseSettingsClicked()
 {
+    if (owPollingPeriod != owPrevPollingPeriod) {
+        owPrevPollingPeriod = owPollingPeriod;
+        quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
+        quint8 data[2];
+        data[0] = dev_family;
+        data[1] = (quint8)owPollingPeriod;
+        this->onSendCommand(eReadCmd, data, sizeof(data));
+    }
+
     if (settingsWindow != nullptr) {
         settingsWindow->close();
         delete settingsWindow;
@@ -231,7 +275,7 @@ void MainWindow::startUsbPolling()
 
     if (!isPollingRunning) {
         isPollingRunning = true;
-        pollingPeriod = startTimer(10);
+        usbPollingPeriod = startTimer(10);
         secCounterEvent = startTimer(1000);
     }
 }
@@ -241,8 +285,8 @@ void MainWindow::startUsbPolling()
  */
 void MainWindow::stopUsbPolling()
 {
-    killTimer(pollingPeriod);
-    pollingPeriod = 0;
+    killTimer(usbPollingPeriod);
+    usbPollingPeriod = 0;
     isPollingRunning = false;
 }
 
@@ -252,7 +296,7 @@ void MainWindow::stopUsbPolling()
  */
 void MainWindow::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == pollingPeriod) {
+    if (event->timerId() == usbPollingPeriod) {
         int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
         if (len < 0) { // Lost connection
             if (isConnected) this->onConnectButtonClicked();
@@ -314,7 +358,11 @@ void MainWindow::onDeviceComboBoxChanged(int index)
     ui->deviceCountLabel->setText(QString::number(selDevices.size()));
 
     this->createWidgetsLayout(selDevices.size());
-    this->onSendCommand(eReadCmd, &dev_family, sizeof(dev_family));
+
+    quint8 data[2];
+    data[0] = dev_family;
+    data[1] = (quint8)owPollingPeriod;
+    this->onSendCommand(eReadCmd, data, sizeof(data));
 }
 
 /**
