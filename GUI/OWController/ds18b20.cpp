@@ -142,7 +142,7 @@ void DS18B20::onSettingsButtonClicked()
     QPushButton *copyButton = new QPushButton;
     copyButton->setFlat(true);
     copyButton->setIcon(QIcon(":/images/copy.png"));
-    copyButton->setToolTip(tr("Copy to clipboard"));
+    copyButton->setToolTip(tr("Copy address to clipboard"));
     QPushButton *writeButton = new QPushButton(tr("Write"));
     QPushButton *readButton = new QPushButton(tr("Read"));
     QPushButton *closeButton = new QPushButton(tr("Close"));

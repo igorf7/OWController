@@ -77,7 +77,7 @@ void DS_OTHER::onSettingsButtonClicked()
     QPushButton *copyButton = new QPushButton;
     copyButton->setFlat(true);
     copyButton->setIcon(QIcon(":/images/copy.png"));
-    copyButton->setToolTip(tr("Copy to clipboard"));
+    copyButton->setToolTip(tr("Copy address to clipboard"));
     QVBoxLayout *vdlgLayout = new QVBoxLayout;
     QLabel *addressLabel = new QLabel;
     QLabel *descrLabel = new QLabel;
