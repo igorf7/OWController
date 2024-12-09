@@ -23,6 +23,7 @@ public:
 
 private slots:
     void onSettingsButtonClicked();
+    void onCopyButtonnClicked();
     void onCloseButtonClicked();
     void onWriteButtonClicked();
     void onReadButtonClicked();

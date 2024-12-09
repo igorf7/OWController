@@ -2,6 +2,7 @@
 #include "ui_ds18b20.h"
 #include "owdevice.h"
 #include <QValidator>
+#include <QClipboard>
 
 DS18B20::DS18B20(DeviceWidget *parent) :
     DeviceWidget(parent), ui(new Ui::DS18B20)
@@ -138,20 +139,30 @@ void DS18B20::onSettingsButtonClicked()
     editLayout->addWidget(resolutionLabel, 2, 0);
     editLayout->addWidget(resolutionLineEdit, 2, 1);
 
+    QPushButton *copyButton = new QPushButton;
+    copyButton->setFlat(true);
+    copyButton->setIcon(QIcon(":/images/copy.png"));
+    copyButton->setToolTip(tr("Copy to clipboard"));
     QPushButton *writeButton = new QPushButton(tr("Write"));
     QPushButton *readButton = new QPushButton(tr("Read"));
     QPushButton *closeButton = new QPushButton(tr("Close"));
     QHBoxLayout *hbtnLayout = new QHBoxLayout;
 
+    QHBoxLayout *haddrLayout = new QHBoxLayout;
+    haddrLayout->addWidget(addressLabel);
+    haddrLayout->addWidget(copyButton);
+    haddrLayout->addStretch();
+
     hbtnLayout->addWidget(writeButton);
     hbtnLayout->addWidget(readButton);
     hbtnLayout->addWidget(closeButton);
-    vdlgLayout->addWidget(addressLabel);
+    vdlgLayout->addLayout(haddrLayout);
     vdlgLayout->addWidget(descrLabel);
     vdlgLayout->addLayout(editLayout);
     vdlgLayout->addLayout(hbtnLayout);
     settingsWindow->setLayout(vdlgLayout);
 
+    connect(copyButton, SIGNAL(clicked()), this, SLOT(onCopyButtonnClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
     connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
@@ -171,6 +182,15 @@ void DS18B20::onSettingsButtonClicked()
     resolutionLineEdit->setText(QString::number(devResolution));
 
     settingsWindow->show();
+}
+
+/**
+ * @brief DS18B20::onCopyButtonnClicked
+ */
+void DS18B20::onCopyButtonnClicked()
+{
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setText(QString::number(myAddress, 16).toUpper());
 }
 
 /**

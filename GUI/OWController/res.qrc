@@ -7,5 +7,6 @@
         <file>images/search.png</file>
         <file>images/menu_dark.png</file>
         <file>images/menu_light.png</file>
+        <file>images/copy.png</file>
     </qresource>
 </RCC>

@@ -3,7 +3,7 @@
 #include "owdevice.h"
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QDebug>
+#include <QClipboard>
 
 DS1971::DS1971(DeviceWidget *parent)
     : DeviceWidget(parent), ui(new Ui::DS1971)
@@ -88,15 +88,24 @@ void DS1971::onSettingsButtonClicked()
     memEdit = new QPlainTextEdit;
     QLabel *memLabel = new QLabel(tr("Device memory (can be edited and rewritten):"));
 
+    QPushButton *copyButton = new QPushButton;
+    copyButton->setFlat(true);
+    copyButton->setIcon(QIcon(":/images/copy.png"));
+    copyButton->setToolTip(tr("Copy to clipboard"));
     QPushButton *writeButton = new QPushButton(tr("Write"));
     QPushButton *readButton = new QPushButton(tr("Read"));
     QPushButton *closeButton = new QPushButton(tr("Close"));
     QHBoxLayout *hbtnLayout = new QHBoxLayout;
 
+    QHBoxLayout *haddrLayout = new QHBoxLayout;
+    haddrLayout->addWidget(addressLabel);
+    haddrLayout->addWidget(copyButton);
+    haddrLayout->addStretch();
+
     hbtnLayout->addWidget(writeButton);
     hbtnLayout->addWidget(readButton);
     hbtnLayout->addWidget(closeButton);
-    vdlgLayout->addWidget(addressLabel);
+    vdlgLayout->addLayout(haddrLayout);
     vdlgLayout->addWidget(descrLabel);
     vdlgLayout->addWidget(memLabel);
     vdlgLayout->addWidget(memEdit);
@@ -104,6 +113,7 @@ void DS1971::onSettingsButtonClicked()
     vdlgLayout->addLayout(hbtnLayout);
     settingsWindow->setLayout(vdlgLayout);
 
+    connect(copyButton, SIGNAL(clicked()), this, SLOT(onCopyButtonnClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
     connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
@@ -134,6 +144,15 @@ void DS1971::showDeviceMemory()
         memEdit->appendPlainText(output);
         output.clear();
     }
+}
+
+/**
+ * @brief DS1971::onCopyButtonnClicked
+ */
+void DS1971::onCopyButtonnClicked()
+{
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setText(QString::number(myAddress, 16).toUpper());
 }
 
 /**
