@@ -106,7 +106,7 @@ void RTC_SecondEvent(void)
     if (secCounter == 0) {
         isPollingEnabled = true;
     }
-    secCounter = (secCounter < pollPeriod) ? secCounter + 1 : 0;
+    if (++secCounter == pollPeriod) secCounter = 0;
 }
 
 /*!
