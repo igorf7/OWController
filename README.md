@@ -12,7 +12,7 @@ MCU/keil/Binary — contains the firmware file.\
 GUI/OWController — contains the project and source files for building the OWController application. Qt Creator IDE and Qt 5.15.2 was used.\
 GUI/BIN — contains the executable file of the OWController application for Windows OS.
 ## Supported devices
-![DS18B20](https://github.com/user-attachments/assets/ed8bc947-ffed-4f19-a865-b1b02e74d2a5)  ![DS18B20_conf](https://github.com/user-attachments/assets/a99732c2-abd6-4f2a-8a6a-997084a44d8e)
+![DS18B20](https://github.com/user-attachments/assets/ed8bc947-ffed-4f19-a865-b1b02e74d2a5) ![DS18B20_conf](https://github.com/user-attachments/assets/a99732c2-abd6-4f2a-8a6a-997084a44d8e)
 
 
 DS18B20 - measuring and displaying temperature, reading and writing to the configuration register, displaying the device description.
