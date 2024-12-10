@@ -145,14 +145,14 @@ void MainWindow::onSettingsButtonClicked()
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
 
     QVBoxLayout *vdlgLayout = new QVBoxLayout;
-    QCheckBox *writeFileCheckbox = new QCheckBox(tr("Write CSV file"));
+    writeFileCheckbox = new QCheckBox(tr("Write CSV file"));
     writeFileCheckbox->setChecked(true);
-    QSpinBox *writeFilePeriodSpinbox = new QSpinBox;
+    writeFilePeriodSpinbox = new QSpinBox;
     writeFilePeriodSpinbox->setRange(1, 300);
     writeFilePeriodSpinbox->setSingleStep(1);
     writeFilePeriodSpinbox->setValue(writeFilePeriod);
     writeFilePeriodSpinbox->setSuffix(tr(" sec"));
-    QSpinBox *pollingPeriodSpinbox = new QSpinBox;
+    pollingPeriodSpinbox = new QSpinBox;
     pollingPeriodSpinbox->setRange(1, 60);
     pollingPeriodSpinbox->setSingleStep(1);
     pollingPeriodSpinbox->setValue(owPollingPeriod);
@@ -179,8 +179,6 @@ void MainWindow::onSettingsButtonClicked()
 
     connect(closeButton, SIGNAL(clicked()),
             this, SLOT(onCloseSettingsClicked()));
-    connect(writeFileCheckbox, SIGNAL(toggled(bool)),
-            this, SLOT(onWriteFileCheckboxToggled(bool)));
     connect(writeFilePeriodSpinbox, SIGNAL(valueChanged(int)),
             this, SLOT(onWriteFilePeriodChanged(int)));
     connect(pollingPeriodSpinbox, SIGNAL(valueChanged(int)),
@@ -190,28 +188,14 @@ void MainWindow::onSettingsButtonClicked()
 }
 
 /**
- * @brief MainWindow::onWriteFileCheckboxToggled
- * @param checked
- */
-void MainWindow::onWriteFileCheckboxToggled(bool checked)
-{
-    isWriteFileEnabled = checked;
-}
-
-/**
  * @brief MainWindow::onWriteFilePeriodChanged
  * @param value
  */
 void MainWindow::onWriteFilePeriodChanged(int value)
-{
-    if (writeFilePeriod < owPollingPeriod) {
-        writeFilePeriod = owPollingPeriod;
+{    
+    if (value < pollingPeriodSpinbox->value()) {
+        writeFilePeriodSpinbox->setValue(pollingPeriodSpinbox->value());
     }
-
-    if (value < writeFilePeriod) {
-        secCounter = 0;
-    }
-    writeFilePeriod = value;
 }
 
 /**
@@ -220,10 +204,8 @@ void MainWindow::onWriteFilePeriodChanged(int value)
  */
 void MainWindow::onOWPollingPeriodChanged(int value)
 {
-    owPollingPeriod = value;
-
-    if (writeFilePeriod < owPollingPeriod) {
-        writeFilePeriod = owPollingPeriod;
+    if (writeFilePeriodSpinbox->value() < value) {
+        writeFilePeriodSpinbox->setValue(value);
     }
 }
 
@@ -232,18 +214,27 @@ void MainWindow::onOWPollingPeriodChanged(int value)
  */
 void MainWindow::onCloseSettingsClicked()
 {
-    if (owPollingPeriod != owPrevPollingPeriod) {
-        owPrevPollingPeriod = owPollingPeriod;
-        quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
-        quint8 data[2];
-        data[0] = dev_family;
-        data[1] = (quint8)owPollingPeriod;
-        this->onSendCommand(eReadCmd, data, sizeof(data));
-    }
+    if (settingsWindow != nullptr)
+    {
+        isWriteFileEnabled = writeFileCheckbox->isChecked();
 
-    if (settingsWindow != nullptr) {
+        if (writeFilePeriodSpinbox->value() < writeFilePeriod) {
+            secCounter = 0;
+        }
+        writeFilePeriod = writeFilePeriodSpinbox->value();
+
+        if (owPollingPeriod != pollingPeriodSpinbox->value()) {
+            owPollingPeriod = pollingPeriodSpinbox->value();
+            quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
+            quint8 data[2];
+            data[0] = dev_family;
+            data[1] = (quint8)owPollingPeriod;
+            this->onSendCommand(eReadCmd, data, sizeof(data));
+        }
+
         settingsWindow->close();
         delete settingsWindow;
+        settingsWindow = nullptr;
     }
 }
 
@@ -563,7 +554,6 @@ void MainWindow::readSettings()
 
     settings.beginGroup("/Settings");
     owPollingPeriod = settings.value("/PollPeriod", 1).toInt();
-    owPrevPollingPeriod = settings.value("/PrevPollPeriod", 1).toInt();
     writeFilePeriod = settings.value("/WriteFilePeriod", 60).toInt();
     settings.endGroup();
 }
@@ -577,7 +567,6 @@ void MainWindow::writeSettings()
 
     settings.beginGroup("/Settings");
     settings.setValue("/PollPeriod", owPollingPeriod);
-    settings.setValue("/PrevPollPeriod", owPrevPollingPeriod);
     settings.setValue("/WriteFilePeriod", writeFilePeriod);
     settings.endGroup();
 }

@@ -18,10 +18,10 @@ typedef struct{
 }RtcEvents_t;
 
 /* API */
-unsigned char rtc_init(RtcEvents_t *events);
-void rtc_set_irq(uint16_t irq_event);
-void disableRtcInterrupt(uint16_t irq_event);
-void enableRtcInterrupt(uint16_t irq_event);
-//void rtcClkOutput(void);
-uint32_t presetDateTime(uint32_t datetime);
+void RTC_Init(RtcEvents_t *events);
+void RTC_Set_Irq(uint16_t irq_event);
+void RTC_DisableInterrupt(uint16_t irq_event);
+void RTC_EnableInterrupt(uint16_t irq_event);
+//void RTC_ClkOutput(void);
+uint32_t RTC_PresetDateTime(uint32_t datetime);
 #endif

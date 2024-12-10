@@ -199,5 +199,6 @@ void DS1971::onCloseButtonClicked()
     if (settingsWindow != nullptr) {
         settingsWindow->close();
         delete settingsWindow;
+        settingsWindow = nullptr;
     }
 }

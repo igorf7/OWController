@@ -13,7 +13,7 @@ static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcValue;
 static uint32_t systickIntervalCnt = 0;
-uint16_t pollPeriod = 0;
+uint16_t pollPeriod = 1;
 uint16_t secCounter = 0;
 static bool isRtcSendEnabled = false;
 volatile bool isPollingEnabled = false;
@@ -51,8 +51,8 @@ int main(void)
     
     /* Initialize the RTC hardware */
     rtcEvents.secondEvent = RTC_SecondEvent;
-    rtc_init(&rtcEvents);
-    rtc_set_irq(RTC_IT_SEC);
+    RTC_Init(&rtcEvents);
+    RTC_Set_Irq(RTC_IT_SEC);
     
     /* Initializing the SysTick Timer */
     InitSystickTimer(SysTick_Callback);
@@ -60,9 +60,7 @@ int main(void)
     
     /* Search devices task */
     PutTask(DeviceSearchTask, NULL);
-    
-    pollPeriod = 1;
-    
+        
     /* Enable Watchdog */
     #ifndef DEBUG
     InitWatchdog();
@@ -106,7 +104,7 @@ void RTC_SecondEvent(void)
     if (secCounter == 0) {
         isPollingEnabled = true;
     }
-    if (++secCounter == pollPeriod) secCounter = 0;
+    if (++secCounter >= pollPeriod) secCounter = 0;
 }
 
 /*!
@@ -156,10 +154,10 @@ void USB_HandleRxData(void)
                 PutTask(DeviceWriteTask, rx_packet->data); // Schedule a task to write at 1-wire devices
         		break;
             case eSyncRtcCmd:
-                disableRtcInterrupt(RTC_IT_SEC);
+                RTC_DisableInterrupt(RTC_IT_SEC);
                 rtcValue = *((uint32_t*)rx_packet->data);
-                presetDateTime(rtcValue);
-                enableRtcInterrupt(RTC_IT_SEC);
+                RTC_PresetDateTime(rtcValue);
+                RTC_EnableInterrupt(RTC_IT_SEC);
                 break;
         	default:
         		break;

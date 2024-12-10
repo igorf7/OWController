@@ -7,11 +7,12 @@
 #include "onewire.h"
 #include "ds18b20.h"
 #include "ds1971.h"
+#include "rtc.h"
 #include "string.h"
 
-#define DEVICE_GANG_SIZE    16 // Maximum number of devices on a 1-wire bus
+#define OW_DEVICE_GANG_SIZE    16 // Maximum number of devices on a 1-wire bus
 
-static OW_Device_t owDevice[DEVICE_GANG_SIZE];
+static OW_Device_t owDevice[OW_DEVICE_GANG_SIZE];
 static DS18B20_t ds18B20;
 static uint8_t deviceCount = 0;
 static uint8_t deviceIndex = 0;
@@ -27,14 +28,14 @@ void DeviceSearchTask(void *prm)
     deviceCount = 0;
     
     // Clear properties
-    for (i = 0; i < DEVICE_GANG_SIZE; i++)
+    for (i = 0; i < OW_DEVICE_GANG_SIZE; i++)
     {
         owDevice[i].address = 0;
         owDevice[i].connected = false;
     }
     
     // Search devices
-    for (i = 0; i < DEVICE_GANG_SIZE; i++)
+    for (i = 0; i < OW_DEVICE_GANG_SIZE; i++)
     {
         owDevice[i].connected = OW_SearchRom((uint8_t*)&owDevice[i].address);
         
@@ -57,7 +58,7 @@ void DeviceEnumerate(void *prm)
 {
     uint8_t i;
     
-    for (i = 0; i < DEVICE_GANG_SIZE; i++)
+    for (i = 0; i < OW_DEVICE_GANG_SIZE; i++)
     {
         if (owDevice[i].address == 0) break;
         USB_SendToHost(eEnumerate, OW_ROM_SIZE, (uint8_t*)&owDevice[i].address);
@@ -128,12 +129,14 @@ void DeviceReadTask(void *prm)
 void DeviceWriteTask(void *prm)
 {
     uint64_t address = 0;
-    uint8_t *buffer = (uint8_t*)prm;
-    memcpy((uint8_t*)&address, buffer, OW_ROM_SIZE);
-    uint8_t dev_family = (address & 0xFF);
     uint8_t check_sum = 0;
+    uint8_t *buffer = (uint8_t*)prm;
     
-    switch (dev_family)
+    RTC_DisableInterrupt(RTC_IT_SEC);
+    
+    memcpy((uint8_t*)&address, buffer, OW_ROM_SIZE);
+    
+    switch (address & 0xFF) // check device family
     {
     	case DS18B20:
             OW_Reset();
@@ -166,4 +169,5 @@ void DeviceWriteTask(void *prm)
     	default:
     		break;
     }
+    RTC_EnableInterrupt(RTC_IT_SEC);
 }

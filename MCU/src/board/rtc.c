@@ -6,8 +6,12 @@
 #include "rtc.h"
 
 static RtcEvents_t *rtcEvents;
-                        
-unsigned char rtc_init(RtcEvents_t *events)
+
+/*!
+ \brief Initializes the Real Time Clock module
+ \param pointer to RTC callbacks
+ */
+void RTC_Init(RtcEvents_t *events)
 {
     rtcEvents = events; // init callbacks
     
@@ -33,12 +37,14 @@ unsigned char rtc_init(RtcEvents_t *events)
         RTC_SetPrescaler(0x7FFF); // RTC period = RTCCLK/RTC_PR = (32.768 KHz)/(32767+1)
         /* Wait until last write operation on RTC registers has finished */
         RTC_WaitForLastTask();
-        return 1;
     }
-    return 0;
 }
 
-void rtc_set_irq(uint16_t irq_event)
+/*!
+ \brief Configures the specified interrupt
+ \param interrupt
+ */
+void RTC_Set_Irq(uint16_t irq_event)
 {
     /* Configure irq priority */
     //NVIC_SetPriority(RTC_IRQn, NVIC_EncodePriority(1, 0, 0));
@@ -53,26 +59,39 @@ void rtc_set_irq(uint16_t irq_event)
     RTC_WaitForLastTask();
 }
 
-void disableRtcInterrupt(uint16_t irq_event)
+/*!
+ \brief Disables the specified interrupt
+ \param interrupt
+ */
+void RTC_DisableInterrupt(uint16_t irq_event)
 { 
     RTC_ITConfig(irq_event, DISABLE);
 }
 
-void enableRtcInterrupt(uint16_t irq_event)
+/*!
+ \brief Enables the specified interrupt
+ \param interrupt
+ */
+void RTC_EnableInterrupt(uint16_t irq_event)
 {
     RTC_WaitForLastTask();
     RTC_ITConfig(irq_event, ENABLE);
     RTC_WaitForLastTask();
 }
 
-uint32_t presetDateTime(uint32_t datetime)
+/*!
+ \brief Sets date/time
+ \param datetime timestamp
+ \retval datetime timestamp
+ */
+uint32_t RTC_PresetDateTime(uint32_t datetime)
 {
     RTC_SetCounter(datetime);
     
     return datetime;
 }
 
-//void rtcClkOutput(void)
+//void RTC_ClkOutput(void)
 //{
 //    /* Вывод RTC_Clock/64 на PC13 */
 //    // Disable the Tamper Pin
@@ -82,7 +101,9 @@ uint32_t presetDateTime(uint32_t datetime)
 //    BKP_RTCOutputConfig(BKP_RTCOutputSource_CalibClock);
 //}
 
-/* RTC second interrupt */
+/*!
+ \brief RTC second interrupt handler
+ */
 void RTC_IRQHandler(void)
 {    
     if (RTC_GetITStatus(RTC_IT_SEC) != RESET)

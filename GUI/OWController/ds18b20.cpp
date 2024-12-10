@@ -282,5 +282,6 @@ void DS18B20::onCloseButtonClicked()
     if (settingsWindow != nullptr) {
         settingsWindow->close();
         delete settingsWindow;
+        settingsWindow = nullptr;
     }
 }

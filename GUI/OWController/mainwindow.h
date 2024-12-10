@@ -44,7 +44,6 @@ private slots:
     void onDeviceComboBoxChanged(int index);
     void onSettingsButtonClicked();
     void onCloseSettingsClicked();
-    void onWriteFileCheckboxToggled(bool checked);
     void onWriteFilePeriodChanged(int value);
     void onOWPollingPeriodChanged(int value);
 
@@ -56,6 +55,10 @@ private:
     const QString ProductString = "1-Wire Controller";
 
     QDialog *settingsWindow = nullptr;
+    QCheckBox *writeFileCheckbox = nullptr;
+    QSpinBox *writeFilePeriodSpinbox = nullptr;
+    QSpinBox *pollingPeriodSpinbox = nullptr;
+
     CustomHid *hidDevice = nullptr;
     ClockView *clockWidget = nullptr;
     QVBoxLayout *deviceViewLayout = nullptr;
@@ -67,7 +70,6 @@ private:
     int secCounter = 0;
     int writeFilePeriod;
     int owPollingPeriod;
-    int owPrevPollingPeriod;
 
     bool isConnected = false;
     bool isPollingRunning = false;

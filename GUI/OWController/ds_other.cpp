@@ -120,5 +120,6 @@ void DS_OTHER::onCloseButtonClicked()
     if (settingsWindow != nullptr) {
         settingsWindow->close();
         delete settingsWindow;
+        settingsWindow = nullptr;
     }
 }
