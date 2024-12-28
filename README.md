@@ -8,9 +8,9 @@ The OWController (1-Wire bus controller) project contains two levels:
 Data exchange between the lower and upper levels is carried out via USB (Custom HID class device).
 ## Implemented
 The following functions have been implemented:\
-Reading data from device memory.
-Writing data to device memory.
-Displaying device descriptions.
+Reading data from device memory.\
+Writing data to device memory.\
+Displaying device descriptions.\
 Additionally:\n
 Writing received data to a CSV file.
 Display of date and time received from the MCU RTC.
