@@ -47,9 +47,9 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+# To create an Android build, you need to comment out the following four lines
 win32: LIBS += -L$$PWD/hidapi/ -lhidapi
-# unix:!macx: LIBS += -L$$PWD/hidapi/ -lhidapi-libusb
-
+unix:!macx: LIBS += -L$$PWD/hidapi/ -lhidapi-libusb
 INCLUDEPATH += $$PWD/hidapi
 DEPENDPATH += $$PWD/hidapi
 
