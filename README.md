@@ -11,12 +11,12 @@ The following functions have been implemented:\
 Reading data from device memory.\
 Writing data to device memory.\
 Displaying device descriptions.\
-Additionally:\n
-Writing received data to a CSV file.
-Display of date and time received from the MCU RTC.
+Additionally:\
+Writing received data to a CSV file.\
+Display of date and time received from the MCU RTC.\
 ## Supported 1-Wire devices
-Supported 1-Wire devices:
-DS18B20 Temperature Sensor
-DS1971 EEPROM
-For all other devices, the contents of the ROM and the device description are displayed.
+Supported 1-Wire devices:\
+DS18B20 Temperature Sensor\
+DS1971 EEPROM\
+For all other devices, the contents of the ROM and the device description are displayed.\
 Support for any device can be easily implemented by analogy with the existing implementation.
