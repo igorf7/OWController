@@ -47,10 +47,19 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    res.qrc
-
 win32: LIBS += -L$$PWD/hidapi/ -lhidapi
+# unix:!macx: LIBS += -L$$PWD/hidapi/ -lhidapi-libusb
 
 INCLUDEPATH += $$PWD/hidapi
 DEPENDPATH += $$PWD/hidapi
+
+android {
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    OTHER_FILES += android/AndroidManifest.xml
+    LIBS += -L$$PWD/android/libs/arm64-v8a/ -lhidapi
+    INCLUDEPATH += $$PWD/android/libs
+    DEPENDPATH += $$PWD/android/libs
+}
+
+RESOURCES += \
+    res.qrc
