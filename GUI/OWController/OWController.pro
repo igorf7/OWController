@@ -6,7 +6,7 @@ CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+# DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
     cardview.cpp \
@@ -16,7 +16,6 @@ SOURCES += \
     ds18b20.cpp \
     ds1971.cpp \
     ds_other.cpp \
-    hidapi/hid.c \
     main.cpp \
     mainwindow.cpp
 
@@ -28,7 +27,6 @@ HEADERS += \
     ds18b20.h \
     ds1971.h \
     ds_other.h \
-    hidapi/hidapi.h \
     mainwindow.h \
     owdevice.h \
     usertypes.h
@@ -52,4 +50,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     res.qrc
 
-DESTDIR = ../../../BIN
+win32: LIBS += -L$$PWD/hidapi/ -lhidapi
+
+INCLUDEPATH += $$PWD/hidapi
+DEPENDPATH += $$PWD/hidapi
