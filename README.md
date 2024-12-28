@@ -7,7 +7,7 @@ The OWController (1-Wire bus controller) project contains two levels:
 2. The upper level is a cross-platform application for displaying data received from the lower level.
 Data exchange between the lower and upper levels is carried out via USB (Custom HID class device).
 ## Implemented
-The following functions have been implemented:
+The following functions have been implemented:\
 Reading data from device memory.
 Writing data to device memory.
 Displaying device descriptions.
