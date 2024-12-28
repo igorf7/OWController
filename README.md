@@ -13,7 +13,7 @@ Writing data to device memory.\
 Displaying device descriptions.\
 Additionally:\
 Writing received data to a CSV file.\
-Display of date and time received from the MCU RTC.\
+Display of date and time received from the MCU RTC.
 ## Supported 1-Wire devices
 Supported 1-Wire devices:\
 DS18B20 Temperature Sensor\
