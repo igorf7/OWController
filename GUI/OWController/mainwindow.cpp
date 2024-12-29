@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     font.setItalic(true);
     statusBar()->setFont(font);
 
-    //this->resize(260, 310);
+    this->resize(260, 310);
 
     /* Attempting to connect a USB device */
     onConnectButtonClicked();
@@ -161,6 +161,7 @@ void MainWindow::onSettingsButtonClicked()
     QLabel *writePeriodLabel = new QLabel(tr("Write File Period"));
     QLabel *pollingPeriodLabel = new QLabel(tr("1-Wire Bus Polling Period"));
     QPushButton *closeButton = new QPushButton(tr("Save and Close"));
+    closeButton->setMinimumHeight(32);
 
     QHBoxLayout *h1Layout = new QHBoxLayout;
     h1Layout->addWidget(pollingPeriodLabel);
@@ -352,7 +353,8 @@ void MainWindow::onDeviceComboBoxChanged(int index)
         }
     }
 
-    ui->deviceCountLabel->setText(QString::number(selDevices.size()));
+    statusBar()->showMessage(ui->deviceComboBox->currentText() +
+                                 " device found: " + QString::number(selDevices.size()), 5000);
 
     this->createWidgetsLayout(selDevices.size());
 
@@ -539,7 +541,6 @@ void MainWindow::deleteDeviceLayout()
 void MainWindow::deinitWidgets()
 {
     this->deleteDeviceLayout();
-    ui->deviceCountLabel->setText("0");
     ui->deviceComboBox->clear();
     ui->deviceComboBox->setCurrentIndex(-1);
     ui->searchPushButton->setEnabled(false);
