@@ -48,20 +48,20 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
     OTHER_FILES += android/AndroidManifest.xml
-    LIBS += -L$$PWD/android/libs/arm64-v8a/ -lhidapi
+    LIBS += -L$$PWD/android/libs/x86_64/ -lhidapi
     INCLUDEPATH += $$PWD/android/libs
     DEPENDPATH += $$PWD/android/libs
 }
 
 win32 {
-    LIBS += -L$$PWD/windows/ -lhidapi
+    LIBS += -L$$PWD/windows/libs/ -lhidapi
     INCLUDEPATH += $$PWD/hidapi
     DEPENDPATH += $$PWD/hidapi
 }
 
 unix:!macx {
     unix:!android {
-        LIBS += -L$$PWD/linux/ -lhidapi-hidraw
+        LIBS += -L$$PWD/linux/libs/ -lhidapi-hidraw
         INCLUDEPATH += $$PWD/hidapi
         DEPENDPATH += $$PWD/hidapi
     }
