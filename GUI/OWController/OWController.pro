@@ -27,12 +27,10 @@ HEADERS += \
     ds18b20.h \
     ds1971.h \
     ds_other.h \
+    hidapi/hidapi.h \
     mainwindow.h \
     owdevice.h \
     usertypes.h
-
-OTHER_FILES += \
-    hidapi.dll
 
 FORMS += \
     cardview.ui \
@@ -47,12 +45,6 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-# To create an Android build, you need to comment out the following four lines
-win32: LIBS += -L$$PWD/hidapi/ -lhidapi
-unix:!macx: LIBS += -L$$PWD/hidapi/ -lhidapi-libusb
-INCLUDEPATH += $$PWD/hidapi
-DEPENDPATH += $$PWD/hidapi
-
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
     OTHER_FILES += android/AndroidManifest.xml
@@ -61,5 +53,10 @@ android {
     DEPENDPATH += $$PWD/android/libs
 }
 
-RESOURCES += \
-    res.qrc
+unix:!macx: unix:!android: LIBS += -L$$PWD/linux/ -lhidapi-hidraw
+win32: LIBS += -L$$PWD/windows/ -lhidapi
+
+INCLUDEPATH += $$PWD/hidapi
+DEPENDPATH += $$PWD/hidapi
+
+RESOURCES += res.qrc

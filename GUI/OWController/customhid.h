@@ -1,7 +1,7 @@
 #ifndef CUSTOMHID_H
 #define CUSTOMHID_H
 
-#include <hidapi/hidapi.h>
+#include "hidapi/hidapi.h"
 #include <QObject>
 
 class CustomHid : public QObject
