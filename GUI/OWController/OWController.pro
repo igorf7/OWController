@@ -53,10 +53,18 @@ android {
     DEPENDPATH += $$PWD/android/libs
 }
 
-unix:!macx: unix:!android: LIBS += -L$$PWD/linux/ -lhidapi-hidraw
-win32: LIBS += -L$$PWD/windows/ -lhidapi
+win32 {
+    LIBS += -L$$PWD/windows/ -lhidapi
+    INCLUDEPATH += $$PWD/hidapi
+    DEPENDPATH += $$PWD/hidapi
+}
 
-INCLUDEPATH += $$PWD/hidapi
-DEPENDPATH += $$PWD/hidapi
+unix:!macx {
+    unix:!android {
+        LIBS += -L$$PWD/linux/ -lhidapi-hidraw
+        INCLUDEPATH += $$PWD/hidapi
+        DEPENDPATH += $$PWD/hidapi
+    }
+}
 
 RESOURCES += res.qrc
