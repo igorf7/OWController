@@ -1,5 +1,5 @@
 # OWController
-Version 1.1.1
+Version 1.1.3
 ## Description
 Controlling devices on the 1-Wire bus.
 The OWController project contains two levels:

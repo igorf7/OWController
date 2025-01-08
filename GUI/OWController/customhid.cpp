@@ -41,9 +41,10 @@ void CustomHid::Connect(const QString &product_string)
     Q_UNUSED(product_string)
 
     /* Open USB device via JNI */
-    int fdesc = this->openUsbDevice();
-    if (fdesc > 0) {
-        deviceHandle = hid_libusb_wrap_sys_device((intptr_t)fdesc, 0);
+    int file_descriptor = this->openUsbDevice();
+
+    if (file_descriptor > 0) {
+        deviceHandle = hid_libusb_wrap_sys_device((intptr_t)file_descriptor, 0);
     }
 #else
 
