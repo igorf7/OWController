@@ -12,13 +12,14 @@ DS18B20::DS18B20(DeviceWidget *parent) :
 #ifdef __ANDROID__
     QFont font;
     font.setPixelSize(16);
-    ui->label->setFont(font);
-    ui->deviceIndexLabel->setFont(font);
+    ui->pointNameLabel->setFont(font);
     font.setPixelSize(24);
-    ui->label_2->setFont(font);
+    ui->prmNameLabel->setFont(font);
     font.setPixelSize(32);
-    ui->temperValueLabel->setFont(font);
+    ui->prmValueLabel->setFont(font);
 #endif
+
+    ui->prmNameLabel->setText(tr("Temperature:"));
 
     /* Connecting signals to slots */
     connect(ui->settingsPushButton, SIGNAL(clicked()),
@@ -75,17 +76,17 @@ void DS18B20::showDeviceData(quint8 *data, int index)
     }
 
     if (qIsNaN(temperValue)) {
-        ui->temperValueLabel->setText(tr("FAILURE"));
+        ui->prmValueLabel->setText(tr("FAILURE"));
         return;
     }
     else if (temperValue < 0.0f) {
-        ui->temperValueLabel->setStyleSheet("color: blue");
+        ui->prmValueLabel->setStyleSheet("color: blue");
     }
     else {
-        ui->temperValueLabel->setStyleSheet("color: red");
+        ui->prmValueLabel->setStyleSheet("color: red");
     }
-    ui->deviceIndexLabel->setText(QString::number(myIndex));
-    ui->temperValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
+    ui->pointNameLabel->setText(tr("Sensor ") + QString::number(myIndex));
+    ui->prmValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
 }
 
 /**

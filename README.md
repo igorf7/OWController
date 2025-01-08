@@ -4,9 +4,7 @@ Version 1.1.3
 Controlling devices on the 1-Wire bus.
 The OWController project contains two levels:
 1. The lower level, implemented on the STM32F103 microcontroller (Blue Pill PLus board).
-   The USART1_TX (PA9) or USART2_TX (PA2) line of the microcontroller is used as a 1-Wire bus.
-   A 4.7 kOhm pull-up resistor is required between the line and VCC.
-3. The top level is a cross-platform application for displaying data received from lower level devices and configuring device parameters.
+2. The top level is a cross-platform application for displaying data received from lower level devices and configuring device parameters.
 Data exchange between the lower and upper levels is carried out via USB (Custom HID Class device).
 ## Implemented
 The following functions have been implemented:\

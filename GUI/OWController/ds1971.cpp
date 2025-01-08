@@ -10,6 +10,18 @@ DS1971::DS1971(DeviceWidget *parent)
 {
     ui->setupUi(this);
 
+#ifdef __ANDROID__
+    QFont font;
+    font.setPixelSize(16);
+    ui->pointNameLabel->setFont(font);
+    font.setPixelSize(18);
+    ui->prmNameLabel->setFont(font);
+    font.setPixelSize(20);
+    ui->prmValueLabel->setFont(font);
+#endif
+
+    ui->prmNameLabel->setText(tr("Address:"));
+
     /* Connecting signals to slots */
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
@@ -38,8 +50,8 @@ void DS1971::showDeviceData(quint8 *data, int index)
         pData++;
     }
 
-    ui->deviceIndexLabel->setText(QString::number(myIndex));
-    ui->addrLabel->setText(QString::number(myAddress, 16).toUpper());
+    ui->pointNameLabel->setText(tr("Device ") + QString::number(myIndex));
+    ui->prmValueLabel->setText(QString::number(myAddress, 16).toUpper());
 }
 
 /**

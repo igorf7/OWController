@@ -1,0 +1,2 @@
+The USART1_TX (PA9) or USART2_TX (PA2) line of the STM32F103 microcontroller is used as a 1-Wire bus.
+A 4.7 kOhm pull-up resistor is required between the line and VCC.

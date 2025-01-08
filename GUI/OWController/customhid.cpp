@@ -46,6 +46,9 @@ void CustomHid::Connect(const QString &product_string)
     if (file_descriptor > 0) {
         deviceHandle = hid_libusb_wrap_sys_device((intptr_t)file_descriptor, 0);
     }
+    else {
+        return;
+    }
 #else
 
     struct hid_device_info *devs, *cur_dev;

@@ -49,10 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     font.setItalic(true);
     statusBar()->setFont(font);
 
-    this->resize(260, 310);
-
-    /* Attempting to connect a USB device
-    onConnectButtonClicked(); */
+    /* Attempting to connect a USB device */
+    onConnectButtonClicked();
 }
 
 /**
