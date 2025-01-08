@@ -4,7 +4,7 @@ Version 1.1.3
 Controlling devices on the 1-Wire bus.
 The OWController project contains two levels:
 1. The lower level, implemented on the STM32F103 microcontroller (Blue Pill PLus board).
-2. The top level is a cross-platform application for displaying data received from lower level devices and configuring device parameters.
+2. The upper level is a cross-platform application for displaying data received from lower level devices and configuring device parameters.
 Data exchange between the lower and upper levels is carried out via USB (Custom HID Class device).
 ## Supported OS
 Tested on Windows 11, Manjaro Linux, Android 8. \
