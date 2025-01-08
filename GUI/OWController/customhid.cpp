@@ -1,5 +1,12 @@
 #include "customhid.h"
-#include <QDebug>
+
+#ifdef __ANDROID__
+#include <QtCore/qjniobject.h>
+#include <QtCore/qcoreapplication.h>
+#include <QtCore/private/qandroidextras_p.h>
+
+using namespace Qt::StringLiterals;
+#endif
 
 /**
  * @brief Class constructor
@@ -9,6 +16,12 @@
 CustomHid::CustomHid(unsigned short vid,
                      unsigned short pid) : VID(vid), PID(pid)
 {
+    hid_init();
+
+#ifdef __ANDROID__
+    /* Find USB device via JNI */
+    this->findUsbDevice();
+#endif
 }
 
 /**
@@ -19,11 +32,21 @@ CustomHid::~CustomHid()
 }
 
 /**
- * @brief CustomHid::Connect
- * @return true if connected, false otherwise
+ * @brief CustomHid::onConnect
+ * @param product_string
  */
-bool CustomHid::Connect(const QString &product_string)
+void CustomHid::Connect(const QString &product_string)
 {
+#ifdef __ANDROID__
+    Q_UNUSED(product_string)
+
+    /* Open USB device via JNI */
+    int fdesc = this->openUsbDevice();
+    if (fdesc > 0) {
+        deviceHandle = hid_libusb_wrap_sys_device((intptr_t)fdesc, 0);
+    }
+#else
+
     struct hid_device_info *devs, *cur_dev;
 
     /* Find devices with specified VID/PID */
@@ -32,44 +55,43 @@ bool CustomHid::Connect(const QString &product_string)
 
     while (cur_dev)
     {
-        /* Trying to find a device with a given product string */
+        /* Find USB device with a given product string */
         if (QString::fromWCharArray(cur_dev->product_string) == product_string)
+        {
             break;
+        }
         cur_dev = cur_dev->next;
     }
 
-    if (!cur_dev) return false;
+    if (!cur_dev) return;
 
     /* Open found device */
     deviceHandle = hid_open_path(cur_dev->path);
 
     if (!deviceHandle) {
         hid_exit();
-        return false;
+        return;
     }
+#endif
 
     hid_set_nonblocking(deviceHandle, 1);
-
-    /* Read the Manufacturer String */
-    opResult = hid_get_manufacturer_string(deviceHandle, wstr, MAX_STR);
-    /* Read the Product String */
-    opResult = hid_get_product_string(deviceHandle, wstr, MAX_STR);
-    /* Read the Serial Number String */
-    opResult = hid_get_serial_number_string(deviceHandle, wstr, MAX_STR);
-    /* Read VID/PID */
-    deviceInfo = hid_get_device_info(deviceHandle);
-    return true;
+    emit deviceConnected();
 }
 
 /**
- * @brief CustomHid::Disconnect
+ * @brief CustomHid::onDisconnect
  */
 void CustomHid::Disconnect()
 {
     /* Close the device */
-    hid_close(deviceHandle);
+    if (deviceHandle != nullptr) {
+        hid_close(deviceHandle);
+        deviceHandle = nullptr;
+    }
+
     /* Finalize the hidapi library */
     hid_exit();
+    emit deviceDisconnected();
 }
 
 /**
@@ -103,64 +125,38 @@ int CustomHid::Write(unsigned char *buff, size_t len, bool feat_mode)
 }
 
 /**
- * @brief CustomHid::setVid
- * @param vid
+ * @brief CustomHid::findUsbDevice
  */
-void CustomHid::setVid(unsigned short vid)
+void CustomHid::findUsbDevice()
 {
-    VID = vid;
+#ifdef __ANDROID__
+
+    jint vid = (jint)VID;
+    jint pid = (jint)PID;
+    QJniObject::callStaticMethod<void>(
+        "org/qtproject/example/OWController/CustomHid",
+        "findUsbDevice",
+        QNativeInterface::QAndroidApplication::context(),
+        vid, pid);
+
+#endif
 }
 
 /**
- * @brief CustomHid::setPid
- * @param pid
+ * @brief CustomHid::openUsbDevice
+ * @return
  */
-void CustomHid::setPid(unsigned short pid)
+int CustomHid::openUsbDevice()
 {
-    PID = pid;
-}
+#ifdef __ANDROID__
 
-/**
- * @brief CustomHid::getVid
- * @return device VID
- */
-unsigned short CustomHid::getVid()
-{
-    return deviceInfo->vendor_id;
-}
+    jint file_descriptor = QJniObject::callStaticMethod<int>(
+        "org/qtproject/example/OWController/CustomHid",
+        "openUsbDevice",
+        QNativeInterface::QAndroidApplication::context());
 
-/**
- * @brief CustomHid::getPid
- * @return device PID
- */
-unsigned short CustomHid::getPid()
-{
-    return deviceInfo->product_id;
-}
-
-/**
- * @brief CustomHid::getProductString
- * @return pointer to Product string
- */
-wchar_t* CustomHid::getProductString()
-{
-    return deviceInfo->product_string;
-}
-
-/**
- * @brief CustomHid::getManufacturerString
- * @return pointer to Manufacturer string
- */
-wchar_t* CustomHid::getManufacturerString()
-{
-    return deviceInfo->manufacturer_string;
-}
-
-/**
- * @brief CustomHid::getSerialNumber
- * @return pointer to Serian Number string
- */
-wchar_t* CustomHid::getSerialNumber()
-{
-    return deviceInfo->serial_number;
+    return (int)file_descriptor;
+#else
+    return 0;
+#endif
 }

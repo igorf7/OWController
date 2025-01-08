@@ -9,10 +9,20 @@ DS18B20::DS18B20(DeviceWidget *parent) :
 {
     ui->setupUi(this);
 
+#ifdef __ANDROID__
+    QFont font;
+    font.setPixelSize(16);
+    ui->label->setFont(font);
+    ui->deviceIndexLabel->setFont(font);
+    font.setPixelSize(24);
+    ui->label_2->setFont(font);
+    font.setPixelSize(32);
+    ui->temperValueLabel->setFont(font);
+#endif
+
     /* Connecting signals to slots */
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
-
 }
 
 DS18B20::~DS18B20()

@@ -36,6 +36,9 @@ protected:
 
 public slots:
     void onSendCommand(TOpcode opcode, quint8 *data, int data_len);
+    void onShowStatusBar(const QString &str, int timeout);
+    void onUsbConnected();
+    void onUsbDisconnected();
 
 private slots:
     void onConnectButtonClicked();
@@ -50,7 +53,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    static const size_t USB_BUFF_SIZE = 65;
+    static const size_t USB_BUFF_SIZE = 64;
 
     const QString ProductString = "1-Wire Controller";
 
@@ -75,6 +78,7 @@ private:
     bool isPollingRunning = false;
     bool isShowClockEnabled = false;
     bool isWriteFileEnabled = true;
+    bool isOwSearchDone = false;
 
     quint8 writedDevice = 0;
 

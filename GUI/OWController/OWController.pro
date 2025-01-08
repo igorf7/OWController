@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui core-private
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,6 +28,8 @@ HEADERS += \
     ds1971.h \
     ds_other.h \
     hidapi/hidapi.h \
+    hidapi/hidapi_libusb.h \
+    hidapi/libusb.h \
     mainwindow.h \
     owdevice.h \
     usertypes.h
@@ -47,8 +49,22 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-    OTHER_FILES += android/AndroidManifest.xml
-    LIBS += -L$$PWD/android/libs/x86_64/ -lhidapi
+    OTHER_FILES += \
+                android/src/org/qtproject/example/OWController/CustomHid.java \
+                android/AndroidManifest.xml
+
+    arm64-v8a {
+        LIBS += -L$$PWD/android/libs/arm64-v8a/ -lhidapi -lusb1.0
+    }
+    armeabi-v7a {
+        LIBS += -L$$PWD/android/libs/armeabi-v7a/ -lhidapi -lusb1.0
+    }
+    x86 {
+        LIBS += -L$$PWD/android/libs/x86/ -lhidapi -lusb1.0
+    }
+    x86_64 {
+        LIBS += -L$$PWD/android/libs/x86_64/ -lhidapi -lusb1.0
+    }
     INCLUDEPATH += $$PWD/android/libs
     DEPENDPATH += $$PWD/android/libs
 }

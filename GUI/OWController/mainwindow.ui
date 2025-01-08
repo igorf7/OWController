@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>335</height>
+    <width>264</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,10 +21,10 @@
     <item>
      <widget class="QFrame" name="frame">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
+       <enum>QFrame::Shadow::Plain</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -41,19 +41,6 @@
             <bool>false</bool>
            </property>
           </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="searchPushButton">
@@ -79,20 +66,13 @@
             <iconset resource="res.qrc">
              <normaloff>:/images/search.png</normaloff>:/images/search.png</iconset>
            </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
+           <property name="iconSize">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>18</width>
+             <height>18</height>
             </size>
            </property>
-          </spacer>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="clockPushButton">
@@ -127,19 +107,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QPushButton" name="settingsPushButton">
            <property name="enabled">
             <bool>true</bool>
@@ -168,24 +135,11 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>16</width>
-             <height>16</height>
+             <width>18</width>
+             <height>18</height>
             </size>
            </property>
           </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="connectPushButton">
@@ -201,26 +155,17 @@
              <height>32</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>USB Connect/Disconnect</string>
-           </property>
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset resource="res.qrc">
-             <normaloff>:/images/switch-off.png</normaloff>:/images/switch-off.png</iconset>
+             <normaloff>:/images/unpowered.png</normaloff>:/images/unpowered.png</iconset>
            </property>
            <property name="iconSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>22</width>
+             <height>22</height>
             </size>
            </property>
           </widget>
@@ -233,16 +178,16 @@
     <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
+       <enum>QFrame::Shadow::Plain</enum>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -252,8 +197,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>266</width>
-         <height>216</height>
+         <width>246</width>
+         <height>260</height>
         </rect>
        </property>
       </widget>
@@ -266,8 +211,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>284</width>
-     <height>21</height>
+     <width>264</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

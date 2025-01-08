@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <QSettings>
+#include <QDebug>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle(QApplication::applicationName());
 
-    readSettings();
+    this->readSettings();
 
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
@@ -36,6 +37,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
 
+    connect(hidDevice, &CustomHid::showStatusBar,
+            this, &MainWindow::onShowStatusBar);
+    connect(hidDevice, &CustomHid::deviceConnected,
+            this, &MainWindow::onUsbConnected);
+    connect(hidDevice, &CustomHid::deviceDisconnected,
+            this, &MainWindow::onUsbDisconnected);
+
     /* Activate status bar */
     QFont font;
     font.setItalic(true);
@@ -43,8 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->resize(260, 310);
 
-    /* Attempting to connect a USB device */
-    onConnectButtonClicked();
+    /* Attempting to connect a USB device
+    onConnectButtonClicked(); */
 }
 
 /**
@@ -52,13 +60,26 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
-    writeSettings();
-
     if (isConnected) {
         this->onConnectButtonClicked();
     }
-    delete hidDevice;
+
+    this->writeSettings();
+
+    if (hidDevice != nullptr) {
+        delete hidDevice;
+    }
     delete ui;
+}
+
+/**
+ * @brief onShowStatusBar
+ * @param str
+ * @param timeout
+ */
+void MainWindow::onShowStatusBar(const QString &str, int timeout)
+{
+    statusBar()->showMessage(str, timeout);
 }
 
 /**
@@ -67,32 +88,96 @@ MainWindow::~MainWindow()
 void MainWindow::onConnectButtonClicked()
 {
     isShowClockEnabled = false;
+    isOwSearchDone = false;
 
-    if (isConnected) {
-        this->stopUsbPolling();
-        hidDevice->Disconnect();
-        isConnected = false;
-        this->deinitWidgets();
-
-        ui->connectPushButton->setIcon(QIcon(":/images/switch-off.png"));
-        statusBar()->showMessage(tr("No USB connection"));
+    if (!isConnected) {
+        hidDevice->Connect(ProductString);
     }
     else {
-        isConnected = hidDevice->Connect(ProductString);
+        this->stopUsbPolling();
+        hidDevice->Disconnect();
+    }
+}
 
-        if (!isConnected) {
-            this->deinitWidgets();
-            ui->connectPushButton->setIcon(QIcon(":/images/switch-off.png"));
-            statusBar()->showMessage(tr("USB device not found"));
+/**
+ * @brief MainWindow::onUsbConnected
+ */
+void MainWindow::onUsbConnected()
+{
+    isConnected = true;
+    statusBar()->showMessage(tr("USB device connected"));
+    ui->connectPushButton->setIcon(QIcon(":/images/powered.png"));
+    this->startUsbPolling();
+}
+
+/**
+ * @brief MainWindow::onUsbDisconnected
+ */
+void MainWindow::onUsbDisconnected()
+{
+    isConnected = false;
+    this->deinitWidgets();
+    statusBar()->showMessage(tr("USB device disconnected"));
+    ui->connectPushButton->setIcon(QIcon(":/images/unpowered.png"));
+}
+
+/**
+ * @brief MainWindow::startUsbPolling
+ */
+void MainWindow::startUsbPolling()
+{
+    if (!isConnected) return;
+
+    if (!isPollingRunning) {
+        isPollingRunning = true;
+        usbPollingPeriod = startTimer(10);
+        secCounterEvent = startTimer(1000);
+    }
+}
+
+/**
+ * @brief MainWindow::stopUsbPolling
+ */
+void MainWindow::stopUsbPolling()
+{
+    if (usbPollingPeriod != 0) {
+        killTimer(usbPollingPeriod);
+        usbPollingPeriod = 0;
+        isPollingRunning = false;
+    }
+    if (secCounterEvent != 0) {
+        killTimer(secCounterEvent);
+        secCounterEvent = 0;
+        secCounter = 0;
+        writedDevice = 0;
+    }
+}
+
+/**
+ * @brief MainWindow::timerEvent
+ * @param event
+ */
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == usbPollingPeriod) {
+        int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
+        if (len < 0) { // Lost connection
+            if (isConnected)
+                ///this->onConnectButtonClicked();
             return;
         }
-
-        ui->searchPushButton->setEnabled(true);
-        ui->clockPushButton->setEnabled(true);
-        ui->connectPushButton->setIcon(QIcon(":/images/switch-on.png"));
-        statusBar()->showMessage(tr("USB device connected"));
-        this->startUsbPolling();
-        this->onSearchButtonClicked();
+        else if (len != 0) {
+            this->handleReceivedPacket();
+        }
+    }
+    else if (event->timerId() == secCounterEvent) {
+        if (!isOwSearchDone) {
+            this->onSearchButtonClicked();
+        }
+        else if (++secCounter == writeFilePeriod) {
+            secCounter = 0;
+            writedDevice = 0;
+        }
     }
 }
 
@@ -101,9 +186,10 @@ void MainWindow::onConnectButtonClicked()
  */
 void MainWindow::onSearchButtonClicked()
 {
-    allDeviceAddressList.clear();
+    if (!isConnected) return;
 
-    ui->searchPushButton->setEnabled(false);
+    isOwSearchDone = false;
+    allDeviceAddressList.clear();
     this->onSendCommand(eSearchCmd, nullptr, 0);
 }
 
@@ -147,6 +233,7 @@ void MainWindow::onSettingsButtonClicked()
 
     QVBoxLayout *vdlgLayout = new QVBoxLayout;
     writeFileCheckbox = new QCheckBox(tr("Write CSV file"));
+    writeFileCheckbox->setLayoutDirection(Qt::RightToLeft);
     writeFileCheckbox->setChecked(true);
     writeFilePeriodSpinbox = new QSpinBox;
     writeFilePeriodSpinbox->setRange(1, 300);
@@ -258,57 +345,9 @@ void MainWindow::onSendCommand(TOpcode opcode, quint8 *data, int data_len)
         tx_packet->data[i] = data[i];
     }
 
-    int len = hidDevice->Write(txUsbBuffer, USB_BUFF_SIZE, false);
+    int len = hidDevice->Write(txUsbBuffer, USB_BUFF_SIZE, true);
     if (len < 0) { // Lost connection
-        if (isConnected) this->onConnectButtonClicked();
-    }
-}
-
-/**
- * @brief MainWindow::startUsbPolling
- */
-void MainWindow::startUsbPolling()
-{
-    if (!isConnected) return;
-
-    if (!isPollingRunning) {
-        isPollingRunning = true;
-        usbPollingPeriod = startTimer(10);
-        secCounterEvent = startTimer(1000);
-    }
-}
-
-/**
- * @brief MainWindow::stopUsbPolling
- */
-void MainWindow::stopUsbPolling()
-{
-    killTimer(usbPollingPeriod);
-    usbPollingPeriod = 0;
-    isPollingRunning = false;
-}
-
-/**
- * @brief MainWindow::timerEvent
- * @param event
- */
-void MainWindow::timerEvent(QTimerEvent *event)
-{
-    if (event->timerId() == usbPollingPeriod) {
-        int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
-        if (len < 0) { // Lost connection
-            if (isConnected) this->onConnectButtonClicked();
-            return;
-        }
-        else if (len != 0) {
-            handleReceivedPacket();
-        }
-    }
-    if (event->timerId() == secCounterEvent) {
-        if (++secCounter == writeFilePeriod) {
-            secCounter = 0;
-            writedDevice = 0;
-        }
+    //    if (isConnected) this->onConnectButtonClicked();
     }
 }
 
@@ -329,7 +368,6 @@ void MainWindow::initDeviceComboBox()
         }
     }
     ui->deviceComboBox->addItems(ComboBoxItems);
-    ui->searchPushButton->setEnabled(true);
 }
 
 /**
@@ -354,14 +392,16 @@ void MainWindow::onDeviceComboBoxChanged(int index)
     }
 
     statusBar()->showMessage(ui->deviceComboBox->currentText() +
-                                 " device found: " + QString::number(selDevices.size()), 5000);
+                                 " device found: " + QString::number(selDevices.size()));
 
     this->createWidgetsLayout(selDevices.size());
 
     quint8 data[2];
     data[0] = dev_family;
     data[1] = (quint8)owPollingPeriod;
-    this->onSendCommand(eReadCmd, data, sizeof(data));
+    if (isPollingRunning) {
+        this->onSendCommand(eReadCmd, data, sizeof(data));
+    }
 }
 
 /**
@@ -371,7 +411,9 @@ void MainWindow::createWidgetsLayout(int count)
 {
     if (count < 1) return;
 
-    deviceWidget.clear();
+    if (!deviceWidget.isEmpty()) {
+        deviceWidget.clear();
+    }
 
     /* Delete previous layout if exist */
     this->deleteDeviceLayout();
@@ -437,13 +479,14 @@ void MainWindow::handleReceivedPacket()
             break;
 
         case eEnumerateDone:
+            isOwSearchDone = true;
             this->initDeviceComboBox();
             if ((allDeviceAddressList.size() == 0) && (!isShowClockEnabled)) {
                 this->onClockButtonClicked();
             }
             else {
                 statusBar()->showMessage(tr("Total 1-Wre devices found: ") +
-                                            QString::number(allDeviceAddressList.size()), 5000);
+                                            QString::number(allDeviceAddressList.size()));
             }
             break;
 
@@ -490,10 +533,18 @@ void MainWindow::writeCsvFile(float value, int index)
 {
     if (isWriteFileEnabled && (writedDevice < selDevices.size()))
     {
-        QString folderPath = QDir::currentPath() + "/DS18B20_CSV";
+        QString folderPath;
+
+#ifdef __ANDROID__
+        folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
+#else
+        folderPath = QDir::currentPath() + "/DS18B20_CSV";
+#endif
+
         QDir folder = folderPath;
+
         if (!folder.exists()) {
-            folder.mkdir(folderPath);
+            folder.mkpath(folderPath);
         }
 
         QString filename = (folderPath + "/sensor" + QString::number(index) +
@@ -541,10 +592,9 @@ void MainWindow::deleteDeviceLayout()
 void MainWindow::deinitWidgets()
 {
     this->deleteDeviceLayout();
+    deviceWidget.clear();
     ui->deviceComboBox->clear();
     ui->deviceComboBox->setCurrentIndex(-1);
-    ui->searchPushButton->setEnabled(false);
-    ui->clockPushButton->setEnabled(false);
 }
 
 /**

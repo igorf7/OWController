@@ -2,6 +2,8 @@
 #define CUSTOMHID_H
 
 #include "hidapi/hidapi.h"
+#include "hidapi/libusb.h"
+#include "hidapi/hidapi_libusb.h"
 #include <QObject>
 
 class CustomHid : public QObject
@@ -14,17 +16,15 @@ public:
 
     ~CustomHid();
 
-    bool Connect(const QString &product_string);
+    void Connect(const QString &product_string);
     void Disconnect();
-    void setVid(unsigned short vid);
-    void setPid(unsigned short pid);
     int Read(unsigned char *buff, size_t len);
     int Write(unsigned char *buff, size_t len, bool feat_mode);
-    unsigned short getVid();
-    unsigned short getPid();
-    wchar_t* getProductString();
-    wchar_t* getManufacturerString();
-    wchar_t* getSerialNumber();
+
+signals:
+    void showStatusBar(const QString &str, int timeout);
+    void deviceConnected();
+    void deviceDisconnected();
 
 private:
     static const unsigned short MAX_STR = 255;
@@ -32,9 +32,10 @@ private:
     unsigned short VID, PID;
     wchar_t wstr[MAX_STR];
 
-    hid_device *deviceHandle = nullptr;
-    hid_device_info *deviceInfo = nullptr;
+    hid_device *deviceHandle = NULL;
+    hid_device_info *deviceInfo = NULL;
 
-    int opResult;
+    void findUsbDevice();
+    int openUsbDevice();
 };
 #endif // CUSTOMHID_H
