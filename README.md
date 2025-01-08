@@ -24,4 +24,4 @@ For all other devices, the contents of the ROM and the device description are di
 Support for any device can be easily implemented by analogy with the existing implementation.
 ## Supported OS
 Tested on Windows, Linux, Android. \
-Qt 6.7.0 is used for building on Android.
+Qt 6.7.0 is used for building on Android, Linux and Windows platforms.
