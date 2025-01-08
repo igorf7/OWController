@@ -23,5 +23,5 @@ DS1971 EEPROM\
 For all other devices, the contents of the ROM and the device description are displayed.\
 Support for any device can be easily implemented by analogy with the existing implementation.
 ## Supported OS
-Tested on Windows, Linux, Android. \
+Tested on Windows 11, Manjaro Linux, Android 8. \
 Qt 6.7.0 is used for building on Android, Linux and Windows platforms.
