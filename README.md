@@ -1,7 +1,7 @@
 # OWController
 Version 1.1.1
 ## Description
-Controls devices on the 1-Wire bus.
+Controlling devices on the 1-Wire bus.
 The OWController project contains two levels:
 1. The lower level, implemented on the STM32F103 microcontroller (Blue Pill PLus board).
    The USART1_TX (PA9) or USART2_TX (PA2) line of the microcontroller is used as a 1-Wire bus.
