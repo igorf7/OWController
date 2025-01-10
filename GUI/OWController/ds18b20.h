@@ -23,8 +23,8 @@ public:
     void setWriteFilePeriod(bool enabled, int period) override;
 
 protected:
-    qint32 secondIntervalEvent = 0;
-    void timerEvent(QTimerEvent *event);
+    qint32 secIntervalEvent = 0;
+    void timerEvent(QTimerEvent *event) override;
 
 private slots:
     void onSettingsButtonClicked();

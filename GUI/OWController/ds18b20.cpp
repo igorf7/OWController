@@ -32,9 +32,9 @@ DS18B20::DS18B20(DeviceWidget *parent) :
 
 DS18B20::~DS18B20()
 {
-    if (secondIntervalEvent != 0) {
-        killTimer(secondIntervalEvent);
-        secondIntervalEvent = 0;
+    if (secIntervalEvent != 0) {
+        killTimer(secIntervalEvent);
+        secIntervalEvent = 0;
     }
 
     delete ui;
@@ -109,7 +109,7 @@ void DS18B20::showDeviceData(quint8 *data, int index)
  */
 void DS18B20::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == secondIntervalEvent) {
+    if (event->timerId() == secIntervalEvent) {
         secCounter++;
         if (secCounter >= writeFilePeriod) {
             isWriteFileRequired = true;
@@ -130,11 +130,11 @@ void DS18B20::setWriteFilePeriod(bool enabled, int period)
     writeFilePeriod = period;
 
     if (isWriteFileEnabled) {
-        secondIntervalEvent = startTimer(1000);
+        secIntervalEvent = startTimer(1000);
     }
-    else if (secondIntervalEvent != 0) {
-        killTimer(secondIntervalEvent);
-        secondIntervalEvent = 0;
+    else if (secIntervalEvent != 0) {
+        killTimer(secIntervalEvent);
+        secIntervalEvent = 0;
     }
 }
 
