@@ -19,5 +19,6 @@ void DeviceSearchTask(void *prm);
 void DeviceEnumerate(void *prm);
 void DeviceReadTask(void *prm);
 void DeviceWriteTask(void *prm);
+void setUsbTransmitEnable(bool state);
 uint8_t DeviceGetCount(void);
 #endif // __DEVIETASK_H
