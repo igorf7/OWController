@@ -107,8 +107,18 @@ void CustomHid::Disconnect()
 int CustomHid::Read(unsigned char *buff, size_t len)
 {
     /* Read rx data */
-    //return hid_get_feature_report(deviceHandle, buff, len);
     return hid_read(deviceHandle, buff, len);
+}
+
+/**
+ * @brief CustomHid::getFeatureReport
+ * @param buff - pointer to rx data buffer
+ * @param len - received data lenght
+ * @return  number of bytes received
+ */
+int CustomHid::getFeatureReport(unsigned char *buff, size_t len)
+{
+    return hid_get_feature_report(deviceHandle, buff, len);
 }
 
 /**
@@ -117,15 +127,21 @@ int CustomHid::Read(unsigned char *buff, size_t len)
  * @param len - transmitted data lenght
  * @return number of bytes transmitted
  */
-int CustomHid::Write(unsigned char *buff, size_t len, bool feat_mode)
+int CustomHid::Write(unsigned char *buff, size_t len)
 {
     /* Send data to device */
-    if (feat_mode) {
-        return hid_send_feature_report(deviceHandle, buff, len);
-    }
-    else {
-        return hid_write(deviceHandle, buff, len);
-    }
+    return hid_write(deviceHandle, buff, len);
+}
+
+/**
+ * @brief CustomHid::sendFeatureReport
+ * @param buff - pointer to tx data buffer
+ * @param len - transmitted data lenght
+ * @return  number of bytes transmitted
+ */
+int CustomHid::sendFeatureReport(unsigned char *buff, size_t len)
+{
+    return hid_send_feature_report(deviceHandle, buff, len);
 }
 
 /**

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>264</width>
-    <height>380</height>
+    <width>260</width>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,10 +21,10 @@
     <item>
      <widget class="QFrame" name="frame">
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Plain</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -178,16 +178,16 @@
     <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Plain</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -197,8 +197,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>246</width>
-         <height>260</height>
+         <width>242</width>
+         <height>248</height>
         </rect>
        </property>
       </widget>
@@ -211,8 +211,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>264</width>
-     <height>22</height>
+     <width>260</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>

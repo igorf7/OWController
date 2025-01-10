@@ -19,7 +19,9 @@ public:
     void Connect(const QString &product_string);
     void Disconnect();
     int Read(unsigned char *buff, size_t len);
-    int Write(unsigned char *buff, size_t len, bool feat_mode);
+    int Write(unsigned char *buff, size_t len);
+    int getFeatureReport(unsigned char *buff, size_t len);
+    int sendFeatureReport(unsigned char *buff, size_t len);
 
 signals:
     void showStatusBar(const QString &str, int timeout);
@@ -34,6 +36,8 @@ private:
 
     hid_device *deviceHandle = NULL;
     hid_device_info *deviceInfo = NULL;
+
+
 
     void findUsbDevice();
     int openUsbDevice();

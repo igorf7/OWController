@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <QSettings>
-#include <QDebug>
 
 using namespace std;
 
@@ -36,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(onDeviceComboBoxChanged(int)));
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
-
     connect(hidDevice, &CustomHid::showStatusBar,
             this, &MainWindow::onShowStatusBar);
     connect(hidDevice, &CustomHid::deviceConnected,
@@ -128,7 +126,7 @@ void MainWindow::startUsbPolling()
 
     if (!isPollingRunning) {
         isPollingRunning = true;
-        usbPollingPeriod = startTimer(10);
+        usbPollingPeriod = startTimer(15);
         secCounterEvent = startTimer(1000);
     }
 }
@@ -160,8 +158,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
     if (event->timerId() == usbPollingPeriod) {
         int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
         if (len < 0) { // Lost connection
-            if (isConnected)
-                ///this->onConnectButtonClicked();
+            if (isConnected) this->onConnectButtonClicked();
             return;
         }
         else if (len != 0) {
@@ -169,10 +166,11 @@ void MainWindow::timerEvent(QTimerEvent *event)
         }
     }
     else if (event->timerId() == secCounterEvent) {
+        secCounter++;
         if (!isOwSearchDone) {
             this->onSearchButtonClicked();
         }
-        else if (++secCounter == writeFilePeriod) {
+        else if (secCounter == writeFilePeriod) {
             secCounter = 0;
             writedDevice = 0;
         }
@@ -230,8 +228,7 @@ void MainWindow::onSettingsButtonClicked()
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
 
     QVBoxLayout *vdlgLayout = new QVBoxLayout;
-    writeFileCheckbox = new QCheckBox(tr("Write CSV file"));
-    writeFileCheckbox->setLayoutDirection(Qt::RightToLeft);
+    writeFileCheckbox = new QCheckBox(tr("Write CSV file (DS18B20 Only)"));
     writeFileCheckbox->setChecked(true);
     writeFilePeriodSpinbox = new QSpinBox;
     writeFilePeriodSpinbox->setRange(1, 300);
@@ -243,8 +240,8 @@ void MainWindow::onSettingsButtonClicked()
     pollingPeriodSpinbox->setSingleStep(1);
     pollingPeriodSpinbox->setValue(owPollingPeriod);
     pollingPeriodSpinbox->setSuffix(tr(" sec"));
-    QLabel *writePeriodLabel = new QLabel(tr("Write File Period"));
     QLabel *pollingPeriodLabel = new QLabel(tr("1-Wire Bus Polling Period"));
+    QLabel *writePeriodLabel = new QLabel(tr("Write CSV file period"));
     QPushButton *closeButton = new QPushButton(tr("Save and Close"));
     closeButton->setMinimumHeight(32);
 
@@ -254,12 +251,11 @@ void MainWindow::onSettingsButtonClicked()
     h1Layout->addStretch();
 
     QHBoxLayout *h2Layout = new QHBoxLayout;
-    h2Layout->addWidget(writeFileCheckbox);
-    h2Layout->addStretch();
     h2Layout->addWidget(writePeriodLabel);
     h2Layout->addWidget(writeFilePeriodSpinbox);
 
     vdlgLayout->addLayout(h1Layout);
+    vdlgLayout->addWidget(writeFileCheckbox);
     vdlgLayout->addLayout(h2Layout);
     vdlgLayout->addWidget(closeButton);
     settingsWindow->setLayout(vdlgLayout);
@@ -343,9 +339,9 @@ void MainWindow::onSendCommand(TOpcode opcode, quint8 *data, int data_len)
         tx_packet->data[i] = data[i];
     }
 
-    int len = hidDevice->Write(txUsbBuffer, USB_BUFF_SIZE, true);
+    int len = hidDevice->Write(txUsbBuffer, USB_BUFF_SIZE);
     if (len < 0) { // Lost connection
-    //    if (isConnected) this->onConnectButtonClicked();
+        if (isConnected) this->onConnectButtonClicked();
     }
 }
 
@@ -365,7 +361,9 @@ void MainWindow::initDeviceComboBox()
             ComboBoxItems.append(name);
         }
     }
-    ui->deviceComboBox->addItems(ComboBoxItems);
+    if (!ComboBoxItems.isEmpty()) {
+        ui->deviceComboBox->addItems(ComboBoxItems);
+    }
 }
 
 /**
@@ -484,7 +482,7 @@ void MainWindow::handleReceivedPacket()
             }
             else {
                 statusBar()->showMessage(tr("Total 1-Wre devices found: ") +
-                                            QString::number(allDeviceAddressList.size()));
+                                        QString::number(allDeviceAddressList.size()));
             }
             break;
 
