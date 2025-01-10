@@ -31,7 +31,7 @@ public:
 
 protected:
     qint32 usbPollingPeriod = 0;
-    qint32 secCounterEvent = 0;
+    qint32 secondIntervalEvent = 0;
     void timerEvent(QTimerEvent *event);
 
 public slots:
@@ -70,7 +70,6 @@ private:
     QHash<quint64, int> selDevices;
 
     quint32 timeStamp;
-    int secCounter = 0;
     int writeFilePeriod;
     int owPollingPeriod;
 
@@ -79,10 +78,6 @@ private:
     bool isShowClockEnabled = false;
     bool isWriteFileEnabled = true;
     bool isOwSearchDone = false;
-
-    quint8 writedDevice = 0;
-
-    char column_sep = ';';
 
     unsigned char rxUsbBuffer[USB_BUFF_SIZE];
     unsigned char txUsbBuffer[USB_BUFF_SIZE];
@@ -94,7 +89,6 @@ private:
     void handleReceivedPacket();
     void initDeviceComboBox();
     void deleteDeviceLayout();
-    void writeCsvFile(float value, int index);
     void readSettings();
     void writeSettings();
 };

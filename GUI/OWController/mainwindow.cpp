@@ -1,10 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "cardview.h"
-#include <QDir>
-#include <QFile>
-#include <QDateTime>
-#include <QTextStream>
 #include <QSettings>
 
 using namespace std;
@@ -127,7 +123,7 @@ void MainWindow::startUsbPolling()
     if (!isPollingRunning) {
         isPollingRunning = true;
         usbPollingPeriod = startTimer(15);
-        secCounterEvent = startTimer(1000);
+        secondIntervalEvent = startTimer(1000);
     }
 }
 
@@ -141,11 +137,9 @@ void MainWindow::stopUsbPolling()
         usbPollingPeriod = 0;
         isPollingRunning = false;
     }
-    if (secCounterEvent != 0) {
-        killTimer(secCounterEvent);
-        secCounterEvent = 0;
-        secCounter = 0;
-        writedDevice = 0;
+    if (secondIntervalEvent != 0) {
+        killTimer(secondIntervalEvent);
+        secondIntervalEvent = 0;
     }
 }
 
@@ -165,14 +159,9 @@ void MainWindow::timerEvent(QTimerEvent *event)
             this->handleReceivedPacket();
         }
     }
-    else if (event->timerId() == secCounterEvent) {
-        secCounter++;
+    else if (event->timerId() == secondIntervalEvent) {
         if (!isOwSearchDone) {
             this->onSearchButtonClicked();
-        }
-        else if (secCounter == writeFilePeriod) {
-            secCounter = 0;
-            writedDevice = 0;
         }
     }
 }
@@ -301,18 +290,23 @@ void MainWindow::onCloseSettingsClicked()
     {
         isWriteFileEnabled = writeFileCheckbox->isChecked();
 
-        if (writeFilePeriodSpinbox->value() < writeFilePeriod) {
-            secCounter = 0;
-        }
         writeFilePeriod = writeFilePeriodSpinbox->value();
 
-        if (owPollingPeriod != pollingPeriodSpinbox->value()) {
+        if (!ui->deviceComboBox->currentText().isEmpty() &&
+            (owPollingPeriod != pollingPeriodSpinbox->value()))
+        {
             owPollingPeriod = pollingPeriodSpinbox->value();
             quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
             quint8 data[2];
             data[0] = dev_family;
             data[1] = (quint8)owPollingPeriod;
             this->onSendCommand(eReadCmd, data, sizeof(data));
+        }
+
+        if (!deviceWidget.isEmpty()) {
+            for (auto &it : deviceWidget) {
+                it->setWriteFilePeriod(isWriteFileEnabled, writeFilePeriod);
+            }
         }
 
         settingsWindow->close();
@@ -433,6 +427,7 @@ void MainWindow::createWidgetsLayout(int count)
 
             case 0x28: // DS18B20
                 deviceWidget << new DS18B20;
+                deviceWidget.at(i)->setWriteFilePeriod(isWriteFileEnabled, writeFilePeriod);
                 break;
 
             default:  // any other device
@@ -491,11 +486,6 @@ void MainWindow::handleReceivedPacket()
                 int index = selDevices.value(dev_addr);
                 deviceWidget.at(index)->showDeviceData(rx_packet->data, index + 1);
             }
-            if (ui->deviceComboBox->currentText() == "DS18B20") {
-                int index = selDevices.value(dev_addr);
-                float value = *((float*)(rx_packet->data + sizeof(dev_addr)));
-                this->writeCsvFile(value, index+1);
-            }
             break;
 
         case eWriteCmd:
@@ -519,51 +509,6 @@ void MainWindow::handleReceivedPacket()
         default:
             break;
         }
-    }
-}
-
-/**
- * @brief MainWindow::writeCsvFile
- */
-void MainWindow::writeCsvFile(float value, int index)
-{
-    if (isWriteFileEnabled && (writedDevice < selDevices.size()))
-    {
-        QString folderPath;
-
-#ifdef __ANDROID__
-        folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
-#else
-        folderPath = QDir::currentPath() + "/DS18B20_CSV";
-#endif
-
-        QDir folder = folderPath;
-
-        if (!folder.exists()) {
-            folder.mkpath(folderPath);
-        }
-
-        QString filename = (folderPath + "/sensor" + QString::number(index) +
-                            QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));
-
-        QFile file(filename);
-        QTextStream ts(&file);
-
-        if (!file.exists()) {
-            /* Write header for new csv file */
-            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                ts << "sep=" << column_sep << Qt::endl
-                   << "Time" << column_sep << "t, " << QChar(176) << 'C' << Qt::endl;
-                file.close();
-            }
-        }
-
-        /* Write data to csv file */
-        file.open(QIODevice::Append | QIODevice::Text);
-        ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
-           << QString::number(value, 'f', 1) << Qt::endl;
-        file.close();
-        writedDevice++;
     }
 }
 

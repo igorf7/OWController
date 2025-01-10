@@ -19,6 +19,7 @@ public:
     void showDeviceData(quint8 *data, int index) override;
     void setAddress(quint64 address) override;
     void setIndex(int index) override;
+    void setWriteFilePeriod(bool enabled, int period) override;
 
 private slots:
     void onSettingsButtonClicked();
@@ -33,8 +34,11 @@ private:
     quint64 myAddress = 0;
 
     int myIndex = 0;
+    int writeFilePeriod = 60;
 
     quint8 devFamilyCode = 0;
+
+    bool isWriteFileEnabled = true;
 };
 
 #endif // DS_OTHER_H

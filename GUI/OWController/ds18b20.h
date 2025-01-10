@@ -20,6 +20,11 @@ public:
     void showDeviceData(quint8 *data, int index) override;
     void setAddress(quint64 address) override;
     void setIndex(int index) override;
+    void setWriteFilePeriod(bool enabled, int period) override;
+
+protected:
+    qint32 secondIntervalEvent = 0;
+    void timerEvent(QTimerEvent *event);
 
 private slots:
     void onSettingsButtonClicked();
@@ -39,12 +44,21 @@ private:
     QLineEdit *resolutionLineEdit = nullptr;
     quint64 myAddress = 0;
     int myIndex = 0;
+    int secCounter = 0;
+    int writeFilePeriod = 60; // 60 sec by default
 
     float temperValue = 0.0f;
 
     qint8 devAlarmHigh = 0;
     qint8 devAlarmLow = 0;
     quint8 devResolution = 0;
+
+    char column_sep = ';';
+
+    bool isWriteFileEnabled = true;
+    bool isWriteFileRequired = false;
+
+    void writeCsvFile(float value, int index);
 };
 
 #endif // DS18B20_H

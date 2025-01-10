@@ -124,7 +124,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string/>
+            <string>Program settings</string>
            </property>
            <property name="text">
             <string/>
@@ -154,6 +154,9 @@
              <width>32</width>
              <height>32</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Connect/Disconnect</string>
            </property>
            <property name="text">
             <string/>

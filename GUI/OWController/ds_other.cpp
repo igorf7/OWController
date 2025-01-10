@@ -48,6 +48,17 @@ void DS_OTHER::showDeviceData(quint8 *data, int index)
 }
 
 /**
+ * @brief DS_OTHER::setWriteFilePeriod
+ * @param enabled
+ * @param period
+ */
+void DS_OTHER::setWriteFilePeriod(bool enabled, int period)
+{
+    Q_UNUSED(enabled)
+    Q_UNUSED(period)
+}
+
+/**
  * @brief DS_OTHER::setAddress
  * @param address
  */

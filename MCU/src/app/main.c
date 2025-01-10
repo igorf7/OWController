@@ -58,8 +58,8 @@ int main(void)
     InitSystickTimer(SysTick_Callback);
     StartSystickTimer(SYSTICK_INTERVAL);
     
-    /* Search devices task
-    PutTask(DeviceSearchTask, NULL); */
+    /* Search devices task */
+    PutTask(DeviceSearchTask, NULL);
         
     /* Enable Watchdog */
     #ifndef DEBUG
