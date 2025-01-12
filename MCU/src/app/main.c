@@ -12,14 +12,8 @@ static HidProp_t hidProp;
 static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcValue;
-static uint32_t systickIntervalCnt = 0;
-uint16_t pollPeriod = 1;
-uint16_t secCounter = 0;
-static bool isRtcSendEnabled = false;
-volatile bool isPollingEnabled = false;
-static uint8_t devType = DS18B20;
-static uint8_t totalDevCount = 0;
-static uint8_t currDevIndex = 0;
+static bool isRtcDataRequsted = false;
+static uint8_t devFamily = DS18B20;
 static uint8_t usbRxBuffer[wMaxPacketSize];
 
 /*!
@@ -27,18 +21,6 @@ static uint8_t usbRxBuffer[wMaxPacketSize];
 */
 int main(void)
 {
-    /* Initialize the USB hardware */
-    Wait_ticks(1500000); // to sinc with host
-    hidEndp.rx_buffer = usbRxBuffer;
-    hidEndp.rx_handler = USB_HandleRxData;
-    USB_SetHidEndp(&hidEndp);
-    hidProp.rx_buffer = usbRxBuffer;
-    hidProp.rx_handler = USB_HandleRxData;
-    USB_SetHidProp(&hidProp);
-    USB_Interrupts_Config();
-    Set_USBClock();
-    USB_Init();
-    
     /* Program startup indicator */
     LED_Init(LED1_PORT, LED1_PIN);
     LED_Blink(LED1_PORT, LED1_PIN, 1000000);
@@ -54,12 +36,23 @@ int main(void)
     RTC_Init(&rtcEvents);
     RTC_Set_Irq(RTC_IT_SEC);
     
-    /* Initializing the SysTick Timer */
+    /* Initializing the SysTick Timer
     InitSystickTimer(SysTick_Callback);
-    StartSystickTimer(SYSTICK_INTERVAL);
+    StartSystickTimer(SYSTICK_INTERVAL); */
     
     /* Search devices task */
     PutTask(DeviceSearchTask, NULL);
+    
+    /* Initialize the USB hardware */
+    hidEndp.rx_buffer = usbRxBuffer;
+    hidEndp.rx_handler = USB_HandleRxData;
+    USB_SetHidEndp(&hidEndp);
+    hidProp.rx_buffer = usbRxBuffer;
+    hidProp.rx_handler = USB_HandleRxData;
+    USB_SetHidProp(&hidProp);
+    USB_Interrupts_Config();
+    Set_USBClock();
+    USB_Init();
         
     /* Enable Watchdog */
     #ifndef DEBUG
@@ -85,11 +78,11 @@ static void BackgroundTask(void)
     WatchdogReload(KR_KEY_Reload);
     #endif
     
-    /* Send RTC value */
-    if (isRtcSendEnabled) {
-        isRtcSendEnabled = false;
+    /* Send RTC data via USB */
+    if (isRtcDataRequsted) {
+        isRtcDataRequsted = false;
         rtcValue = RTC_GetCounter();
-        USB_SendToHost(eGetRtcCmd, sizeof(rtcValue), (uint8_t*)&rtcValue);
+        USB_SendToHost(eGetRtcData, (uint8_t*)&rtcValue, sizeof(rtcValue));
     }
 }
 
@@ -98,35 +91,8 @@ static void BackgroundTask(void)
 */
 void RTC_SecondEvent(void)
 {
-    systickIntervalCnt = 0;
-    totalDevCount = DeviceGetCount();
-    /* Enable 1-Wire bus polling */
-    if (secCounter == 0) {
-        isPollingEnabled = true;
-    }
-    if (++secCounter >= pollPeriod) secCounter = 0;
-}
-
-/*!
- \brief SysTick Event callback function
-*/
-void SysTick_Callback(void)
-{
-    if (systickIntervalCnt % 2) {
-        isRtcSendEnabled = true;
-    }
-    else {
-        isRtcSendEnabled = false;
-        if (isPollingEnabled) {
-            PutTask(DeviceReadTask, &devType); // Schedule a task to read from 1-wire devices
-            currDevIndex++;
-            if (currDevIndex >= totalDevCount) {
-                currDevIndex = 0;
-                isPollingEnabled = false;
-            }
-        }
-    }
-    systickIntervalCnt++;
+    /* Schedule a task to read a 1-wire devices */
+    PutTask(DeviceReadTask, &devFamily);
 }
 
 /*!
@@ -140,24 +106,27 @@ void USB_HandleRxData(void)
     {
         switch (rx_packet->opcode)      // Check command code
         {
-        	case eSearchCmd:
+            case eOwSearch:
+                SetOwDataRequest(true);
                 PutTask(DeviceSearchTask, NULL); // Schedule a task to search a 1-wire devices
         		break;
-            case eReadCmd:
-                secCounter = 0;
-                devType = rx_packet->data[0];
-                pollPeriod = rx_packet->data[1];
+            case eOwReadData:
+                devFamily = rx_packet->data[0];
+                SetOwDataRequest(true);
         		break;
-            case eWriteCmd:
-                isPollingEnabled = false;
-                isRtcSendEnabled = false;
+            case eOwWriteData:
+                SetOwDataRequest(false);
                 PutTask(DeviceWriteTask, rx_packet->data); // Schedule a task to write at 1-wire devices
         		break;
-            case eSyncRtcCmd:
+            case eSyncRtc:
+                SetOwDataRequest(false);
                 RTC_DisableInterrupt(RTC_IT_SEC);
                 rtcValue = *((uint32_t*)rx_packet->data);
                 RTC_PresetDateTime(rtcValue);
                 RTC_EnableInterrupt(RTC_IT_SEC);
+                break;
+            case eGetRtcData:
+                isRtcDataRequsted = true;
                 break;
         	default:
         		break;

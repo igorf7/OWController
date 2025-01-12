@@ -14,8 +14,8 @@
 
 static OW_Device_t owDevice[OW_DEVICE_GANG_SIZE];
 static DS18B20_t ds18B20;
+static bool isOwDataRequested = false;
 static uint8_t deviceCount = 0;
-static uint8_t deviceIndex = 0;
 static uint8_t dataBuffer[64];
 
 /*!
@@ -47,7 +47,10 @@ void DeviceSearchTask(void *prm)
     }
     
     OW_ClearSearchResult();
-    DeviceEnumerate(NULL);
+    
+    if (isOwDataRequested) {
+        DeviceEnumerate(NULL);
+    }
 }
 
 /*!
@@ -60,11 +63,13 @@ void DeviceEnumerate(void *prm)
     
     for (i = 0; i < OW_DEVICE_GANG_SIZE; i++)
     {
-        if (owDevice[i].address == 0) break;
-        USB_SendToHost(eEnumerate, OW_ROM_SIZE, (uint8_t*)&owDevice[i].address);
+        if (owDevice[i].address == 0) continue;
+        
+        USB_SendToHost(eOwEnumerate, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
     }
     
-    USB_SendToHost(eEnumerateDone, 0, NULL);
+    USB_SendToHost(eOwEnumerateDone, NULL, 0);
+    isOwDataRequested = false;
 }
 
 /*!
@@ -73,8 +78,16 @@ void DeviceEnumerate(void *prm)
 */
 uint8_t DeviceGetCount(void)
 {
-    deviceIndex = 0;
     return deviceCount;
+}
+
+/*!
+ \brief Enable/Disable transmit via USB
+ \param true - enable transmit, false disable transmit
+*/
+void SetOwDataRequest(bool state)
+{
+    isOwDataRequested = state;
 }
 
 /*!
@@ -83,42 +96,49 @@ uint8_t DeviceGetCount(void)
 */
 void DeviceReadTask(void *prm)
 {
-    uint16_t data_size = 0;
-    uint8_t my_dev_family = 0;
+    uint16_t i, data_size;
+    uint8_t dev_family = 0;
     uint8_t sel_dev_family = *((uint8_t*)prm);
     
-    if ((owDevice[deviceIndex].address != 0) && (deviceIndex < deviceCount))
+    for (i = 0; i < deviceCount; i++)
     {
-        my_dev_family = owDevice[deviceIndex].address & FAMILY_CODE_MASK;
-        if (owDevice[deviceIndex].connected && (my_dev_family == sel_dev_family))
-        {
+        if (owDevice[i].address == 0) continue;
+        data_size = 0;
+        dev_family = owDevice[i].address & FAMILY_CODE_MASK;
+        if (owDevice[i].connected && (dev_family == sel_dev_family)) {
             OW_Reset();
-            OW_MatchRom(((uint8_t*)&owDevice[deviceIndex].address));
+            OW_MatchRom(((uint8_t*)&owDevice[i].address));
             
-            switch (sel_dev_family)
+            switch (dev_family)
             {
-            case DS1971:
-                memcpy(dataBuffer, (uint8_t*)&owDevice[deviceIndex].address, OW_ROM_SIZE);
-                DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
-                data_size = OW_ROM_SIZE + DS1971_EEPROM_SIZE;
-                break;
-            case DS18B20:
-                DS18B20_ReadScratchpad(&ds18B20);
-                memcpy(dataBuffer, (uint8_t*)&owDevice[deviceIndex].address, OW_ROM_SIZE);
-                memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
-                data_size = OW_ROM_SIZE + sizeof(ds18B20);
-                OW_Reset();
-                OW_MatchRom(((uint8_t*)&owDevice[deviceIndex].address));
-                DS18B20_Convert();  // start new conversion
-                break;
-            default:
-                memcpy(dataBuffer, (uint8_t*)&owDevice[deviceIndex].address, OW_ROM_SIZE);
-                data_size = OW_ROM_SIZE;
-                break;
+                case DS18B20:
+                    DS18B20_ReadScratchpad(&ds18B20);
+                    memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
+                    memcpy((dataBuffer + OW_ROM_SIZE), (uint8_t*)&ds18B20, sizeof(ds18B20));
+                    data_size = OW_ROM_SIZE + sizeof(ds18B20);
+                    break;
+                case DS1971:
+                    memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
+                    DS1971_ReadEeprom((dataBuffer + OW_ROM_SIZE));
+                    data_size = OW_ROM_SIZE + DS1971_EEPROM_SIZE;
+                    break;
+                default:
+                    memcpy(dataBuffer, (uint8_t*)&owDevice[i].address, OW_ROM_SIZE);
+                    data_size = OW_ROM_SIZE;
+                    break;
             }
-            USB_SendToHost(eReadCmd, data_size, dataBuffer);
+            if (isOwDataRequested) {
+                USB_SendToHost(eOwReadData, dataBuffer, data_size);
+            }
         }
-        deviceIndex++;
+    }
+    
+    isOwDataRequested = false;
+    
+    if (dev_family == DS18B20) {
+        OW_Reset();
+        OW_SkipRom();
+        DS18B20_Convert();  // start new conversion for al DS18B20
     }
 }
 

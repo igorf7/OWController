@@ -12,8 +12,6 @@
 #include "rtc.h"
 #include "usart.h"
 
-#define SYSTICK_INTERVAL    50U // half period
-
 #define IWDG_WA_Enable      ((uint16_t)0x5555)
 #define IWDG_WA_Disable     ((uint16_t)0x0000)
 #define KR_KEY_Reload       ((uint16_t)0xAAAA)
@@ -35,5 +33,4 @@ static void BackgroundTask(void);
 /* Callbacks */
 void RTC_SecondEvent(void);
 void USB_HandleRxData(void);
-void SysTick_Callback(void);
 #endif  // __MAIN_H

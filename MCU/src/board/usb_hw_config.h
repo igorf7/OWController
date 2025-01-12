@@ -27,13 +27,13 @@ typedef enum
 /* Device Opcodes */
 typedef enum
 {
-    eSearchCmd = (uint8_t)1,
-    eEnumerate,
-    eEnumerateDone,
-    eReadCmd,
-    eWriteCmd,
-    eGetRtcCmd,
-    eSyncRtcCmd
+    eOwSearch = (uint8_t)1,
+    eOwEnumerate,
+    eOwEnumerateDone,
+    eOwReadData,
+    eOwWriteData,
+    eGetRtcData,
+    eSyncRtc
 } AppLayerOpcode_t;
 
 /* Application Layer Packet Structure */
@@ -57,7 +57,7 @@ static void IntToUnicode(uint32_t value , uint8_t *pbuf , uint8_t len);
 void USB_Interrupts_Config(void);
 void Set_USBClock(void);
 void Set_System(void);
-bool USB_SendToHost(uint8_t opcode, int16_t size, uint8_t *data);
+bool USB_SendToHost(uint8_t opcode, uint8_t *data, int16_t size);
 void GPIO_AINConfig(void);
 void Enter_LowPowerMode(void);
 void Leave_LowPowerMode(void);

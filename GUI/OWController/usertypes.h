@@ -16,13 +16,13 @@ typedef enum
 /* Opcodes */
 typedef enum
 {
-    eSearchCmd = (quint8)1,
-    eEnumerate,
-    eEnumerateDone,
-    eReadCmd,
-    eWriteCmd,
-    eGetRtcCmd,
-    eSyncRtcCmd
+    eOwSearch = (quint8)1,
+    eOwEnumerate,
+    eOwEnumerateDone,
+    eOwReadData,
+    eOwWriteData,
+    eGetRtcData,
+    eSyncRtc
 } TOpcode;
 
 /* Application Layer Packet Structure */

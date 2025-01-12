@@ -67,7 +67,7 @@ void Set_USBClock(void)
  \param Size of data block
  \param data block
 */
-bool USB_SendToHost(uint8_t opcode, int16_t size, uint8_t *data)
+bool USB_SendToHost(uint8_t opcode, uint8_t *data, int16_t size)
 {
     uint32_t timeout = 1500000;
     AppLayerPacket_t *txUsbPacket = (AppLayerPacket_t*)usbTxBuffer;

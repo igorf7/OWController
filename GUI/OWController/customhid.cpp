@@ -40,6 +40,14 @@ void CustomHid::Connect(const QString &product_string)
 #ifdef __ANDROID__
     Q_UNUSED(product_string)
 
+    // if (QNativeInterface::QAndroidApplication::sdkVersion() >= __ANDROID_API_T__) {
+    //     const auto permission = "android.permission.USB_PERMISSION"_L1;
+    //     auto requestResult = QtAndroidPrivate::requestPermission(permission);
+    //     if (requestResult.result() != QtAndroidPrivate::Authorized) {
+    //         emit showStatusBar("No permission", 0);
+    //     }
+    // }
+
     /* Open USB device via JNI */
     int file_descriptor = this->openUsbDevice();
 

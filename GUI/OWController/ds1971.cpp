@@ -211,7 +211,7 @@ void DS1971::onWriteButtonClicked()
 
     memEdit->clear();
     len += DS1971_MEMORY_SIZE;
-    emit sendCommand(eWriteCmd, tx_data, len);
+    emit sendCommand(eOwWriteData, tx_data, len);
 }
 
 /**
