@@ -21,7 +21,13 @@ public class CustomHid
     private static UsbManager usbManager;
     private static UsbDevice usbDevice;
     private static PendingIntent mPermissionIntent;
-    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    private static String productName = "";
+    private static final String ACTION_USB_PERMISSION = "android.permission.USB_PERMISSION";
+
+    public static void setProductName(String product_name)
+    {
+        productName = product_name;
+    }
 
     public static void findUsbDevice(Context context, int vid, int pid)
     {
@@ -31,7 +37,10 @@ public class CustomHid
         usbDevice = null;
         while(deviceIterator.hasNext()) {
             UsbDevice device = deviceIterator.next();
-            if ((device.getVendorId() == vid) && (device.getProductId() == pid)) {
+            if ((device.getVendorId() == vid) && (device.getProductId() == pid)
+                &&
+                (productName.compareTo(device.getProductName())==0))
+            {
                 usbDevice = device;
                 if (usbDevice != null) {
                     mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);

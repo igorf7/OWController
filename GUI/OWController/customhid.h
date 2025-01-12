@@ -16,7 +16,7 @@ public:
 
     ~CustomHid();
 
-    void Connect(const QString &product_string);
+    void Connect();
     void Disconnect();
     int Read(unsigned char *buff, size_t len);
     int Write(unsigned char *buff, size_t len);
@@ -29,6 +29,7 @@ signals:
     void deviceDisconnected();
 
 private:
+    const QString ProductString = "OW Controller";
     static const unsigned short MAX_STR = 255;
 
     unsigned short VID, PID;
@@ -37,8 +38,7 @@ private:
     hid_device *deviceHandle = NULL;
     hid_device_info *deviceInfo = NULL;
 
-
-
+    void setProductName();
     void findUsbDevice();
     int openUsbDevice();
 };

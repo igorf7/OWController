@@ -83,7 +83,7 @@ void MainWindow::onConnectButtonClicked()
     isOwSearchDone = false;
 
     if (!isConnected) {
-        hidDevice->Connect(ProductString);
+        hidDevice->Connect();
     }
     else {
         this->stopUsbPolling();

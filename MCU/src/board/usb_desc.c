@@ -195,7 +195,7 @@ const uint8_t RHID_StringProduct[RHID_SIZ_STRING_PRODUCT] =
     RHID_SIZ_STRING_PRODUCT,        /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,     /* bDescriptorType */
     /* Product: */
-    '1', 0, '-', 0, 'W', 0, 'i', 0, 'r', 0, 'e', 0, ' ', 0, 'C', 0, 'o', 0, 'n', 0, 't', 0, 'r', 0, 'o', 0, 'l', 0, 'l', 0, 'e', 0, 'r', 0
+    'O', 0, 'W', 0, ' ', 0, 'C', 0, 'o', 0, 'n', 0, 't', 0, 'r', 0, 'o', 0, 'l', 0, 'l', 0, 'e', 0, 'r', 0
 };
 
 uint8_t RHID_StringSerial[RHID_SIZ_STRING_SERIAL] =

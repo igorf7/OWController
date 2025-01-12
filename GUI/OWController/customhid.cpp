@@ -19,7 +19,8 @@ CustomHid::CustomHid(unsigned short vid,
     hid_init();
 
 #ifdef __ANDROID__
-    /* Find USB device via JNI */
+    /* Set Product Name and find USB device via JNI */
+    this->setProductName();
     this->findUsbDevice();
 #endif
 }
@@ -29,25 +30,23 @@ CustomHid::CustomHid(unsigned short vid,
  */
 CustomHid::~CustomHid()
 {
+    // /* Close the device */
+    // if (deviceHandle != nullptr) {
+    //     hid_close(deviceHandle);
+    //     deviceHandle = nullptr;
+    // }
+
+    // /* Finalize the hidapi library */
+    // hid_exit();
 }
 
 /**
  * @brief CustomHid::onConnect
  * @param product_string
  */
-void CustomHid::Connect(const QString &product_string)
+void CustomHid::Connect()
 {
 #ifdef __ANDROID__
-    Q_UNUSED(product_string)
-
-    // if (QNativeInterface::QAndroidApplication::sdkVersion() >= __ANDROID_API_T__) {
-    //     const auto permission = "android.permission.USB_PERMISSION"_L1;
-    //     auto requestResult = QtAndroidPrivate::requestPermission(permission);
-    //     if (requestResult.result() != QtAndroidPrivate::Authorized) {
-    //         emit showStatusBar("No permission", 0);
-    //     }
-    // }
-
     /* Open USB device via JNI */
     int file_descriptor = this->openUsbDevice();
 
@@ -68,7 +67,7 @@ void CustomHid::Connect(const QString &product_string)
     while (cur_dev)
     {
         /* Find USB device with a given product string */
-        if (QString::fromWCharArray(cur_dev->product_string) == product_string)
+        if (QString::fromWCharArray(cur_dev->product_string) == ProductString)
         {
             break;
         }
@@ -150,6 +149,22 @@ int CustomHid::Write(unsigned char *buff, size_t len)
 int CustomHid::sendFeatureReport(unsigned char *buff, size_t len)
 {
     return hid_send_feature_report(deviceHandle, buff, len);
+}
+
+/**
+ * @brief CustomHid::setProductName
+ * @param prod_name
+ */
+void CustomHid::setProductName()
+{
+#ifdef __ANDROID__
+    QJniObject prod_name = QJniObject::fromString(ProductString);
+    QJniObject::callStaticMethod<void>(
+        "org/qtproject/example/OWController/CustomHid",
+        "setProductName",
+        "(Ljava/lang/String;)V",
+        prod_name.object<jstring>());
+#endif
 }
 
 /**

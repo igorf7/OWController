@@ -337,19 +337,15 @@ void DS18B20::onWriteButtonClicked()
     case 9:
         resolution = 0x1F;
         break;
-
     case 10:
         resolution = 0x3F;
         break;
-
     case 11:
         resolution = 0x5F;
         break;
-
     case 12:
         resolution = 0x7F;
         break;
-
     default:
         break;
     }

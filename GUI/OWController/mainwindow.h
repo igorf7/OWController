@@ -54,8 +54,6 @@ private:
 
     static const size_t USB_BUFF_SIZE = 64;
 
-    const QString ProductString = "1-Wire Controller";
-
     QDialog *settingsWindow = nullptr;
     QCheckBox *writeFileCheckbox = nullptr;
     QSpinBox *writeFilePeriodSpinbox = nullptr;
