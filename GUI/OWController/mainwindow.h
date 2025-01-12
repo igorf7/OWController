@@ -55,7 +55,6 @@ private:
     static const size_t USB_BUFF_SIZE = 64;
 
     QDialog *settingsWindow = nullptr;
-    QCheckBox *writeFileCheckbox = nullptr;
     QSpinBox *writeFilePeriodSpinbox = nullptr;
     QSpinBox *pollingPeriodSpinbox = nullptr;
 
@@ -75,7 +74,6 @@ private:
     bool isConnected = false;
     bool isUsbPollRunning = false;
     bool isShowClockEnabled = false;
-    bool isWriteFileEnabled = true;
     bool isOwSearchDone = false;
 
     unsigned char rxUsbBuffer[USB_BUFF_SIZE];

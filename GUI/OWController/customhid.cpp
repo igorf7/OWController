@@ -17,12 +17,6 @@ CustomHid::CustomHid(unsigned short vid,
                      unsigned short pid) : VID(vid), PID(pid)
 {
     hid_init();
-
-#ifdef __ANDROID__
-    /* Set Product Name and find USB device via JNI */
-    this->setProductName();
-    this->findUsbDevice();
-#endif
 }
 
 /**
@@ -30,14 +24,7 @@ CustomHid::CustomHid(unsigned short vid,
  */
 CustomHid::~CustomHid()
 {
-    // /* Close the device */
-    // if (deviceHandle != nullptr) {
-    //     hid_close(deviceHandle);
-    //     deviceHandle = nullptr;
-    // }
-
-    // /* Finalize the hidapi library */
-    // hid_exit();
+    this->closeHidDevice();
 }
 
 /**
@@ -47,8 +34,8 @@ CustomHid::~CustomHid()
 void CustomHid::Connect()
 {
 #ifdef __ANDROID__
-    /* Open USB device via JNI */
-    int file_descriptor = this->openUsbDevice();
+    /* Find and open USB device via JNI */
+    int file_descriptor = this->findUsbDevice();
 
     if (file_descriptor > 0) {
         deviceHandle = hid_libusb_wrap_sys_device((intptr_t)file_descriptor, 0);
@@ -94,14 +81,7 @@ void CustomHid::Connect()
  */
 void CustomHid::Disconnect()
 {
-    /* Close the device */
-    if (deviceHandle != nullptr) {
-        hid_close(deviceHandle);
-        deviceHandle = nullptr;
-    }
-
-    /* Finalize the hidapi library */
-    hid_exit();
+    this->closeHidDevice();
     emit deviceDisconnected();
 }
 
@@ -152,54 +132,38 @@ int CustomHid::sendFeatureReport(unsigned char *buff, size_t len)
 }
 
 /**
- * @brief CustomHid::setProductName
- * @param prod_name
- */
-void CustomHid::setProductName()
-{
-#ifdef __ANDROID__
-    QJniObject prod_name = QJniObject::fromString(ProductString);
-    QJniObject::callStaticMethod<void>(
-        "org/qtproject/example/OWController/CustomHid",
-        "setProductName",
-        "(Ljava/lang/String;)V",
-        prod_name.object<jstring>());
-#endif
-}
-
-/**
  * @brief CustomHid::findUsbDevice
  */
-void CustomHid::findUsbDevice()
+int CustomHid::findUsbDevice()
 {
 #ifdef __ANDROID__
 
     jint vid = (jint)VID;
     jint pid = (jint)PID;
-    QJniObject::callStaticMethod<void>(
+
+    jint file_descriptor = QJniObject::callStaticMethod<int>(
         "org/qtproject/example/OWController/CustomHid",
         "findUsbDevice",
         QNativeInterface::QAndroidApplication::context(),
         vid, pid);
 
-#endif
-}
-
-/**
- * @brief CustomHid::openUsbDevice
- * @return
- */
-int CustomHid::openUsbDevice()
-{
-#ifdef __ANDROID__
-
-    jint file_descriptor = QJniObject::callStaticMethod<int>(
-        "org/qtproject/example/OWController/CustomHid",
-        "openUsbDevice",
-        QNativeInterface::QAndroidApplication::context());
-
     return (int)file_descriptor;
 #else
     return 0;
 #endif
+}
+
+/**
+ * @brief CustomHid::closeHidDevice
+ */
+void CustomHid::closeHidDevice()
+{
+    /* Close the device */
+    if (deviceHandle != nullptr) {
+        hid_close(deviceHandle);
+        deviceHandle = nullptr;
+    }
+
+    /* Finalize the hidapi library */
+    hid_exit();
 }

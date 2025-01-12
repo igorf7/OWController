@@ -14,7 +14,7 @@ public:
     virtual void showDeviceData(quint8 *data, int index) = 0;
     virtual void setAddress(quint64 address) = 0;
     virtual void setIndex(int index) = 0;
-    virtual void setWriteFilePeriod(bool enabled, int period) = 0;
+    virtual void setWriteFilePeriod(int period) = 0;
 
 signals:
     void sendCommand(TOpcode opcode, quint8 *data, quint8 data_len);

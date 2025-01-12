@@ -38,8 +38,7 @@ private:
     hid_device *deviceHandle = NULL;
     hid_device_info *deviceInfo = NULL;
 
-    void setProductName();
-    void findUsbDevice();
-    int openUsbDevice();
+    int findUsbDevice();
+    void closeHidDevice();
 };
 #endif // CUSTOMHID_H

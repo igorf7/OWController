@@ -20,7 +20,7 @@ public:
     void showDeviceData(quint8 *data, int index) override;
     void setAddress(quint64 address) override;
     void setIndex(int index) override;
-    void setWriteFilePeriod(bool enabled, int period) override;
+    void setWriteFilePeriod(int period) override;
 
 protected:
     qint32 secIntervalEvent = 0;
@@ -55,7 +55,6 @@ private:
 
     char column_sep = ';';
 
-    bool isWriteFileEnabled = true;
     bool isWriteFileRequired = false;
 
     void writeCsvFile(float value, int index);

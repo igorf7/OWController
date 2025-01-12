@@ -19,7 +19,7 @@ public:
     void showDeviceData(quint8 *data, int index) override;
     void setAddress(quint64 address) override;
     void setIndex(int index) override;
-    void setWriteFilePeriod(bool enabled, int period) override;
+    void setWriteFilePeriod(int period) override;
 
 private slots:
     void onSettingsButtonClicked();

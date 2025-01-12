@@ -28,6 +28,8 @@ DS18B20::DS18B20(DeviceWidget *parent) :
     /* Connecting signals to slots */
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
+
+    secIntervalEvent = startTimer(1000);
 }
 
 DS18B20::~DS18B20()
@@ -97,7 +99,7 @@ void DS18B20::showDeviceData(quint8 *data, int index)
     ui->pointNameLabel->setText(tr("Sensor ") + QString::number(myIndex));
     ui->prmValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
 
-    if (isWriteFileEnabled && isWriteFileRequired) {
+    if (isWriteFileRequired) {
         isWriteFileRequired = false;
         this->writeCsvFile(temperValue, myIndex);
     }
@@ -123,19 +125,9 @@ void DS18B20::timerEvent(QTimerEvent *event)
  * @param enabled
  * @param period
  */
-void DS18B20::setWriteFilePeriod(bool enabled, int period)
+void DS18B20::setWriteFilePeriod(int period)
 {
-    isWriteFileEnabled = enabled;
-    isWriteFileRequired = enabled;
     writeFilePeriod = period;
-
-    if (isWriteFileEnabled) {
-        secIntervalEvent = startTimer(1000);
-    }
-    else if (secIntervalEvent != 0) {
-        killTimer(secIntervalEvent);
-        secIntervalEvent = 0;
-    }
 }
 
 /**

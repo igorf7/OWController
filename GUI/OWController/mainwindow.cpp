@@ -229,8 +229,6 @@ void MainWindow::onSettingsButtonClicked()
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
 
     QVBoxLayout *vdlgLayout = new QVBoxLayout;
-    writeFileCheckbox = new QCheckBox(tr("Write CSV file (DS18B20 Only)"));
-    writeFileCheckbox->setChecked(true);
     writeFilePeriodSpinbox = new QSpinBox;
     writeFilePeriodSpinbox->setRange(1, 300);
     writeFilePeriodSpinbox->setSingleStep(1);
@@ -256,7 +254,6 @@ void MainWindow::onSettingsButtonClicked()
     h2Layout->addWidget(writeFilePeriodSpinbox);
 
     vdlgLayout->addLayout(h1Layout);
-    vdlgLayout->addWidget(writeFileCheckbox);
     vdlgLayout->addLayout(h2Layout);
     vdlgLayout->addWidget(closeButton);
     settingsWindow->setLayout(vdlgLayout);
@@ -300,13 +297,11 @@ void MainWindow::onCloseSettingsClicked()
 {
     if (settingsWindow != nullptr)
     {
-        isWriteFileEnabled = writeFileCheckbox->isChecked();
-
         writeFilePeriod = writeFilePeriodSpinbox->value();
 
         if (!deviceWidget.isEmpty()) {
             for (auto &it : deviceWidget) {
-                it->setWriteFilePeriod(isWriteFileEnabled, writeFilePeriod);
+                it->setWriteFilePeriod(writeFilePeriod);
             }
         }
 
@@ -421,7 +416,7 @@ void MainWindow::createWidgetsLayout(int count)
 
             case 0x28: // DS18B20
                 deviceWidget << new DS18B20;
-                deviceWidget.at(i)->setWriteFilePeriod(isWriteFileEnabled, writeFilePeriod);
+                deviceWidget.at(i)->setWriteFilePeriod(writeFilePeriod);
                 break;
 
             default:  // any other device

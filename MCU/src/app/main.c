@@ -21,6 +21,18 @@ static uint8_t usbRxBuffer[wMaxPacketSize];
 */
 int main(void)
 {
+    /* Initialize the USB hardware */
+    Wait_ticks(3000000);
+    hidEndp.rx_buffer = usbRxBuffer;
+    hidEndp.rx_handler = USB_HandleRxData;
+    USB_SetHidEndp(&hidEndp);
+    hidProp.rx_buffer = usbRxBuffer;
+    hidProp.rx_handler = USB_HandleRxData;
+    USB_SetHidProp(&hidProp);
+    USB_Interrupts_Config();
+    Set_USBClock();
+    USB_Init();
+    
     /* Program startup indicator */
     LED_Init(LED1_PORT, LED1_PIN);
     LED_Blink(LED1_PORT, LED1_PIN, 1000000);
@@ -42,17 +54,6 @@ int main(void)
     
     /* Search devices task */
     PutTask(DeviceSearchTask, NULL);
-    
-    /* Initialize the USB hardware */
-    hidEndp.rx_buffer = usbRxBuffer;
-    hidEndp.rx_handler = USB_HandleRxData;
-    USB_SetHidEndp(&hidEndp);
-    hidProp.rx_buffer = usbRxBuffer;
-    hidProp.rx_handler = USB_HandleRxData;
-    USB_SetHidProp(&hidProp);
-    USB_Interrupts_Config();
-    Set_USBClock();
-    USB_Init();
         
     /* Enable Watchdog */
     #ifndef DEBUG

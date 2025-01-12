@@ -20,16 +20,8 @@ public class CustomHid
     private static int fileDescriptor = 0;
     private static UsbManager usbManager;
     private static UsbDevice usbDevice;
-    private static PendingIntent mPermissionIntent;
-    private static String productName = "";
-    private static final String ACTION_USB_PERMISSION = "android.permission.USB_PERMISSION";
 
-    public static void setProductName(String product_name)
-    {
-        productName = product_name;
-    }
-
-    public static void findUsbDevice(Context context, int vid, int pid)
+    public static int findUsbDevice(Context context, int vid, int pid)
     {
         usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
@@ -37,22 +29,11 @@ public class CustomHid
         usbDevice = null;
         while(deviceIterator.hasNext()) {
             UsbDevice device = deviceIterator.next();
-            if ((device.getVendorId() == vid) && (device.getProductId() == pid)
-                &&
-                (productName.compareTo(device.getProductName())==0))
-            {
+            if ((device.getVendorId() == vid) && (device.getProductId() == pid)) {
                 usbDevice = device;
-                if (usbDevice != null) {
-                    mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                    usbManager.requestPermission(usbDevice, mPermissionIntent);
-                }
                 break;
             }
         }
-    }
-
-    public static int openUsbDevice(Context context)
-    {
         if (usbDevice != null) {
             UsbDeviceConnection usbDeviceConnection = usbManager.openDevice(usbDevice);
             fileDescriptor = usbDeviceConnection.getFileDescriptor();

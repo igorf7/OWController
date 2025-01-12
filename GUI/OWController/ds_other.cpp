@@ -52,9 +52,8 @@ void DS_OTHER::showDeviceData(quint8 *data, int index)
  * @param enabled
  * @param period
  */
-void DS_OTHER::setWriteFilePeriod(bool enabled, int period)
+void DS_OTHER::setWriteFilePeriod(int period)
 {
-    Q_UNUSED(enabled)
     Q_UNUSED(period)
 }
 
