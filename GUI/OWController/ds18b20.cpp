@@ -362,7 +362,7 @@ void DS18B20::onWriteButtonClicked()
 
     devAlarmHigh = devAlarmLow = devResolution = 0;
 
-    emit sendCommand(eWriteCmd, tx_data, len);
+    emit sendCommand(eOwWriteData, tx_data, len);
 }
 
 /**

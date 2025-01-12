@@ -97,34 +97,34 @@ const uint8_t RHID_ConfigDescriptor[RHID_SIZ_CONFIG_DESC] =
     0x00,         // nInterfaceProtocol : протокол интерфейса
     0,            // iInterface: индекс строки, описывающей интерфейс
 
-        // теперь отдельный дескриптор для уточнения того, что данный интерфейс - это HID устройство
-        /******************** HID дескриптор ********************/
-        0x09,         // bLength: длина HID-дескриптора
-        HID_DESCRIPTOR_TYPE, // bDescriptorType: тип дескриптора - HID
-        0x01, 0x01,   // bcdHID: номер версии HID 1.1
-        0x00,         // bCountryCode: код страны (если нужен)
-        0x01,         // bNumDescriptors: Сколько дальше будет report дескрипторов
-        HID_REPORT_DESCRIPTOR_TYPE,         // bDescriptorType: Тип дескриптора - report
-        RHID_SIZ_REPORT_DESC,	0x00, // wItemLength: длина report-дескриптора
+    // теперь отдельный дескриптор для уточнения того, что данный интерфейс - это HID устройство
+    /******************** HID дескриптор ********************/
+    0x09,         // bLength: длина HID-дескриптора
+    HID_DESCRIPTOR_TYPE, // bDescriptorType: тип дескриптора - HID
+    0x01, 0x01,   // bcdHID: номер версии HID 1.1
+    0x00,         // bCountryCode: код страны (если нужен)
+    0x01,         // bNumDescriptors: Сколько дальше будет report дескрипторов
+    HID_REPORT_DESCRIPTOR_TYPE,         // bDescriptorType: Тип дескриптора - report
+    RHID_SIZ_REPORT_DESC,	0x00, // wItemLength: длина report-дескриптора
 
-        /******************** дескриптор конечных точек (endpoints) ********************/
-        0x07,          // bLength: длина дескриптора
-        USB_ENDPOINT_DESCRIPTOR_TYPE, // тип дескриптора - endpoints
+    /******************** дескриптор конечных точек (endpoints) ********************/
+    0x07,          // bLength: длина дескриптора
+    USB_ENDPOINT_DESCRIPTOR_TYPE, // тип дескриптора - endpoints
 
-        0x81,          // bEndpointAddress: адрес конечной точки и направление 1(IN)
-        0x03,          // bmAttributes: тип конечной точки - Interrupt endpoint
-        wMaxPacketSize, 0x00,    // wMaxPacketSize:  Bytes max
-        0x20,          // bInterval: Polling Interval (32 ms)
+    0x81,          // bEndpointAddress: адрес конечной точки и направление 1(IN)
+    0x03,          // bmAttributes: тип конечной точки - Interrupt endpoint
+    wMaxPacketSize, 0x00,    // wMaxPacketSize:  Bytes max
+    0x20,          // bInterval: Polling Interval (32 ms)
 
-        0x07,	/* bLength: Endpoint Descriptor size */
-        USB_ENDPOINT_DESCRIPTOR_TYPE,	/* bDescriptorType: */
-        /*	Endpoint descriptor type */
-        0x01,	/* bEndpointAddress: */
-        /*	Endpoint Address (OUT) */
-        0x03,	/* bmAttributes: Interrupt endpoint */
-        wMaxPacketSize,	/* wMaxPacketSize:  Bytes max  */
-        0x00,
-        0x20,	/* bInterval: Polling Interval (32 ms) */
+    0x07,	/* bLength: Endpoint Descriptor size */
+    USB_ENDPOINT_DESCRIPTOR_TYPE,	/* bDescriptorType: */
+    /*	Endpoint descriptor type */
+    0x01,	/* bEndpointAddress: */
+    /*	Endpoint Address (OUT) */
+    0x03,	/* bmAttributes: Interrupt endpoint */
+    wMaxPacketSize,	/* wMaxPacketSize:  Bytes max  */
+    0x00,
+    0x20,	/* bInterval: Polling Interval (32 ms) */
 }; /* RHID_ConfigDescriptor */
 
 const uint8_t RHID_ReportDescriptor[RHID_SIZ_REPORT_DESC] =
@@ -185,23 +185,23 @@ const uint8_t RHID_StringLangID[RHID_SIZ_STRING_LANGID] =
 const uint8_t RHID_StringVendor[RHID_SIZ_STRING_VENDOR] =
 {
     RHID_SIZ_STRING_VENDOR, /* Size of Vendor string */
-    USB_STRING_DESCRIPTOR_TYPE,  /* bDescriptorType*/
+    USB_STRING_DESCRIPTOR_TYPE, /* bDescriptorType*/
     /* Manufacturer: */
     'M', 0, 'y', 0, ' ', 0, 'C', 0, 'o', 0, 'm', 0, 'p', 0, 'a', 0, 'n', 0, 'y', 0, ' ', 0, 'L', 0, 't', 0, 'd', 0
 };
 
 const uint8_t RHID_StringProduct[RHID_SIZ_STRING_PRODUCT] =
 {
-    RHID_SIZ_STRING_PRODUCT,          /* bLength */
-    USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
+    RHID_SIZ_STRING_PRODUCT,        /* bLength */
+    USB_STRING_DESCRIPTOR_TYPE,     /* bDescriptorType */
     /* Product: */
     '1', 0, '-', 0, 'W', 0, 'i', 0, 'r', 0, 'e', 0, ' ', 0, 'C', 0, 'o', 0, 'n', 0, 't', 0, 'r', 0, 'o', 0, 'l', 0, 'l', 0, 'e', 0, 'r', 0
 };
 
 uint8_t RHID_StringSerial[RHID_SIZ_STRING_SERIAL] =
 {
-    RHID_SIZ_STRING_SERIAL,           /* bLength */
-    USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
+    RHID_SIZ_STRING_SERIAL,         /* bLength */
+    USB_STRING_DESCRIPTOR_TYPE,     /* bDescriptorType */
     /* Serial number: */
     '1', 0, '2', 0, '3', 0, '4', 0, '5', 0, '6', 0, '7', 0, '8', 0, '9', 0
 };

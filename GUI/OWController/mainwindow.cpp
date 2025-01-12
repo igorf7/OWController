@@ -120,10 +120,9 @@ void MainWindow::startUsbPolling()
 {
     if (!isConnected) return;
 
-    if (!isPollingRunning) {
-        isPollingRunning = true;
-        usbPollingPeriod = startTimer(15);
-        secondIntervalEvent = startTimer(1000);
+    if (!isUsbPollRunning) {
+        isUsbPollRunning = true;
+        usbPollingEvent = startTimer(usbPollPeriod);
     }
 }
 
@@ -132,14 +131,10 @@ void MainWindow::startUsbPolling()
  */
 void MainWindow::stopUsbPolling()
 {
-    if (usbPollingPeriod != 0) {
-        killTimer(usbPollingPeriod);
-        usbPollingPeriod = 0;
-        isPollingRunning = false;
-    }
-    if (secondIntervalEvent != 0) {
-        killTimer(secondIntervalEvent);
-        secondIntervalEvent = 0;
+    if (usbPollingEvent != 0) {
+        killTimer(usbPollingEvent);
+        usbPollingEvent = 0;
+        isUsbPollRunning = false;
     }
 }
 
@@ -149,7 +144,8 @@ void MainWindow::stopUsbPolling()
  */
 void MainWindow::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == usbPollingPeriod) {
+    if (event->timerId() == usbPollingEvent) {
+        milliSeconds += usbPollPeriod;
         int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
         if (len < 0) { // Lost connection
             if (isConnected) this->onConnectButtonClicked();
@@ -158,10 +154,26 @@ void MainWindow::timerEvent(QTimerEvent *event)
         else if (len != 0) {
             this->handleReceivedPacket();
         }
-    }
-    else if (event->timerId() == secondIntervalEvent) {
-        if (!isOwSearchDone) {
-            this->onSearchButtonClicked();
+
+        switch (milliSeconds)
+        {
+        case 300:
+        case 600:
+        case 900:
+            this->onSendCommand(eGetRtcData, nullptr, 0);
+            break;
+        case 1000:
+            milliSeconds = 0;
+            if (!isOwSearchDone) {
+                this->onSearchButtonClicked();
+            }
+            else {
+                quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
+                this->onSendCommand(eOwReadData, &dev_family, sizeof(dev_family));
+            }
+            break;
+        default:
+            break;
         }
     }
 }
@@ -175,7 +187,7 @@ void MainWindow::onSearchButtonClicked()
 
     isOwSearchDone = false;
     allDeviceAddressList.clear();
-    this->onSendCommand(eSearchCmd, nullptr, 0);
+    this->onSendCommand(eOwSearch, nullptr, 0);
 }
 
 /**
@@ -292,17 +304,6 @@ void MainWindow::onCloseSettingsClicked()
 
         writeFilePeriod = writeFilePeriodSpinbox->value();
 
-        if (!ui->deviceComboBox->currentText().isEmpty() &&
-            (owPollingPeriod != pollingPeriodSpinbox->value()))
-        {
-            owPollingPeriod = pollingPeriodSpinbox->value();
-            quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
-            quint8 data[2];
-            data[0] = dev_family;
-            data[1] = (quint8)owPollingPeriod;
-            this->onSendCommand(eReadCmd, data, sizeof(data));
-        }
-
         if (!deviceWidget.isEmpty()) {
             for (auto &it : deviceWidget) {
                 it->setWriteFilePeriod(isWriteFileEnabled, writeFilePeriod);
@@ -382,16 +383,9 @@ void MainWindow::onDeviceComboBoxChanged(int index)
     }
 
     statusBar()->showMessage(ui->deviceComboBox->currentText() +
-                                 " device found: " + QString::number(selDevices.size()));
+                            " device found: " + QString::number(selDevices.size()));
 
     this->createWidgetsLayout(selDevices.size());
-
-    quint8 data[2];
-    data[0] = dev_family;
-    data[1] = (quint8)owPollingPeriod;
-    if (isPollingRunning) {
-        this->onSendCommand(eReadCmd, data, sizeof(data));
-    }
 }
 
 /**
@@ -462,14 +456,14 @@ void MainWindow::handleReceivedPacket()
     {
         switch (rx_packet->opcode)
         {
-        case eSearchCmd:
+        case eOwSearch:
             break;
 
-        case eEnumerate:
+        case eOwEnumerate:
             allDeviceAddressList.append(dev_addr);
             break;
 
-        case eEnumerateDone:
+        case eOwEnumerateDone:
             isOwSearchDone = true;
             this->initDeviceComboBox();
             if ((allDeviceAddressList.size() == 0) && (!isShowClockEnabled)) {
@@ -481,24 +475,24 @@ void MainWindow::handleReceivedPacket()
             }
             break;
 
-        case eReadCmd:
+        case eOwReadData:
             if (!isShowClockEnabled && !deviceWidget.isEmpty()) {
                 int index = selDevices.value(dev_addr);
                 deviceWidget.at(index)->showDeviceData(rx_packet->data, index + 1);
             }
             break;
 
-        case eWriteCmd:
+        case eOwWriteData:
             break;
 
-        case eGetRtcCmd:
+        case eGetRtcData:
             if (isShowClockEnabled) {
                 timeStamp = *((quint32*)rx_packet->data);
                 quint64 unixtime = QDateTime::currentSecsSinceEpoch();
                 qint64 dif = (qint64)(unixtime - timeStamp);
                 if (qAbs(dif) > 2) {
                     timeStamp = unixtime + 1;
-                    this->onSendCommand(eSyncRtcCmd, (quint8*)&timeStamp, sizeof(timeStamp));
+                    this->onSendCommand(eSyncRtc, (quint8*)&timeStamp, sizeof(timeStamp));
                 }
                 else {
                     clockWidget->showDateTime(timeStamp);

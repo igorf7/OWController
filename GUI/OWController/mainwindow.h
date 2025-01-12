@@ -30,8 +30,7 @@ public:
     ~MainWindow();
 
 protected:
-    qint32 usbPollingPeriod = 0;
-    qint32 secondIntervalEvent = 0;
+    qint32 usbPollingEvent = 0;
     void timerEvent(QTimerEvent *event);
 
 public slots:
@@ -69,12 +68,14 @@ private:
     QList<quint64> allDeviceAddressList;
     QHash<quint64, int> selDevices;
 
-    quint32 timeStamp;
+    int timeStamp = 0;
+    int milliSeconds = 0;
+    int usbPollPeriod = 10;
     int writeFilePeriod;
     int owPollingPeriod;
 
     bool isConnected = false;
-    bool isPollingRunning = false;
+    bool isUsbPollRunning = false;
     bool isShowClockEnabled = false;
     bool isWriteFileEnabled = true;
     bool isOwSearchDone = false;
