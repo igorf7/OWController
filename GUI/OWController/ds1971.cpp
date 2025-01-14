@@ -55,16 +55,6 @@ void DS1971::showDeviceData(quint8 *data, int index)
 }
 
 /**
- * @brief DS1971::setWriteFilePeriod
- * @param enabled
- * @param period
- */
-void DS1971::setWriteFilePeriod(int period)
-{
-    Q_UNUSED(period)
-}
-
-/**
  * @brief DS1971::setAddress
  * @param address
  */

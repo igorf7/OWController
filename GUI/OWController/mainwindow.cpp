@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "cardview.h"
+#include <QDir>
+#include <QTextStream>
+#include <QDateTime>
 #include <QSettings>
 
 using namespace std;
@@ -14,8 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle(QApplication::applicationName());
-
-    this->readSettings();
 
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
@@ -38,6 +39,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(hidDevice, &CustomHid::deviceDisconnected,
             this, &MainWindow::onUsbDisconnected);
 
+#ifdef __ANDROID__
+    folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
+#else
+    folderPath = QDir::currentPath() + "/DS18B20_CSV";
+#endif
+    QDir folder = folderPath;
+    if (!folder.exists()) {
+        folder.mkdir(folderPath);
+    }
+
     /* Activate status bar */
     QFont font;
     font.setItalic(true);
@@ -55,9 +66,6 @@ MainWindow::~MainWindow()
     if (isConnected) {
         this->onConnectButtonClicked();
     }
-
-    this->writeSettings();
-
     if (hidDevice != nullptr) {
         delete hidDevice;
     }
@@ -86,8 +94,12 @@ void MainWindow::onConnectButtonClicked()
         hidDevice->Connect();
     }
     else {
-        this->stopUsbPolling();
         hidDevice->Disconnect();
+        if (usbPollingEvent != 0) {
+            killTimer(usbPollingEvent);
+            usbPollingEvent = 0;
+            isUsbPollRunning = false;
+        }
     }
 }
 
@@ -99,7 +111,12 @@ void MainWindow::onUsbConnected()
     isConnected = true;
     statusBar()->showMessage(tr("USB device connected"));
     ui->connectPushButton->setIcon(QIcon(":/images/powered.png"));
-    this->startUsbPolling();
+
+    if (!isUsbPollRunning) {
+        isUsbPollRunning = true;
+        secIntervalEvent = startTimer(1000);
+        usbPollingEvent = startTimer(1);
+    }
 }
 
 /**
@@ -114,38 +131,28 @@ void MainWindow::onUsbDisconnected()
 }
 
 /**
- * @brief MainWindow::startUsbPolling
- */
-void MainWindow::startUsbPolling()
-{
-    if (!isConnected) return;
-
-    if (!isUsbPollRunning) {
-        isUsbPollRunning = true;
-        usbPollingEvent = startTimer(usbPollPeriod);
-    }
-}
-
-/**
- * @brief MainWindow::stopUsbPolling
- */
-void MainWindow::stopUsbPolling()
-{
-    if (usbPollingEvent != 0) {
-        killTimer(usbPollingEvent);
-        usbPollingEvent = 0;
-        isUsbPollRunning = false;
-    }
-}
-
-/**
  * @brief MainWindow::timerEvent
  * @param event
  */
 void MainWindow::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == usbPollingEvent) {
-        milliSeconds += usbPollPeriod;
+    if (event->timerId() == secIntervalEvent) {
+        secCounter++;
+        if (!isOwSearchDone) {
+            this->onSearchButtonClicked();
+        }
+        else {
+            quint8 tx_data[2]; // contains the device familiy and 1-Wire polling period
+            tx_data[0] = OWDevice::getFamily(ui->deviceComboBox->currentText());
+            tx_data[1] = (quint8)owPollingPeriod;
+            this->onSendCommand(eOwReadData, tx_data, sizeof(tx_data));
+            if (secCounter >= writeFilePeriod) {
+                secCounter = 0;
+                writedDevice = 0;
+            }
+        }
+    }
+    else if (event->timerId() == usbPollingEvent) {
         int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
         if (len < 0) { // Lost connection
             if (isConnected) this->onConnectButtonClicked();
@@ -153,27 +160,6 @@ void MainWindow::timerEvent(QTimerEvent *event)
         }
         else if (len != 0) {
             this->handleReceivedPacket();
-        }
-
-        switch (milliSeconds)
-        {
-        case 300:
-        case 600:
-        case 900:
-            this->onSendCommand(eGetRtcData, nullptr, 0);
-            break;
-        case 1000:
-            milliSeconds = 0;
-            if (!isOwSearchDone) {
-                this->onSearchButtonClicked();
-            }
-            else {
-                quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
-                this->onSendCommand(eOwReadData, &dev_family, sizeof(dev_family));
-            }
-            break;
-        default:
-            break;
         }
     }
 }
@@ -298,13 +284,6 @@ void MainWindow::onCloseSettingsClicked()
     if (settingsWindow != nullptr)
     {
         writeFilePeriod = writeFilePeriodSpinbox->value();
-
-        if (!deviceWidget.isEmpty()) {
-            for (auto &it : deviceWidget) {
-                it->setWriteFilePeriod(writeFilePeriod);
-            }
-        }
-
         settingsWindow->close();
         delete settingsWindow;
         settingsWindow = nullptr;
@@ -416,7 +395,6 @@ void MainWindow::createWidgetsLayout(int count)
 
             case 0x28: // DS18B20
                 deviceWidget << new DS18B20;
-                deviceWidget.at(i)->setWriteFilePeriod(writeFilePeriod);
                 break;
 
             default:  // any other device
@@ -475,6 +453,12 @@ void MainWindow::handleReceivedPacket()
                 int index = selDevices.value(dev_addr);
                 deviceWidget.at(index)->showDeviceData(rx_packet->data, index + 1);
             }
+            if ((writedDevice < selDevices.size())
+                && (ui->deviceComboBox->currentText() == "DS18B20")) {
+                int index = selDevices.value(dev_addr);
+                float value = *((float*)(rx_packet->data + sizeof(dev_addr)));
+                this->writeCsvFile(value, index+1);
+            }
             break;
 
         case eOwWriteData:
@@ -502,6 +486,38 @@ void MainWindow::handleReceivedPacket()
 }
 
 /**
+ * @brief MainWindow::writeCsvFile
+ */
+void MainWindow::writeCsvFile(float value, int index)
+{
+    QString filename = (folderPath + "/sensor" + QString::number(index) +
+                        QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));
+
+    QFile csvFile(filename);
+    QTextStream ts(&csvFile);
+
+    if (!csvFile.exists()) {
+        /* Write header for new csv file */
+        if (csvFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            ts << "sep=" << column_sep << Qt::endl
+               << "Time" << column_sep << "t, " << 'C' << Qt::endl;
+            csvFile.close();
+        }
+    }
+
+    /* Write data to csv file */
+    if (!csvFile.isOpen())
+        csvFile.open(QIODevice::Append | QIODevice::Text);
+
+    ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
+       << QString::number(value, 'f', 1) << Qt::endl;
+
+    csvFile.flush();
+    csvFile.close();
+    writedDevice++;
+}
+
+/**
  * @brief MainWindow::deleteDeviceLayout
  */
 void MainWindow::deleteDeviceLayout()
@@ -525,30 +541,4 @@ void MainWindow::deinitWidgets()
     deviceWidget.clear();
     ui->deviceComboBox->clear();
     ui->deviceComboBox->setCurrentIndex(-1);
-}
-
-/**
- * @brief MainWindow::readSettings
- */
-void MainWindow::readSettings()
-{
-    QSettings settings("settings.ini", QSettings::IniFormat);
-
-    settings.beginGroup("/Settings");
-    owPollingPeriod = settings.value("/PollPeriod", 1).toInt();
-    writeFilePeriod = settings.value("/WriteFilePeriod", 60).toInt();
-    settings.endGroup();
-}
-
-/**
- * @brief MainWindow::writeSettings
- */
-void MainWindow::writeSettings()
-{
-    QSettings settings("settings.ini", QSettings::IniFormat);
-
-    settings.beginGroup("/Settings");
-    settings.setValue("/PollPeriod", owPollingPeriod);
-    settings.setValue("/WriteFilePeriod", writeFilePeriod);
-    settings.endGroup();
 }

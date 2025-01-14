@@ -20,7 +20,6 @@ public:
     void showDeviceData(quint8 *data, int index) override;
     void setAddress(quint64 address) override;
     void setIndex(int index) override;
-    void setWriteFilePeriod(int period) override;
 
 private slots:
     void onSettingsButtonClicked();
@@ -41,9 +40,6 @@ private:
 
     quint64 myAddress = 0;
     int myIndex = 0;
-    int writeFilePeriod = 60;
-
-    bool isWriteFileEnabled = true;
 
     quint8 ds1971memory[DS1971_MEMORY_SIZE];
 

@@ -66,10 +66,12 @@ void CustomHid::Connect()
     /* Open found device */
     deviceHandle = hid_open_path(cur_dev->path);
 
+
     if (!deviceHandle) {
         hid_exit();
         return;
     }
+
 #endif
 
     hid_set_nonblocking(deviceHandle, 1);

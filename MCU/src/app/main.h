@@ -33,4 +33,5 @@ static void BackgroundTask(void);
 /* Callbacks */
 void RTC_SecondEvent(void);
 void USB_HandleRxData(void);
+void SysTick_Callback(void);
 #endif  // __MAIN_H

@@ -3,10 +3,6 @@
 #include "owdevice.h"
 #include <QValidator>
 #include <QClipboard>
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
-#include <QDateTime>
 
 DS18B20::DS18B20(DeviceWidget *parent) :
     DeviceWidget(parent), ui(new Ui::DS18B20)
@@ -28,17 +24,10 @@ DS18B20::DS18B20(DeviceWidget *parent) :
     /* Connecting signals to slots */
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
-
-    secIntervalEvent = startTimer(1000);
 }
 
 DS18B20::~DS18B20()
 {
-    if (secIntervalEvent != 0) {
-        killTimer(secIntervalEvent);
-        secIntervalEvent = 0;
-    }
-
     delete ui;
 }
 
@@ -98,79 +87,6 @@ void DS18B20::showDeviceData(quint8 *data, int index)
     }
     ui->pointNameLabel->setText(tr("Sensor ") + QString::number(myIndex));
     ui->prmValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
-
-    if (isWriteFileRequired) {
-        isWriteFileRequired = false;
-        this->writeCsvFile(temperValue, myIndex);
-    }
-}
-
-/**
- * @brief DS18B20::timerEvent
- * @param event
- */
-void DS18B20::timerEvent(QTimerEvent *event)
-{
-    if (event->timerId() == secIntervalEvent) {
-        secCounter++;
-        if (secCounter >= writeFilePeriod) {
-            isWriteFileRequired = true;
-            secCounter = 0;
-        }
-    }
-}
-
-/**
- * @brief setWriteFilePeriod
- * @param enabled
- * @param period
- */
-void DS18B20::setWriteFilePeriod(int period)
-{
-    writeFilePeriod = period;
-}
-
-/**
- * @brief DS18B20::writeCsvFile
- * @param value
- * @param index
- */
-void DS18B20::writeCsvFile(float value, int index)
-{
-    QString folderPath;
-
-#ifdef __ANDROID__
-    folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
-#else
-    folderPath = QDir::currentPath() + "/DS18B20_CSV";
-#endif
-
-    QDir folder = folderPath;
-
-    if (!folder.exists()) {
-        folder.mkpath(folderPath);
-    }
-
-    QString filename = (folderPath + "/sensor" + QString::number(index) +
-                        QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));
-
-    QFile file(filename);
-    QTextStream ts(&file);
-
-    if (!file.exists()) {
-        /* Write header for new csv file */
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            ts << "sep=" << column_sep << Qt::endl
-               << "Time" << column_sep << "t, " << 'C' << Qt::endl;
-            file.close();
-        }
-    }
-
-    /* Write data to csv file */
-    file.open(QIODevice::Append | QIODevice::Text);
-    ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
-       << QString::number(value, 'f', 1) << Qt::endl;
-    file.close();
 }
 
 /**

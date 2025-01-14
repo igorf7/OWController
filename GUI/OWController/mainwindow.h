@@ -14,6 +14,7 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QMap>
+#include <QFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,7 +31,8 @@ public:
     ~MainWindow();
 
 protected:
-    qint32 usbPollingEvent = 0;
+    int secIntervalEvent = 0;
+    int usbPollingEvent = 0;
     void timerEvent(QTimerEvent *event);
 
 public slots:
@@ -52,11 +54,14 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    static const size_t USB_BUFF_SIZE = 64;
+    static const size_t USB_BUFF_SIZE = 65;
+    static const int USB_POLLING_PERIOD = 10;
 
     QDialog *settingsWindow = nullptr;
     QSpinBox *writeFilePeriodSpinbox = nullptr;
     QSpinBox *pollingPeriodSpinbox = nullptr;
+
+    QString folderPath;
 
     CustomHid *hidDevice = nullptr;
     ClockView *clockWidget = nullptr;
@@ -66,27 +71,27 @@ private:
     QHash<quint64, int> selDevices;
 
     int timeStamp = 0;
-    int milliSeconds = 0;
-    int usbPollPeriod = 10;
-    int writeFilePeriod;
-    int owPollingPeriod;
+    int secCounter = 0;
+    int owPollingPeriod = 1; // 1 sec by default
+    int writeFilePeriod = 60; // 60 sec by default
 
     bool isConnected = false;
     bool isUsbPollRunning = false;
     bool isShowClockEnabled = false;
     bool isOwSearchDone = false;
+    bool isWriteFileEnabled = true;
+
+    quint8 writedDevice = 0;
+    char column_sep = ';';
 
     unsigned char rxUsbBuffer[USB_BUFF_SIZE];
     unsigned char txUsbBuffer[USB_BUFF_SIZE];
 
-    void startUsbPolling();
-    void stopUsbPolling();
     void deinitWidgets();
     void createWidgetsLayout(int count);
     void handleReceivedPacket();
     void initDeviceComboBox();
     void deleteDeviceLayout();
-    void readSettings();
-    void writeSettings();
+    void writeCsvFile(float value, int index);
 };
 #endif // MAINWINDOW_H

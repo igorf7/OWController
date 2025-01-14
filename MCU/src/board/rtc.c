@@ -108,7 +108,8 @@ void RTC_IRQHandler(void)
 {    
     if (RTC_GetITStatus(RTC_IT_SEC) != RESET)
     {
-        RTC_ClearITPendingBit(RTC_IT_SEC);
+        RTC->CRL &= (uint16_t)~RTC_IT_SEC;
+        RTC->CRL &= (uint16_t)~RTC_FLAG_SEC;
         
         RTC_WaitForSynchro();
         

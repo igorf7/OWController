@@ -12,8 +12,10 @@ static HidProp_t hidProp;
 static HidEndp_t hidEndp;
 static RtcEvents_t rtcEvents;
 static uint32_t rtcValue;
-static bool isRtcDataRequsted = false;
+static uint32_t secCounter = 0;
+static bool isRtcSendEnabled = false;
 static uint8_t devFamily = DS18B20;
+static uint8_t pollPeriod = 1; // 1 sec by default
 static uint8_t usbRxBuffer[wMaxPacketSize];
 
 /*!
@@ -48,9 +50,9 @@ int main(void)
     RTC_Init(&rtcEvents);
     RTC_Set_Irq(RTC_IT_SEC);
     
-    /* Initializing the SysTick Timer
+    /* Initializing the SysTick Timer */
     InitSystickTimer(SysTick_Callback);
-    StartSystickTimer(SYSTICK_INTERVAL); */
+    StartSystickTimer(300);
     
     /* Search devices task */
     PutTask(DeviceSearchTask, NULL);
@@ -80,8 +82,8 @@ static void BackgroundTask(void)
     #endif
     
     /* Send RTC data via USB */
-    if (isRtcDataRequsted) {
-        isRtcDataRequsted = false;
+    if (isRtcSendEnabled) {
+        isRtcSendEnabled = false;
         rtcValue = RTC_GetCounter();
         USB_SendToHost(eGetRtcData, (uint8_t*)&rtcValue, sizeof(rtcValue));
     }
@@ -92,8 +94,12 @@ static void BackgroundTask(void)
 */
 void RTC_SecondEvent(void)
 {
-    /* Schedule a task to read a 1-wire devices */
-    PutTask(DeviceReadTask, &devFamily);
+    secCounter++;
+    if (secCounter == pollPeriod) {
+        secCounter = 0;
+        /* Schedule a task to read a 1-wire devices */
+        PutTask(DeviceReadTask, &devFamily);
+    }
 }
 
 /*!
@@ -113,6 +119,7 @@ void USB_HandleRxData(void)
         		break;
             case eOwReadData:
                 devFamily = rx_packet->data[0];
+                pollPeriod = rx_packet->data[1];
                 SetOwDataRequest(true);
         		break;
             case eOwWriteData:
@@ -127,10 +134,18 @@ void USB_HandleRxData(void)
                 RTC_EnableInterrupt(RTC_IT_SEC);
                 break;
             case eGetRtcData:
-                isRtcDataRequsted = true;
+                //isRtcDataRequsted = true;
                 break;
         	default:
         		break;
         }
     }
+}
+
+/*!
+ \brief SysTick event callback function
+*/
+void SysTick_Callback(void)
+{
+    isRtcSendEnabled = true;
 }

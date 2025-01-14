@@ -36,7 +36,6 @@ private:
     wchar_t wstr[MAX_STR];
 
     hid_device *deviceHandle = NULL;
-    hid_device_info *deviceInfo = NULL;
 
     int findUsbDevice();
     void closeHidDevice();
