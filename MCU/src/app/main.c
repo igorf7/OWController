@@ -97,8 +97,7 @@ void RTC_SecondEvent(void)
     secCounter++;
     if (secCounter == pollPeriod) {
         secCounter = 0;
-        /* Schedule a task to read a 1-wire devices */
-        PutTask(DeviceReadTask, &devFamily);
+        PutTask(DeviceReadTask, &devFamily); // Schedule a task to read a 1-wire devices
     }
 }
 
