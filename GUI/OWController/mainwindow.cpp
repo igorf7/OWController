@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "cardview.h"
 #include <QDir>
+#include <QFile>
 #include <QTextStream>
 #include <QDateTime>
 #include <QSettings>
@@ -155,7 +156,8 @@ void MainWindow::timerEvent(QTimerEvent *event)
     else if (event->timerId() == usbPollingEvent) {
         int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
         if (len < 0) { // Lost connection
-            if (isConnected) this->onConnectButtonClicked();
+            //if (isConnected) this->onConnectButtonClicked();
+            statusBar()->showMessage(tr("USB Receive Error"));
             return;
         }
         else if (len != 0) {
@@ -310,7 +312,8 @@ void MainWindow::onSendCommand(TOpcode opcode, quint8 *data, int data_len)
 
     int len = hidDevice->Write(txUsbBuffer, USB_BUFF_SIZE);
     if (len < 0) { // Lost connection
-        if (isConnected) this->onConnectButtonClicked();
+        //if (isConnected) this->onConnectButtonClicked();
+        statusBar()->showMessage(tr("USB Transmit Error"));
     }
 }
 

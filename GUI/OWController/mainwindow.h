@@ -14,7 +14,6 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QMap>
-#include <QFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
