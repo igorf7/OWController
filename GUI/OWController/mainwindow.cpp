@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <QSettings>
+#include <QThread>
 
 using namespace std;
 
@@ -21,6 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
+
+    QThread *threadHidDevice = new QThread;
+    hidDevice->moveToThread(threadHidDevice);
+    threadHidDevice->start();
 
     /* Connecting signals to slots */
     connect(ui->connectPushButton, SIGNAL(clicked()),
