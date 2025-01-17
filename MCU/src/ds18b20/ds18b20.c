@@ -28,15 +28,13 @@ bool DS18B20_ReadScratchpad(DS18B20_t *mem)
     
     OW_SendReceiveByte(DS18B20_READ_SCRATCHPAD);
 
-    for (uint8_t i = 0; i < (DS18B20_SCRATCHPAD_SIZE + 1); i++)
-    {
+    for (uint8_t i = 0; i < (DS18B20_SCRATCHPAD_SIZE + 1); i++) {
         rxDataBuffer[i] = OW_SendReceiveByte(0xFF);
     }
     
     uint8_t checkSum = OW_CalcChecksum(rxDataBuffer, DS18B20_SCRATCHPAD_SIZE);
     
-    if (checkSum != rxDataBuffer[DS18B20_SCRATCHPAD_SIZE])
-    {
+    if (checkSum != rxDataBuffer[DS18B20_SCRATCHPAD_SIZE]) {
         mem->value = *fp_nan;
         return false;
     }
@@ -87,8 +85,7 @@ void DS18B20_WriteScratchpad(uint8_t *data)
 {
     OW_SendReceiveByte(DS18B20_WRITE_SCRATCHPAD);
     
-    for (uint8_t i = 0; i < 3; i++)
-    {
+    for (uint8_t i = 0; i < 3; i++) {
         OW_SendReceiveByte(data[i]);
     }
 }

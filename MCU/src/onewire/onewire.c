@@ -42,8 +42,7 @@ uint8_t OW_SendReceiveByte(uint8_t byte)
 {
     uint8_t rxByte = 0x00;
 
-    for (uint8_t i = 0; i < 8; i++)
-    {
+    for (uint8_t i = 0; i < 8; i++) {
         uint8_t txBit = (byte >> i) & 0x01;
         uint8_t rxBit = 0;
 
@@ -71,8 +70,7 @@ OW_Status_t OW_Reset(void)
 
     UsartSetBaudrate(OneWireBus, 115200);
 
-    if (rxByte == txByte)
-    {
+    if (rxByte == txByte) {
         status = OW_ERROR;
     }
 
@@ -90,15 +88,13 @@ OW_Status_t OW_ReadRom(uint8_t *data_dst)
     
     OW_SendReceiveByte(OW_READ_ROM_CMD);
     
-    for (i = 0; i < OW_ROM_SIZE; i++)
-    {
+    for (i = 0; i < OW_ROM_SIZE; i++) {
         *(data_dst + i) = OW_SendReceiveByte(0xFF);
     }
     
     checkSum = OW_CalcChecksum(data_dst, OW_ROM_SIZE - 1);
     
-    if (checkSum != data_dst[OW_ROM_SIZE - 1])
-    {
+    if (checkSum != data_dst[OW_ROM_SIZE - 1]) {
         return OW_ERROR;
     }
 
@@ -121,8 +117,7 @@ void OW_MatchRom(uint8_t *address)
 {   
     OW_SendReceiveByte(OW_MATCH_ROM_CMD);
     
-    for (uint8_t i = 0; i < OW_ROM_SIZE; i++)
-    {
+    for (uint8_t i = 0; i < OW_ROM_SIZE; i++) {
         OW_SendReceiveByte(address[i]);
     }
 }
@@ -144,10 +139,8 @@ bool OW_SearchRom(uint8_t *address)
     
     bool search_result = false;
     
-    if (!LastDeviceFlag)
-    {
-        if (OW_Reset() != OW_OK)
-        {
+    if (!LastDeviceFlag) {
+        if (OW_Reset() != OW_OK) {
             LastDeviceFlag = false;
             LastDiscrepancy = 0;
             return false;
@@ -155,55 +148,45 @@ bool OW_SearchRom(uint8_t *address)
         OW_SendReceiveByte(0xF0);
     }
     
-    do
-    {
+    do {
         id_bit = OW_SendReceiveBit(1);       // read data bit on 1-Wire bus
         cmp_id_bit = OW_SendReceiveBit(1);   // read data bit on 1-Wire bus
         
-        if ((id_bit == 1) && (cmp_id_bit == 1))
-        {
+        if ((id_bit == 1) && (cmp_id_bit == 1)) {
 			break;
         }
-		else
-		{
-            if (id_bit != cmp_id_bit)
-            {
+        else {
+            if (id_bit != cmp_id_bit) {
                 search_direction = id_bit; // bit write value for search
             }
-            else{
-                if (id_bit_number < LastDiscrepancy)
-                {
+            else {
+                if (id_bit_number < LastDiscrepancy) {
                     search_direction = ((ROM_NO[rom_byte_number] & rom_byte_mask) > 0);
                 }
-                else{
+                else {
                     search_direction = (id_bit_number == LastDiscrepancy);
                 }
-                if (search_direction == 0)
-				{
+                if (search_direction == 0) {
 					last_zero = id_bit_number;
 				}
             }
-            if (search_direction == 1)
-            {
+            if (search_direction == 1) {
 				ROM_NO[rom_byte_number] |= rom_byte_mask;
             }
-			else
-            {
+			else {
 				ROM_NO[rom_byte_number] &= ~rom_byte_mask;
             }
             OW_SendReceiveBit(search_direction);   // write data bit to the 1-Wire bus
 			id_bit_number++;
 			rom_byte_mask <<= 1;
-			if (rom_byte_mask == 0)
-			{
+            if (rom_byte_mask == 0) {
 				rom_byte_number++;
 				rom_byte_mask = 1;
 			}
         }
     } while(rom_byte_number < 8); // read bytes 0..7
     
-    if (!(id_bit_number < 65))
-    {
+    if (!(id_bit_number < 65)) {
         // Search successful so set LastDiscrepancy, LastDeviceFlag, search_result
         LastDiscrepancy = last_zero;
         // Check for last device
@@ -213,16 +196,13 @@ bool OW_SearchRom(uint8_t *address)
 		search_result = true;	
     }
     
-    if (!search_result || !ROM_NO[0])
-	{
+    if (!search_result || !ROM_NO[0]) {
 		LastDiscrepancy = 0;
         LastDeviceFlag = false;
 		search_result = false;
 	}
-    else
-    {
-        for (int i = 0; i < 8; i++)
-        {
+    else {
+        for (int i = 0; i < 8; i++) {
             address[i] = ROM_NO[i];
         }
     }
@@ -251,10 +231,9 @@ void OW_ClearSearchResult(void)
  */
 uint8_t OW_CalcChecksum(uint8_t *data, uint8_t len)
 {
-	uint8_t crc = 0;
-
-	while (len--)
-    {
+    uint8_t crc = 0;
+    
+    while (len--) {
         crc = *(crc8_table + (crc ^ *data++));
 	}
 	return crc;
