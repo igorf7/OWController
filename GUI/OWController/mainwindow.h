@@ -60,8 +60,6 @@ private:
     QSpinBox *writeFilePeriodSpinbox = nullptr;
     QSpinBox *pollingPeriodSpinbox = nullptr;
 
-    QString folderPath;
-
     CustomHid *hidDevice = nullptr;
     ClockView *clockWidget = nullptr;
     QVBoxLayout *deviceViewLayout = nullptr;
@@ -81,7 +79,7 @@ private:
     bool isWriteFileEnabled = true;
 
     quint8 writedDevice = 0;
-    char column_sep = ';';
+    char sep = ';';
 
     unsigned char rxUsbBuffer[USB_BUFF_SIZE];
     unsigned char txUsbBuffer[USB_BUFF_SIZE];

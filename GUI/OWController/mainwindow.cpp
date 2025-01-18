@@ -44,16 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(hidDevice, &CustomHid::deviceDisconnected,
             this, &MainWindow::onUsbDisconnected);
 
-#ifdef __ANDROID__
-    folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
-#else
-    folderPath = QDir::currentPath() + "/DS18B20_CSV";
-#endif
-    QDir folder = folderPath;
-    if (!folder.exists()) {
-        folder.mkdir(folderPath);
-    }
-
     /* Activate status bar */
     QFont font;
     font.setItalic(true);
@@ -450,7 +440,7 @@ void MainWindow::handleReceivedPacket()
                 this->onClockButtonClicked();
             }
             else {
-                statusBar()->showMessage(tr("Total 1-Wre devices found: ") +
+                statusBar()->showMessage(tr("Total 1-Wire devices found: ") +
                                         QString::number(allDeviceAddressList.size()));
             }
             break;
@@ -497,6 +487,17 @@ void MainWindow::handleReceivedPacket()
  */
 void MainWindow::writeCsvFile(float value, int index)
 {
+#ifdef __ANDROID__
+    QString folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
+#else
+    QString folderPath = QDir::currentPath() + "/DS18B20_CSV";
+#endif
+
+    QDir folder(folderPath);
+    if (!folder.exists()) {
+        folder.mkpath(folderPath);
+    }
+
     QString filename = (folderPath + "/sensor" + QString::number(index) +
                         QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));
 
@@ -506,8 +507,8 @@ void MainWindow::writeCsvFile(float value, int index)
     if (!csvFile.exists()) {
         /* Write header for new csv file */
         if (csvFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            ts << "sep=" << column_sep << Qt::endl
-               << "Time" << column_sep << "t, " << 'C' << Qt::endl;
+            ts << "sep=" << sep << Qt::endl << "Time"
+               << sep << "t, " << 'C' << Qt::endl;
             csvFile.close();
         }
     }
@@ -516,10 +517,9 @@ void MainWindow::writeCsvFile(float value, int index)
     if (!csvFile.isOpen())
         csvFile.open(QIODevice::Append | QIODevice::Text);
 
-    ts << QTime::currentTime().toString("hh:mm:ss") << column_sep
+    ts << QTime::currentTime().toString("hh:mm:ss") << sep
        << QString::number(value, 'f', 1) << Qt::endl;
 
-    csvFile.flush();
     csvFile.close();
     writedDevice++;
 }
