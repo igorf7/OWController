@@ -104,8 +104,8 @@ void MainWindow::onConnectButtonClicked()
 void MainWindow::onUsbConnected()
 {
     isConnected = true;
+    ui->connectPushButton->setIcon(QIcon(":/images/sw_on.png"));
     statusBar()->showMessage(tr("USB device connected"));
-    ui->connectPushButton->setIcon(QIcon(":/images/powered.png"));
 
     if (!isUsbPollRunning) {
         isUsbPollRunning = true;
@@ -119,10 +119,10 @@ void MainWindow::onUsbConnected()
  */
 void MainWindow::onUsbDisconnected()
 {
+    ui->connectPushButton->setIcon(QIcon(":/images/sw_off.png"));
     isConnected = false;
     this->deinitWidgets();
     statusBar()->showMessage(tr("USB device disconnected"));
-    ui->connectPushButton->setIcon(QIcon(":/images/unpowered.png"));
 }
 
 /**

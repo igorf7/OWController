@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
+    <width>258</width>
     <height>347</height>
    </rect>
   </property>
@@ -21,10 +21,10 @@
     <item>
      <widget class="QFrame" name="frame">
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Plain</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
@@ -66,8 +66,8 @@
          </property>
          <property name="iconSize">
           <size>
-           <width>18</width>
-           <height>18</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
         </widget>
@@ -94,7 +94,7 @@
          </property>
          <property name="icon">
           <iconset resource="res.qrc">
-           <normaloff>:/images/clock72.png</normaloff>:/images/clock72.png</iconset>
+           <normaloff>:/images/clock.png</normaloff>:/images/clock.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -161,12 +161,12 @@
          </property>
          <property name="icon">
           <iconset resource="res.qrc">
-           <normaloff>:/images/unpowered.png</normaloff>:/images/unpowered.png</iconset>
+           <normaloff>:/images/sw_off.png</normaloff>:/images/sw_off.png</iconset>
          </property>
          <property name="iconSize">
           <size>
-           <width>22</width>
-           <height>22</height>
+           <width>20</width>
+           <height>20</height>
           </size>
          </property>
         </widget>
@@ -177,16 +177,16 @@
     <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="frameShape">
-       <enum>QFrame::Shape::NoFrame</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Plain</enum>
+       <enum>QFrame::Plain</enum>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -196,7 +196,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>226</width>
+         <width>240</width>
          <height>230</height>
         </rect>
        </property>
@@ -210,7 +210,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>244</width>
+     <width>258</width>
      <height>21</height>
     </rect>
    </property>
