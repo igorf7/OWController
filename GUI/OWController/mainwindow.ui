@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>258</width>
-    <height>347</height>
+    <width>252</width>
+    <height>316</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -183,7 +183,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -196,8 +196,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>240</width>
-         <height>234</height>
+         <width>234</width>
+         <height>203</height>
         </rect>
        </property>
       </widget>
@@ -210,7 +210,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>258</width>
+     <width>252</width>
      <height>21</height>
     </rect>
    </property>
