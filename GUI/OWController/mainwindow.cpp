@@ -20,6 +20,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle(QApplication::applicationName());
 
+#ifdef __ANDROID__
+    QSize size(38, 38);
+    ui->searchPushButton->setMinimumSize(size);
+    ui->clockPushButton->setMinimumSize(size);
+    ui->settingsPushButton->setMinimumSize(size);
+    ui->connectPushButton->setMinimumSize(size);
+    ui->searchPushButton->setMaximumSize(size);
+    ui->clockPushButton->setMaximumSize(size);
+    ui->settingsPushButton->setMaximumSize(size);
+    ui->connectPushButton->setMaximumSize(size);
+    ui->deviceComboBox->setMinimumSize(size);
+#endif
+
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
     QThread *threadHidDevice = new QThread;

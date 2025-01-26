@@ -17,9 +17,9 @@ DS18B20::DS18B20(DeviceWidget *parent) : DeviceWidget(parent)
 {
 
 #ifdef __ANDROID__
-    setPointNameLabelFontSize(16);
-    setPrmNameLabelFontSize(24);
-    setPrmValueLabelFontSize(32);
+    setPointNameLabelFontSize(18);
+    setPrmNameLabelFontSize(26);
+    setPrmValueLabelFontSize(34);
 #else
     setPointNameLabelFontSize(10);
     setPrmNameLabelFontSize(14);
