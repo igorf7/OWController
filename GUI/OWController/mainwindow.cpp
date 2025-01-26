@@ -21,12 +21,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
-
     QThread *threadHidDevice = new QThread;
     hidDevice->moveToThread(threadHidDevice);
-    threadHidDevice->start();
 
     /* Connecting signals to slots */
+    connect(threadHidDevice, &QThread::started,
+            this, &MainWindow::onStart);
+    connect(threadHidDevice, &QThread::finished,
+            threadHidDevice, &QThread::deleteLater);
+    connect(this, &MainWindow::quitHidDevice,
+            threadHidDevice, &QThread::quit);
+    connect(hidDevice, &CustomHid::showStatusBar,
+            this, &MainWindow::onShowStatusBar);
+    connect(hidDevice, &CustomHid::deviceConnected,
+            this, &MainWindow::onUsbConnected);
+    connect(hidDevice, &CustomHid::deviceDisconnected,
+            this, &MainWindow::onUsbDisconnected);
     connect(ui->connectPushButton, SIGNAL(clicked()),
             this, SLOT(onConnectButtonClicked()));
     connect(ui->searchPushButton, SIGNAL(clicked()),
@@ -37,20 +47,14 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(onDeviceComboBoxChanged(int)));
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
-    connect(hidDevice, &CustomHid::showStatusBar,
-            this, &MainWindow::onShowStatusBar);
-    connect(hidDevice, &CustomHid::deviceConnected,
-            this, &MainWindow::onUsbConnected);
-    connect(hidDevice, &CustomHid::deviceDisconnected,
-            this, &MainWindow::onUsbDisconnected);
 
     /* Activate status bar */
     QFont font;
     font.setItalic(true);
     statusBar()->setFont(font);
 
-    /* Attempting to connect a USB device */
-    onConnectButtonClicked();
+    /* Start Hid Device thread */
+    threadHidDevice->start();
 }
 
 /**
@@ -61,10 +65,18 @@ MainWindow::~MainWindow()
     if (isConnected) {
         this->onConnectButtonClicked();
     }
-    if (hidDevice != nullptr) {
-        delete hidDevice;
-    }
+
+    emit quitHidDevice();
+    delete hidDevice;
     delete ui;
+}
+
+/**
+ * @brief MainWindow::Connection::onStart
+ */
+void MainWindow::onStart()
+{
+    this->onConnectButtonClicked();
 }
 
 /**
