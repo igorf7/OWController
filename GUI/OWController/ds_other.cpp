@@ -1,68 +1,57 @@
 #include "ds_other.h"
-#include "ui_ds_other.h"
 #include "owdevice.h"
+#include <QApplication>
+#include <QIcon>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
 #include <QClipboard>
+//#include <QDebug>
 
-DS_OTHER::DS_OTHER(DeviceWidget *parent)
-    : DeviceWidget(parent), ui(new Ui::DS_OTHER)
+/**
+ * @brief DS_OTHER::DS_OTHER
+ * @param parent
+ */
+DS_OTHER::DS_OTHER(DeviceWidget *parent) : DeviceWidget(parent)
 {
-    ui->setupUi(this);
-
 #ifdef __ANDROID__
-    QFont font;
-    font.setPixelSize(16);
-    ui->pointNameLabel->setFont(font);
-    font.setPixelSize(18);
-    ui->prmNameLabel->setFont(font);
-    font.setPixelSize(20);
-    ui->prmValueLabel->setFont(font);
+    setPointNameLabelFontSize(16);
+    setPrmNameLabelFontSize(24);
+    setPrmValueLabelFontSize(32);
+#else
+    setPointNameLabelFontSize(10);
+    setPrmNameLabelFontSize(10);
+    setPrmValueLabelFontSize(12);
 #endif
 
-    ui->prmNameLabel->setText(tr("Address:"));
-
-    /* Connecting signals to slots */
-    connect(ui->settingsPushButton, SIGNAL(clicked()),
-            this, SLOT(onSettingsButtonClicked()));
-}
-
-DS_OTHER::~DS_OTHER()
-{
-    delete ui;
+    setParameterName("Address:");
 }
 
 /**
- * @brief DS_OTHER::showAddress
- * @param addr
+ * @brief DS_OTHER::~DS_OTHER
+ */
+DS_OTHER::~DS_OTHER()
+{
+}
+
+/**
+ * @brief DS_OTHER::showDeviceData
+ * @param data
+ * @param index
  */
 void DS_OTHER::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint64 address = *((quint64*)pData);
 
-    if ((address != myAddress) || (index != myIndex)) return;
+    if ((address != getDeviceAddress()) || (index != getDeviceIndex())) return;
 
-    devFamilyCode = (quint8)(myAddress & 0xFF);
+    devFamilyCode = (quint8)(address & 0xFF);
 
-    ui->pointNameLabel->setText(tr("Device ") + QString::number(myIndex));
-    ui->prmValueLabel->setText(QString::number(myAddress, 16).toUpper());
-}
-
-/**
- * @brief DS_OTHER::setAddress
- * @param address
- */
-void DS_OTHER::setAddress(quint64 address)
-{
-    myAddress = address;
-}
-
-/**
- * @brief DS_OTHER::setIndex
- * @param index
- */
-void DS_OTHER::setIndex(int index)
-{
-    myIndex = index;
+    QString str = tr("Device ") + QString::number(getDeviceIndex());
+    setPointName(str);
+    str = QString::number(getDeviceAddress(), 16).toUpper();
+    setParameterValue(str);
 }
 
 /**
@@ -81,7 +70,6 @@ void DS_OTHER::onSettingsButtonClicked()
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
     settingsWindow->setModal(true);
-
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -108,7 +96,7 @@ void DS_OTHER::onSettingsButtonClicked()
     connect(copyButton, SIGNAL(clicked()), this, SLOT(onCopyButtonnClicked()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
 
-    addressLabel->setText(tr("Address: ") + QString::number(myAddress, 16).toUpper());
+    addressLabel->setText(tr("Address: ") + QString::number(getDeviceAddress(), 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     settingsWindow->show();
@@ -120,7 +108,7 @@ void DS_OTHER::onSettingsButtonClicked()
 void DS_OTHER::onCopyButtonnClicked()
 {
     QClipboard* clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(myAddress, 16).toUpper());
+    clipboard->setText(QString::number(getDeviceAddress(), 16).toUpper());
 }
 
 /**

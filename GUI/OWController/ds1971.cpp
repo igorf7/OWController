@@ -1,75 +1,63 @@
 #include "ds1971.h"
-#include "ui_ds1971.h"
 #include "owdevice.h"
-#include <QLineEdit>
-#include <QMessageBox>
+#include <QApplication>
+#include <QIcon>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
 #include <QClipboard>
+#include <QMessageBox>
+//#include <QDebug>
 
-DS1971::DS1971(DeviceWidget *parent)
-    : DeviceWidget(parent), ui(new Ui::DS1971)
+/**
+ * @brief DS1971::DS1971
+ * @param parent
+ */
+DS1971::DS1971(DeviceWidget *parent) : DeviceWidget(parent)
 {
-    ui->setupUi(this);
-
 #ifdef __ANDROID__
-    QFont font;
-    font.setPixelSize(16);
-    ui->pointNameLabel->setFont(font);
-    font.setPixelSize(18);
-    ui->prmNameLabel->setFont(font);
-    font.setPixelSize(20);
-    ui->prmValueLabel->setFont(font);
+    setPointNameLabelFontSize(16);
+    setPrmNameLabelFontSize(24);
+    setPrmValueLabelFontSize(32);
+#else
+    setPointNameLabelFontSize(10);
+    setPrmNameLabelFontSize(10);
+    setPrmValueLabelFontSize(12);
 #endif
 
-    ui->prmNameLabel->setText(tr("Address:"));
-
-    /* Connecting signals to slots */
-    connect(ui->settingsPushButton, SIGNAL(clicked()),
-            this, SLOT(onSettingsButtonClicked()));
-}
-
-DS1971::~DS1971()
-{
-    delete ui;
+    setParameterName("Address:");
 }
 
 /**
- * @brief DS1971::showDateTime
- * @param addr
+ * @brief DS1971::~DS1971
+ */
+DS1971::~DS1971()
+{
+}
+
+/**
+ * @brief DS1971::showDeviceData
+ * @param data
+ * @param index
  */
 void DS1971::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint64 address = *((quint64*)pData);
 
-    if ((address != myAddress) || (index != myIndex)) return;
+    if ((address != getDeviceAddress()) || (index != getDeviceIndex())) return;
 
-    pData += sizeof(myAddress);
+    pData += sizeof(address);
 
     for (auto i = 0; i < DS1971_MEMORY_SIZE; i++) {
         ds1971memory[i] = *pData;
         pData++;
     }
 
-    ui->pointNameLabel->setText(tr("Device ") + QString::number(myIndex));
-    ui->prmValueLabel->setText(QString::number(myAddress, 16).toUpper());
-}
-
-/**
- * @brief DS1971::setAddress
- * @param address
- */
-void DS1971::setAddress(quint64 address)
-{
-    myAddress = address;
-}
-
-/**
- * @brief DS1971::setIndex
- * @param index
- */
-void DS1971::setIndex(int index)
-{
-    myIndex = index;
+    QString str = tr("Device ") + QString::number(getDeviceIndex());
+    setPointName(str);
+    str = QString::number(getDeviceAddress(), 16).toUpper();
+    setParameterValue(str);
 }
 
 /**
@@ -129,7 +117,7 @@ void DS1971::onSettingsButtonClicked()
     connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
 
-    addressLabel->setText("Address: " + QString::number(myAddress, 16).toUpper());
+    addressLabel->setText("Address: " + QString::number(getDeviceAddress(), 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     this->showDeviceMemory();
@@ -163,7 +151,7 @@ void DS1971::showDeviceMemory()
 void DS1971::onCopyButtonnClicked()
 {
     QClipboard* clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(myAddress, 16).toUpper());
+    clipboard->setText(QString::number(getDeviceAddress(), 16).toUpper());
 }
 
 /**
@@ -182,8 +170,9 @@ void DS1971::onWriteButtonClicked()
 {
     quint8 tx_data[44];
 
-    *((quint64*)tx_data) = myAddress;
-    quint8 len  = sizeof(myAddress);
+    quint64 address = getDeviceAddress();
+    *((quint64*)tx_data) = address;
+    quint8 len  = sizeof(address);
 
     QString str = memEdit->toPlainText().simplified();
     QStringList str_list = str.split(' ');
