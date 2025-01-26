@@ -112,7 +112,7 @@ void DS18B20::setIndex(int index)
  */
 void DS18B20::onSettingsButtonClicked()
 {
-    settingsWindow = new QDialog(this);
+    settingsWindow = new QDialog;
 
     settingsWindow->setWindowFlags((settingsWindow->windowFlags())
                                  & (~Qt::WindowContextHelpButtonHint));
@@ -122,7 +122,6 @@ void DS18B20::onSettingsButtonClicked()
     settingsWindow->setWindowIcon(QIcon(pm));
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
-    settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);

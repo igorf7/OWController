@@ -208,7 +208,7 @@ void MainWindow::onClockButtonClicked()
  */
 void MainWindow::onSettingsButtonClicked()
 {
-    settingsWindow = new QDialog(this);
+    settingsWindow = new QDialog;
 
     settingsWindow->setWindowFlags((settingsWindow->windowFlags())
                                    & (~Qt::WindowContextHelpButtonHint));
@@ -217,7 +217,7 @@ void MainWindow::onSettingsButtonClicked()
     pm.fill(QColor(0, 0, 0, 0));
     settingsWindow->setWindowIcon(QIcon(pm));
 
-    settingsWindow->resize(this->window()->width(), 200);
+    settingsWindow->resize(this->window()->width(), this->window()->height()/2);
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);

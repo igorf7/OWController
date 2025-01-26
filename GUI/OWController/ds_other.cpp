@@ -70,7 +70,7 @@ void DS_OTHER::setIndex(int index)
  */
 void DS_OTHER::onSettingsButtonClicked()
 {
-    settingsWindow = new QDialog(this);
+    settingsWindow = new QDialog;
 
     settingsWindow->setWindowFlags((settingsWindow->windowFlags())
                                    & (~Qt::WindowContextHelpButtonHint));
@@ -80,7 +80,6 @@ void DS_OTHER::onSettingsButtonClicked()
     settingsWindow->setWindowIcon(QIcon(pm));
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
-    settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
 
 

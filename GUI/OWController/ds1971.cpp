@@ -77,7 +77,7 @@ void DS1971::setIndex(int index)
  */
 void DS1971::onSettingsButtonClicked()
 {
-    settingsWindow = new QDialog(this);
+    settingsWindow = new QDialog;
 
     settingsWindow->setWindowFlags((settingsWindow->windowFlags())
                                    & (~Qt::WindowContextHelpButtonHint));
@@ -87,7 +87,6 @@ void DS1971::onSettingsButtonClicked()
     settingsWindow->setWindowIcon(QIcon(pm));
 
     settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
-    settingsWindow->resize(this->window()->width(), 200);
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);

@@ -32,7 +32,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>32</height>
+           <height>26</height>
           </size>
          </property>
          <property name="frame">
@@ -44,14 +44,14 @@
         <widget class="QPushButton" name="searchPushButton">
          <property name="minimumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="toolTip">
@@ -76,14 +76,14 @@
         <widget class="QPushButton" name="clockPushButton">
          <property name="minimumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="toolTip">
@@ -111,14 +111,14 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="toolTip">
@@ -143,14 +143,14 @@
         <widget class="QPushButton" name="connectPushButton">
          <property name="minimumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>32</width>
-           <height>32</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="toolTip">
@@ -197,7 +197,7 @@
          <x>0</x>
          <y>0</y>
          <width>240</width>
-         <height>230</height>
+         <height>236</height>
         </rect>
        </property>
       </widget>
