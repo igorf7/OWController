@@ -6,7 +6,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <QThread>
 
 using namespace std;
 
@@ -35,16 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* Create USB Custom HID device */
     hidDevice = new CustomHid(0x0483, 0x5711);
-    QThread *threadHidDevice = new QThread;
-    hidDevice->moveToThread(threadHidDevice);
 
     /* Connecting signals to slots */
-    connect(threadHidDevice, &QThread::started,
-            this, &MainWindow::onStart);
-    connect(threadHidDevice, &QThread::finished,
-            threadHidDevice, &QThread::deleteLater);
-    connect(this, &MainWindow::quitHidDevice,
-            threadHidDevice, &QThread::quit);
     connect(hidDevice, &CustomHid::showStatusBar,
             this, &MainWindow::onShowStatusBar);
     connect(hidDevice, &CustomHid::deviceConnected,
@@ -67,8 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     font.setItalic(true);
     statusBar()->setFont(font);
 
-    /* Start Hid Device thread */
-    threadHidDevice->start();
+    this->onStart();
 }
 
 /**
