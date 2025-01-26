@@ -1,50 +1,56 @@
 #include "ds18b20.h"
-#include "ui_ds18b20.h"
 #include "owdevice.h"
-#include <QValidator>
+#include <QApplication>
 #include <QClipboard>
+#include <QIcon>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QIntValidator>
+//#include <QDebug>
 
-DS18B20::DS18B20(DeviceWidget *parent) :
-    DeviceWidget(parent), ui(new Ui::DS18B20)
+/**
+ * @brief DS18B20::DS18B20
+ * @param parent
+ */
+DS18B20::DS18B20(DeviceWidget *parent) : DeviceWidget(parent)
 {
-    ui->setupUi(this);
 
 #ifdef __ANDROID__
-    QFont font;
-    font.setPixelSize(16);
-    ui->pointNameLabel->setFont(font);
-    font.setPixelSize(24);
-    ui->prmNameLabel->setFont(font);
-    font.setPixelSize(32);
-    ui->prmValueLabel->setFont(font);
+    setPointNameLabelFontSize(16);
+    setPrmNameLabelFontSize(24);
+    setPrmValueLabelFontSize(32);
+#else
+    setPointNameLabelFontSize(10);
+    setPrmNameLabelFontSize(14);
+    setPrmValueLabelFontSize(18);
 #endif
 
-    ui->prmNameLabel->setText(tr("Temperature:"));
-
-    /* Connecting signals to slots */
-    connect(ui->settingsPushButton, SIGNAL(clicked()),
-            this, SLOT(onSettingsButtonClicked()));
-}
-
-DS18B20::~DS18B20()
-{
-    delete ui;
+    setParameterName("Temperature:");
 }
 
 /**
- * @brief DS18B20::showDateTime
+ * @brief DS18B20::~DS18B20
+ */
+DS18B20::~DS18B20()
+{
+}
+
+/**
+ * @brief DS18B20::showDeviceData
  * @param data
+ * @param index
  */
 void DS18B20::showDeviceData(quint8 *data, int index)
 {
     quint8 *pData = data;
     quint64 address = *((quint64*)pData);
 
-    if ((address != myAddress) || (index != myIndex)) return;
+    if ((address != getDeviceAddress()) || (index != getDeviceIndex())) return;
 
     quint8 resolution;
 
-    pData += sizeof(myAddress);
+    pData += sizeof(address);
 
     temperValue = *((float*)pData);
     pData += sizeof(temperValue);
@@ -75,36 +81,25 @@ void DS18B20::showDeviceData(quint8 *data, int index)
         break;
     }
 
-    if (qIsNaN(temperValue)) {
-        ui->prmValueLabel->setText(tr("FAILURE"));
-        return;
-    }
-    else if (temperValue < 0.0f) {
-        ui->prmValueLabel->setStyleSheet("color: blue");
+    if (temperValue < 0.0f) {
+        setPrmValueLabelStyle("color: blue");
     }
     else {
-        ui->prmValueLabel->setStyleSheet("color: red");
+        setPrmValueLabelStyle("color: red");
     }
-    ui->pointNameLabel->setText(tr("Sensor ") + QString::number(myIndex));
-    ui->prmValueLabel->setText(QString::number(temperValue, 'f', 1) + " °C");
-}
 
-/**
- * @brief DS18B20::setAddress
- * @param address
- */
-void DS18B20::setAddress(quint64 address)
-{
-    myAddress = address;
-}
+    QString str = tr("Sensor ") + QString::number(getDeviceIndex());
 
-/**
- * @brief DS18B20::setIndex
- * @param index
- */
-void DS18B20::setIndex(int index)
-{
-    myIndex = index;
+    setPointName(str);
+
+    if (qIsNaN(temperValue)) {
+        str = tr("FAILURE");
+    }
+    else {
+        str = QString::number(temperValue, 'f', 1) + " °C";
+    }
+
+    setParameterValue(str);
 }
 
 /**
@@ -115,7 +110,7 @@ void DS18B20::onSettingsButtonClicked()
     settingsWindow = new QDialog;
 
     settingsWindow->setWindowFlags((settingsWindow->windowFlags())
-                                 & (~Qt::WindowContextHelpButtonHint));
+                                   & (~Qt::WindowContextHelpButtonHint));
 
     QPixmap pm = QPixmap(1, 1);
     pm.fill(QColor(0, 0, 0, 0));
@@ -177,7 +172,7 @@ void DS18B20::onSettingsButtonClicked()
     connect(writeButton, SIGNAL(clicked()), this, SLOT(onWriteButtonClicked()));
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
 
-    addressLabel->setText("Address: " + QString::number(myAddress, 16).toUpper());
+    addressLabel->setText("Address: " + QString::number(getDeviceAddress(), 16).toUpper());
     descrLabel->setText(OWDevice::getDescription(devFamilyCode));
 
     QIntValidator *alm_val = new QIntValidator(settingsWindow);
@@ -200,7 +195,7 @@ void DS18B20::onSettingsButtonClicked()
 void DS18B20::onCopyButtonnClicked()
 {
     QClipboard* clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(myAddress, 16).toUpper());
+    clipboard->setText(QString::number(getDeviceAddress(), 16).toUpper());
 }
 
 /**
@@ -209,7 +204,7 @@ void DS18B20::onCopyButtonnClicked()
 void DS18B20::onWriteButtonClicked()
 {
     quint8 alm_high, alm_low,
-           resolution;
+        resolution;
     quint8 tx_data[11];
 
     if (almHighLineEdit->hasAcceptableInput()) {
@@ -234,8 +229,9 @@ void DS18B20::onWriteButtonClicked()
         return;
     }
 
-    *((quint64*)tx_data) = myAddress;
-    quint8 len  = sizeof(myAddress);
+    quint64 address = getDeviceAddress();
+    *((quint64*)tx_data) = address;
+    quint8 len  = sizeof(address);
     tx_data[len++] = alm_high;
     tx_data[len++] = alm_low;
 

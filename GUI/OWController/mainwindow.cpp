@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "cardview.h"
+#include <QDialog>
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
@@ -398,9 +399,9 @@ void MainWindow::createWidgetsLayout(int count)
         {
             switch (device_family)
             {
-            case 0x14: // DS1971
-                deviceWidget << new DS1971;
-                break;
+           case 0x14: // DS1971
+               deviceWidget << new DS1971;
+               break;
 
             case 0x28: // DS18B20
                 deviceWidget << new DS18B20;

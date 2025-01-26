@@ -37,9 +37,7 @@ HEADERS += \
 FORMS += \
     cardview.ui \
     clockview.ui \
-    ds18b20.ui \
-    ds1971.ui \
-    ds_other.ui \
+    devicewidget.ui \
     mainwindow.ui
 
 # Default rules for deployment.
