@@ -29,9 +29,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-signals:
-    void quitHidDevice();
-
 protected:
     int secIntervalEvent = 0;
     int usbPollingEvent = 0;

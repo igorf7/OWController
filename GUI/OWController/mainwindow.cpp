@@ -70,7 +70,6 @@ MainWindow::~MainWindow()
         this->onConnectButtonClicked();
     }
 
-    emit quitHidDevice();
     delete hidDevice;
     delete ui;
 }

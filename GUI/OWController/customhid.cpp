@@ -1,10 +1,8 @@
 #include "customhid.h"
 
 #ifdef __ANDROID__
-#include <QtCore/qjniobject.h>
-#include <QtCore/qcoreapplication.h>
-#include <QtCore/private/qandroidextras_p.h>
-
+#include <QJniObject>
+#include <QCoreApplication>
 using namespace Qt::StringLiterals;
 #endif
 
