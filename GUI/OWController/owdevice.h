@@ -94,7 +94,7 @@ private:
         {0x18, "4096 bits of read/write nonvolatile memory. Memory is \npartitioned into sixteen pages of 256 bits each. \nHas overdrive mode.\n"},
         {0x1A, "4096 bit read/write nonvolatile memory with \nfour 32-bit read-only non rolling-over page write cycle \ncounters and tamper-detect bits for small money storage\n"},
         {0x1C, "Addressable 1-Wire 4K-bit EEPROM, with 2 channels of \ngeneral-purpose PIO pins with pulse generation capability.\n"},
-        {0x1D, "1-Wire counter with 4096 bits of read/write, nonvolatile memory.  \nMemory is partitioned into sixteen pages of 256 bits each.\n"},
+        {0x1D, "1-Wire counter with 4096 bits of read/write, nonvolatile memory. \nMemory is partitioned into sixteen pages of 256 bits each.\n"},
         {0x1F, "1-Wire Network Coupler with dual addressable switches \nand a general purpose open drain control output.\n"},
         {0x20, "Four high-impedance inputs for measurement of analog voltages. \nUser programable input range. Very low power.\n"},
         {0x21, "Thermochron. Rugged, self-sufficient 1-Wire device that, once \nsetup for a mission, will measure the temperature and \nrecord the result in a protected memory section.\n"},

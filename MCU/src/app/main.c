@@ -41,21 +41,21 @@ int main(void)
     
     /* Initialize the task scheduler */
     InitTaskSheduler(&BackgroundTask);
-        
-    /* Initialize the 1-Wire Bus */
-    OW_InitBus(USART2);
     
     /* Initialize the RTC hardware */
     rtcEvents.secondEvent = RTC_SecondEvent;
     RTC_Init(&rtcEvents);
     RTC_Set_Irq(RTC_IT_SEC);
     
-    /* Initializing the SysTick Timer */
-    InitSystickTimer(SysTick_Callback);
-    StartSystickTimer(300);
+    /* Initialize the 1-Wire Bus */
+    OW_InitBus(USART2);
     
     /* Search devices task */
     PutTask(DeviceSearchTask, NULL);
+    
+    /* Initializing the SysTick Timer */
+    InitSystickTimer(SysTick_Callback);
+    StartSystickTimer(300);
         
     /* Enable Watchdog */
     #ifndef DEBUG
