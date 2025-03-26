@@ -8,7 +8,8 @@ The OWController project contains two levels:
 Data exchange between the lower and upper levels is carried out via USB (Custom HID Class device).
 ## Supported OS
 Tested on Windows 11, Manjaro Linux, Android 8. \
-Qt 6.7.0 is used for building on Android, Linux and Windows platforms.
+Qt 6.7.0 is used for building on Android.
+Qt 5.15.2 is used for building on Linux and Windows platforms.
 ## Supported 1-Wire devices
 Supported 1-Wire devices:\
 DS18B20 Temperature Sensor\
