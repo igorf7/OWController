@@ -23,7 +23,7 @@ Writing data to device memory.\
 Displaying device descriptions.\
 Additionally:\
 Writing received data to a CSV file.\
-Display of date and time received from the MCU RTC.\
+Display of date and time received from the MCU RTC.
 ## Screenshots
 ![owc1](https://github.com/user-attachments/assets/7b0ef613-4716-425b-94c8-46ddfcd8e4f9)
 ![owc2](https://github.com/user-attachments/assets/98e5885f-ff8c-4bb0-a4ff-342a8048ce20)
