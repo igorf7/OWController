@@ -6,6 +6,8 @@ The OWController project contains two levels:
 1. The lower level, implemented on the STM32F103 microcontroller (Blue Pill PLus board).
 2. The upper level is a cross-platform application for displaying data received from lower level devices and configuring device parameters.
 Data exchange between the lower and upper levels is carried out via USB (Custom HID Class device).
+## Supported MCU
+STM32F103 Series Microcontrollers (ARM Cortex M3).
 ## Supported OS
 Tested on Windows 11, Manjaro Linux, Android 8. \
 Qt 6.7.0 is used for building on Android.
