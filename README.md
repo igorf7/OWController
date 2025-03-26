@@ -25,8 +25,8 @@ Writing received data to a CSV file.\
 Display of date and time received from the MCU RTC.\
 ## Screenshots
 ![owc1](https://github.com/user-attachments/assets/7b0ef613-4716-425b-94c8-46ddfcd8e4f9)
-![owc2](https://github.com/user-attachments/assets/98e5885f-ff8c-4bb0-a4ff-342a8048ce20)\
-![owc3](https://github.com/user-attachments/assets/1f720000-0358-47d8-9d02-3c89e4b8e086)
-![owc4](https://github.com/user-attachments/assets/07885023-af41-4f09-abb8-4e9bc3bb78fa)\
-![owc6](https://github.com/user-attachments/assets/d9a73703-e36a-4939-be15-715d8f3e486f)
+![owc2](https://github.com/user-attachments/assets/98e5885f-ff8c-4bb0-a4ff-342a8048ce20)
+![owc3](https://github.com/user-attachments/assets/1f720000-0358-47d8-9d02-3c89e4b8e086)\
+![owc4](https://github.com/user-attachments/assets/07885023-af41-4f09-abb8-4e9bc3bb78fa)
 ![owc5](https://github.com/user-attachments/assets/e3fbb657-46d5-4291-8313-61d67e802ae6)
+![owc6](https://github.com/user-attachments/assets/d9a73703-e36a-4939-be15-715d8f3e486f)
