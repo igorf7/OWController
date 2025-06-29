@@ -6,6 +6,7 @@
 #include "usart.h"
 
 static USART_InitTypeDef USART_InitStruct;
+static RCC_ClocksTypeDef RCC_Clocks;///
 static uint32_t usartClock = 0;///
 
 /*!
@@ -14,7 +15,6 @@ static uint32_t usartClock = 0;///
  */
 void InitUsart(USART_TypeDef *USARTx)
 {
-    RCC_ClocksTypeDef RCC_Clocks;///
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_TypeDef *OneWirePort;
     uint16_t OneWirePin;

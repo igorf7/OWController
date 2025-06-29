@@ -78,7 +78,7 @@ OW_Status_t OW_Reset(void)
 }
 
 /*!
- \brief Performs the READ ROM function on the 1-Wire bus
+ \brief Performs the READROM function on the 1-Wire bus
  \param data_dst - pointer to a buffer for copying ROM data
  \retval operation status
  */
@@ -102,7 +102,7 @@ OW_Status_t OW_ReadRom(uint8_t *data_dst)
 }
 
 /*!
- \brief Performs the SKIP ROM function on the 1-Wire bus
+ \brief Performs the SKIPROM function on the 1-Wire bus
  */
 void OW_SkipRom(void)
 {   
@@ -110,7 +110,7 @@ void OW_SkipRom(void)
 }
 
 /*!
- \brief Performs the MATCH ROM function on the 1-Wire bus
+ \brief Performs the MATCHROM function on the 1-Wire bus
  \param 1-Wire device address
  */
 void OW_MatchRom(uint8_t *address)
@@ -123,7 +123,7 @@ void OW_MatchRom(uint8_t *address)
 }
 
 /*!
- \brief Performs the MATCH ROM function on the 1-Wire bus
+ \brief Performs the SEARCHROM function on the 1-Wire bus
  \param pointer to a buffer for writing the found device address
  \retval true if successful, otherwise false
  */

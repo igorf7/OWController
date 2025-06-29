@@ -63,8 +63,8 @@ android {
     x86_64 {
         LIBS += -L$$PWD/android/libs/x86_64/ -lhidapi -lusb1.0
     }
-    INCLUDEPATH += $$PWD/android/libs
-    DEPENDPATH += $$PWD/android/libs
+    INCLUDEPATH += $$PWD/hidapi
+    DEPENDPATH += $$PWD/hidapi
 }
 
 win32 {

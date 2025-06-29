@@ -138,7 +138,7 @@ void DeviceReadTask(void *prm)
     if (dev_family == DS18B20) {
         OW_Reset();
         OW_SkipRom();
-        DS18B20_Convert();  // start new conversion for al DS18B20
+        DS18B20_Convert();  // start new conversion for all DS18B20
     }
 }
 

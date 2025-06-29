@@ -55,7 +55,7 @@ const uint8_t RHID_DeviceDescriptor[RHID_SIZ_DEVICE_DESC] =
     // те самые пресловутые VID и PID,  по которым и определяется, что же это за устройство.
     // в реальных устройствах надо покупать VID, чтобы устройства можно было различать и подсовывать нужные драйвера
     0x83, 0x04,                 //idVendor (0x0483)
-    0x11, 0x57,                 //idProduct (0x5711)
+    0x11, 0xdf,                 //idProduct (0xDF11)
 
     DEVICE_VER_L, DEVICE_VER_H,                 // bcdDevice rel. DEVICE_VER_H.DEVICE_VER_L  номер релиза устройства
 
@@ -203,7 +203,7 @@ uint8_t RHID_StringSerial[RHID_SIZ_STRING_SERIAL] =
     RHID_SIZ_STRING_SERIAL,         /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,     /* bDescriptorType */
     /* Serial number: */
-    '1', 0, '2', 0, '3', 0, '4', 0, '5', 0, '6', 0, '7', 0, '8', 0, '9', 0
+    '1', 0, '3', 0, '2', 0, '4', 0, '5', 0, '6', 0, '9', 0, '8', 0, '7', 0
 };
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
