@@ -9,7 +9,7 @@ Data exchange between the lower and upper levels is carried out via USB (Custom 
 ## Supported MCU
 STM32F103 Series Microcontrollers (ARM Cortex M3).
 ## Supported OS
-Tested on macOS 26, Windows 11, Manjaro Linux, Android 8. \
+Tested on macOS 26, Windows 11, Manjaro Linux, Android 8.
 ## Supported 1-Wire devices
 Supported 1-Wire devices:\
 DS18B20 Temperature Sensor\
