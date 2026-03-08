@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "cardview.h"
 #include <QDialog>
 #include <QDir>
 #include <QFile>

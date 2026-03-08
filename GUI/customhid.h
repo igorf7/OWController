@@ -1,9 +1,9 @@
 #ifndef CUSTOMHID_H
 #define CUSTOMHID_H
 
-#include "hidapi/hidapi.h"
-#include "hidapi/libusb.h"
-#include "hidapi/hidapi_libusb.h"
+#include "hid/inc/hidapi.h"
+//#include "hidapi/libusb.h"
+//#include "hidapi/hidapi_libusb.h"
 #include <QObject>
 
 class CustomHid : public QObject

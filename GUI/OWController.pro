@@ -11,7 +11,6 @@ CONFIG += c++17
 SOURCES += \
     cardview.cpp \
     clockview.cpp \
-    customhid.cpp \
     devicewidget.cpp \
     ds18b20.cpp \
     ds1971.cpp \
@@ -22,14 +21,10 @@ SOURCES += \
 HEADERS += \
     cardview.h \
     clockview.h \
-    customhid.h \
     devicewidget.h \
     ds18b20.h \
     ds1971.h \
     ds_other.h \
-    hidapi/hidapi.h \
-    hidapi/hidapi_libusb.h \
-    hidapi/libusb.h \
     mainwindow.h \
     owdevice.h \
     usertypes.h
@@ -63,22 +58,34 @@ android {
     x86_64 {
         LIBS += -L$$PWD/android/libs/x86_64/ -lhidapi -lusb1.0
     }
-    INCLUDEPATH += $$PWD/hidapi
-    DEPENDPATH += $$PWD/hidapi
+    INCLUDEPATH += $$PWD/hid/inc
+    DEPENDPATH += $$PWD/hid/inc
+}
+
+linux:!android {
+    SOURCES += customhid.cpp \
+               hid/src/linux/hid.c
+    HEADERS += customhid.h \
+               hid/inc/hidapi.h
+    DESTDIR = ../../Binary/linux
+}
+
+macx {
+    SOURCES += customhid.cpp \
+               hid/src/mac/hid.c
+    HEADERS += customhid.h \
+               hid/inc/hidapi.h
+    DESTDIR = ../../Binary/mac
+#    ICON = $${PWD}/images/press_mac.icns
 }
 
 win32 {
-    LIBS += -L$$PWD/windows/libs/ -lhidapi
-    INCLUDEPATH += $$PWD/hidapi
-    DEPENDPATH += $$PWD/hidapi
-}
-
-unix:!macx {
-    unix:!android {
-        LIBS += -L$$PWD/linux/libs/ -lhidapi-hidraw
-        INCLUDEPATH += $$PWD/hidapi
-        DEPENDPATH += $$PWD/hidapi
-    }
+    SOURCES += customhid.cpp \
+               hid/src/windows/hid.c
+    HEADERS += customhid.h \
+               hid/inc/hidapi.h
+    DESTDIR = ../../Binary/windows
+#    RC_ICONS += $$PWD/images/pressure.ico
 }
 
 RESOURCES += res.qrc
