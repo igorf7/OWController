@@ -20,7 +20,8 @@ public:
     bool writeToDevice(const QByteArray &tx_data);
 
 signals:
-    void finished();
+    void deviceConnected();
+    void deviceDisconnected();
 
 private:
     const QString ProductString = "OW Controller";

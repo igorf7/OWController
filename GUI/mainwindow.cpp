@@ -38,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent)
 #endif
 
     /* Connecting signals to slots */
+    connect(hidDevice, &CustomHid::deviceConnected,
+            this, &MainWindow::onUsbConnected);
+    connect(hidDevice, &CustomHid::deviceDisconnected,
+            this, &MainWindow::onUsbDisconnected);
     connect(ui->connectPushButton, SIGNAL(clicked()),
             this, SLOT(onConnectButtonClicked()));
     connect(ui->searchPushButton, SIGNAL(clicked()),

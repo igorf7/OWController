@@ -18,7 +18,6 @@ CustomHid::CustomHid(unsigned short vid,
 CustomHid::~CustomHid()
 {
     this->closeHidDevice();
-    emit finished();
 }
 
 /**
@@ -56,6 +55,7 @@ bool CustomHid::Connect()
     }
 
     hid_set_nonblocking(deviceHandle, 1);
+    emit deviceConnected();
     return true;
 }
 
@@ -65,6 +65,7 @@ bool CustomHid::Connect()
 void CustomHid::Disconnect()
 {
     this->closeHidDevice();
+    emit deviceDisconnected();
 }
 
 /**

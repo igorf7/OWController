@@ -47,11 +47,11 @@ int main(void)
     RTC_Init(&rtcEvents);
     RTC_Set_Irq(RTC_IT_SEC);
     
-    /* Initialize the 1-Wire Bus */
-    OW_InitBus(USART2);
+    /* Initialize the 1-Wire Bus
+    OW_InitBus(USART2); */
     
-    /* Search devices task */
-    PutTask(DeviceSearchTask, NULL);
+    /* Search devices task
+    PutTask(DeviceSearchTask, NULL); */
     
     /* Initializing the SysTick Timer */
     InitSystickTimer(SysTick_Callback);
