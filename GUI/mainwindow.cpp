@@ -33,11 +33,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->settingsPushButton->setMaximumSize(size);
     ui->connectPushButton->setMaximumSize(size);
     ui->deviceComboBox->setMinimumSize(size);
+    connect(hidDevice, &JniLayer::deviceConnected,
+            this, &MainWindow::onUsbConnected);
+    connect(hidDevice, &JniLayer::deviceDisconnected,
+            this, &MainWindow::onUsbDisconnected);
 #else
     hidDevice = new CustomHid(0x0483, 0xdf11);
-
-
-    /* Connecting signals to slots */
     connect(hidDevice, &CustomHid::deviceConnected,
             this, &MainWindow::onUsbConnected);
     connect(hidDevice, &CustomHid::deviceDisconnected,

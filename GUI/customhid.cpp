@@ -24,7 +24,7 @@ CustomHid::~CustomHid()
  * @brief CustomHid::onConnect
  * @param product_string
  */
-bool CustomHid::Connect()
+void CustomHid::Connect()
 {
     struct hid_device_info *devs, *cur_dev;
 
@@ -56,7 +56,6 @@ bool CustomHid::Connect()
 
     hid_set_nonblocking(deviceHandle, 1);
     emit deviceConnected();
-    return true;
 }
 
 /**

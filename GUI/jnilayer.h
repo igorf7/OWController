@@ -13,13 +13,14 @@ public:
 
     ~JniLayer();
 
-    bool Connect();
+    void Connect();
     void Disconnect();
     void readFromDevice(QByteArray &array);
     bool writeToDevice(const QByteArray &data);
 
 signals:
-    void finished();
+    void deviceConnected();
+    void deviceDisconnected();
 
 private:
     static const int RX_DATA_SIZE = 64;

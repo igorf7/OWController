@@ -26,9 +26,11 @@ JniLayer::~JniLayer()
 /**
  * @brief JniLayer::onConnect
  */
-bool JniLayer::Connect()
+void JniLayer::Connect()
 {
-    return this->openHidDevice(VID, PID);
+    if (this->openHidDevice(VID, PID)) {
+        emit deviceConnected();
+    }
 }
 
 /**
@@ -37,6 +39,7 @@ bool JniLayer::Connect()
 void JniLayer::Disconnect()
 {
     this->closeHidDevice();
+    emit deviceDisconnected();
 }
 
 /**

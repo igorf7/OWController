@@ -14,7 +14,7 @@ public:
 
     ~CustomHid();
 
-    bool Connect();
+    void Connect();
     void Disconnect();
     void readFromDevice(QByteArray &rx_data);
     bool writeToDevice(const QByteArray &tx_data);
