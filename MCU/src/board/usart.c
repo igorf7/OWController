@@ -62,46 +62,7 @@ void InitUsart(USART_TypeDef *USARTx)
  */
 void UsartSetBaudrate(USART_TypeDef *USARTx, uint32_t baudrate)
 {
-//    uint32_t integerdivider = 0;
-//    uint32_t fractionaldivider = 0;
-//    uint32_t tmpreg = 0, apbclock = 0;
-//    RCC_ClocksTypeDef RCC_ClocksStatus;
-//    
-//    uint32_t usartxbase = (uint32_t)USARTx;
-//    
-//    RCC_GetClocksFreq(&RCC_ClocksStatus);
-//    
-//    if (usartxbase == USART1_BASE) {
-//        apbclock = RCC_ClocksStatus.PCLK2_Frequency;
-//    }
-//    else {
-//        apbclock = RCC_ClocksStatus.PCLK1_Frequency;
-//    }
-//  
-//    /* Determine the integer part */
-//    if ((USARTx->CR1 & CR1_OVER8_Set) != 0) {
-//        integerdivider = ((25 * apbclock) / (2 * baudrate));    
-//    }
-//    else {
-//        integerdivider = ((25 * apbclock) / (4 * baudrate));    
-//    }
-//    tmpreg = (integerdivider / 100) << 4;
-
-//    /* Determine the fractional part */
-//    fractionaldivider = integerdivider - (100 * (tmpreg >> 4));
-
-//    /* Implement the fractional part in the register */
-//    if ((USARTx->CR1 & CR1_OVER8_Set) != 0) {
-//        tmpreg |= ((((fractionaldivider * 8) + 50) / 100)) & ((uint8_t)0x07);
-//    }
-//    else {
-//        tmpreg |= ((((fractionaldivider * 16) + 50) / 100)) & ((uint8_t)0x0F);
-//    }
-//  
-//    /* Write to USART BRR */
-//    USARTx->BRR = (uint16_t)tmpreg;
-    
-    USARTx->BRR = (uint16_t)(usartClock/baudrate);///
+    USARTx->BRR = (uint16_t)(usartClock/baudrate);
 }
 
 /*!

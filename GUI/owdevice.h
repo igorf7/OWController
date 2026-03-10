@@ -2,7 +2,6 @@
 #define OWDEVICE_H
 
 #include "usertypes.h"
-#include "qglobal.h"
 #include <QMap>
 #include <QHash>
 

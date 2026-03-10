@@ -34,32 +34,14 @@ FORMS += \
     clockview.ui \
     devicewidget.ui \
     mainwindow.ui
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
-
+	
 android {
+    SOURCES += jnilayer.cpp
+    HEADERS += jnilayer.h
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
     OTHER_FILES += \
-                android/src/org/qtproject/example/OWController/CustomHid.java \
+                android/src/org/qtproject/example/UsbBridge.java \
                 android/AndroidManifest.xml
-
-    arm64-v8a {
-        LIBS += -L$$PWD/android/libs/arm64-v8a/ -lhidapi -lusb1.0
-    }
-    armeabi-v7a {
-        LIBS += -L$$PWD/android/libs/armeabi-v7a/ -lhidapi -lusb1.0
-    }
-    x86 {
-        LIBS += -L$$PWD/android/libs/x86/ -lhidapi -lusb1.0
-    }
-    x86_64 {
-        LIBS += -L$$PWD/android/libs/x86_64/ -lhidapi -lusb1.0
-    }
-    INCLUDEPATH += $$PWD/hid/inc
-    DEPENDPATH += $$PWD/hid/inc
 }
 
 linux:!android {
@@ -87,5 +69,10 @@ win32 {
     DESTDIR = ../../Binary/windows
 #    RC_ICONS += $$PWD/images/pressure.ico
 }
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 
 RESOURCES += res.qrc

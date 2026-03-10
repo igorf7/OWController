@@ -1,6 +1,7 @@
 #ifndef DEVICEWIDGET_H
 #define DEVICEWIDGET_H
 
+#include "usertypes.h"
 #include "cardview.h"
 
 namespace Ui {

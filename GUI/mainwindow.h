@@ -1,19 +1,21 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "customhid.h"
-#include "usertypes.h"
-#include "owdevice.h"
-#include "ds1971.h"
-#include "ds18b20.h"
-#include "ds_other.h"
-#include "clockview.h"
 #include <QMainWindow>
 #include <QLayout>
 #include <QLabel>
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QMap>
+
+#include "devicewidget.h"
+#include "clockview.h"
+
+#ifdef Q_OS_ANDROID
+#include "jnilayer.h"
+#else
+#include "customhid.h"
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -54,14 +56,18 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    static const size_t USB_BUFF_SIZE = 65;
     static const int USB_POLLING_PERIOD = 10;
 
     QDialog *settingsWindow = nullptr;
     QSpinBox *writeFilePeriodSpinbox = nullptr;
     QSpinBox *pollingPeriodSpinbox = nullptr;
 
+#ifdef Q_OS_ANDROID
+    JniLayer *hidDevice = nullptr;
+#else
     CustomHid *hidDevice = nullptr;
+#endif
+
     ClockView *clockWidget = nullptr;
     QVBoxLayout *deviceViewLayout = nullptr;
     QList<DeviceWidget*> deviceWidget;
@@ -79,17 +85,10 @@ private:
     bool isOwSearchDone = false;
     bool isWriteFileEnabled = true;
 
-    quint8 writedDevice = 0;
-    char sep = ';';
-
-    unsigned char rxUsbBuffer[USB_BUFF_SIZE];
-    unsigned char txUsbBuffer[USB_BUFF_SIZE];
-
     void deinitWidgets();
     void createWidgetsLayout(int count);
-    void handleReceivedPacket();
+    void handleReceivedPacket(const QByteArray &received);
     void initDeviceComboBox();
     void deleteDeviceLayout();
-    void writeCsvFile(float value, int index);
 };
 #endif // MAINWINDOW_H

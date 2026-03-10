@@ -1,10 +1,5 @@
 #include "customhid.h"
-
-#ifdef __ANDROID__
-#include <QJniObject>
-#include <QCoreApplication>
-using namespace Qt::StringLiterals;
-#endif
+#include <QTimerEvent>
 
 /**
  * @brief Class constructor
@@ -23,26 +18,15 @@ CustomHid::CustomHid(unsigned short vid,
 CustomHid::~CustomHid()
 {
     this->closeHidDevice();
+    emit finished();
 }
 
 /**
  * @brief CustomHid::onConnect
  * @param product_string
  */
-void CustomHid::Connect()
+bool CustomHid::Connect()
 {
-#ifdef __ANDROID__
-    /* Find and open USB device via JNI */
-    int file_descriptor = this->findUsbDevice();
-
-    if (file_descriptor > 0) {
-        deviceHandle = hid_libusb_wrap_sys_device((intptr_t)file_descriptor, 0);
-    }
-    else {
-        return;
-    }
-#else
-
     struct hid_device_info *devs, *cur_dev;
 
     /* Find devices with specified VID/PID */
@@ -59,7 +43,8 @@ void CustomHid::Connect()
         cur_dev = cur_dev->next;
     }
 
-    if (!cur_dev) return;
+    if (!cur_dev)
+        return false;
 
     /* Open found device */
     deviceHandle = hid_open_path(cur_dev->path);
@@ -67,13 +52,11 @@ void CustomHid::Connect()
 
     if (!deviceHandle) {
         hid_exit();
-        return;
+        return false;
     }
 
-#endif
-
     hid_set_nonblocking(deviceHandle, 1);
-    emit deviceConnected();
+    return true;
 }
 
 /**
@@ -82,75 +65,42 @@ void CustomHid::Connect()
 void CustomHid::Disconnect()
 {
     this->closeHidDevice();
-    emit deviceDisconnected();
 }
 
 /**
  * @brief CustomHid::Read
- * @param buff - pointer to rx data buffer
+ * @param buff - pointer to rx data rx_data
  * @param len - received data lenght
  * @return number of bytes received
  */
-int CustomHid::Read(unsigned char *buff, size_t len)
+void CustomHid::readFromDevice(QByteArray &rx_data)
 {
+    unsigned char data[BUFF_SIZE];
+
     /* Read rx data */
-    return hid_read(deviceHandle, buff, len);
+    int len = hid_read(deviceHandle, data, BUFF_SIZE);
+    if (len > 0) {
+        rx_data.append((char*)data, len);
+    }
 }
 
 /**
- * @brief CustomHid::getFeatureReport
- * @param buff - pointer to rx data buffer
- * @param len - received data lenght
- * @return  number of bytes received
- */
-int CustomHid::getFeatureReport(unsigned char *buff, size_t len)
-{
-    return hid_get_feature_report(deviceHandle, buff, len);
-}
-
-/**
- * @brief CustomHid::Write
+ * @brief CustomHid::writeToDevice
  * @param buff - pointer to tx data buffer
- * @param len - transmitted data lenght
  * @return number of bytes transmitted
  */
-int CustomHid::Write(unsigned char *buff, size_t len)
+bool CustomHid::writeToDevice(const QByteArray &tx_data)
 {
+    unsigned char data[BUFF_SIZE];
+
+    if (tx_data.size() > BUFF_SIZE) return false;
+
+    memcpy(data, tx_data.data(), tx_data.size());
+
     /* Send data to device */
-    return hid_write(deviceHandle, buff, len);
-}
+    int len = hid_write(deviceHandle, data, BUFF_SIZE);
 
-/**
- * @brief CustomHid::sendFeatureReport
- * @param buff - pointer to tx data buffer
- * @param len - transmitted data lenght
- * @return  number of bytes transmitted
- */
-int CustomHid::sendFeatureReport(unsigned char *buff, size_t len)
-{
-    return hid_send_feature_report(deviceHandle, buff, len);
-}
-
-/**
- * @brief CustomHid::findUsbDevice
- */
-int CustomHid::findUsbDevice()
-{
-#ifdef __ANDROID__
-
-    jint vid = (jint)VID;
-    jint pid = (jint)PID;
-
-    jint file_descriptor = QJniObject::callStaticMethod<int>(
-        "org/qtproject/example/OWController/CustomHid",
-        "findUsbDevice",
-        QNativeInterface::QAndroidApplication::context(),
-        vid, pid);
-
-    return (int)file_descriptor;
-#else
-    return 0;
-#endif
+    return len > 0 ? true : false;
 }
 
 /**

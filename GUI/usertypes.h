@@ -1,7 +1,8 @@
 #ifndef USERTYPES_H
 #define USERTYPES_H
 
-#include "qglobal.h"
+#include "qtypes.h"
+#include <QtCore/qobject.h>
 
 /* Report ID */
 typedef enum

@@ -1,7 +1,6 @@
 #ifndef CARDVIEW_H
 #define CARDVIEW_H
 
-#include "usertypes.h"
 #include <QWidget>
 
 namespace Ui {

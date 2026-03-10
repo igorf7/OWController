@@ -1,12 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "owdevice.h"
+#include "ds1971.h"
+#include "ds18b20.h"
+#include "ds_other.h"
 #include <QDialog>
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-
-using namespace std;
 
 /**
  * @brief MainWindow Class Constructor
@@ -18,7 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle(QApplication::applicationName());
 
-#ifdef __ANDROID__
+/* Create USB Custom HID device */
+#ifdef Q_OS_ANDROID
+    hidDevice = new JniLayer(0x0483, 0xdf11);
     QSize size(38, 38);
     ui->searchPushButton->setMinimumSize(size);
     ui->clockPushButton->setMinimumSize(size);
@@ -29,18 +33,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->settingsPushButton->setMaximumSize(size);
     ui->connectPushButton->setMaximumSize(size);
     ui->deviceComboBox->setMinimumSize(size);
+#else
+    hidDevice = new CustomHid(0x0483, 0xdf11);
 #endif
 
-    /* Create USB Custom HID device */
-    hidDevice = new CustomHid(0x0483, 0xdf11);
-
     /* Connecting signals to slots */
-    connect(hidDevice, &CustomHid::showStatusBar,
-            this, &MainWindow::onShowStatusBar);
-    connect(hidDevice, &CustomHid::deviceConnected,
-            this, &MainWindow::onUsbConnected);
-    connect(hidDevice, &CustomHid::deviceDisconnected,
-            this, &MainWindow::onUsbDisconnected);
     connect(ui->connectPushButton, SIGNAL(clicked()),
             this, SLOT(onConnectButtonClicked()));
     connect(ui->searchPushButton, SIGNAL(clicked()),
@@ -157,19 +154,14 @@ void MainWindow::timerEvent(QTimerEvent *event)
             this->onSendCommand(eOwReadData, tx_data, sizeof(tx_data));
             if (secCounter >= writeFilePeriod) {
                 secCounter = 0;
-                writedDevice = 0;
             }
         }
     }
     else if (event->timerId() == usbPollingEvent) {
-        int len = hidDevice->Read(rxUsbBuffer, USB_BUFF_SIZE);
-        if (len < 0) { // Lost connection
-            //if (isConnected) this->onConnectButtonClicked();
-            statusBar()->showMessage(tr("USB Receive Error"));
-            return;
-        }
-        else if (len != 0) {
-            this->handleReceivedPacket();
+        QByteArray rxData;
+        hidDevice->readFromDevice(rxData);
+        if (rxData.size() > 0) {
+            this->handleReceivedPacket(rxData);
         }
     }
 }
@@ -309,20 +301,14 @@ void MainWindow::onSendCommand(TOpcode opcode, quint8 *data, int data_len)
 {
     if (!isConnected) return;
 
-    TAppLayerPacket *tx_packet = (TAppLayerPacket*)txUsbBuffer;
-
-    tx_packet->rep_id = eRepId_3;
-    tx_packet->opcode = opcode;
-    tx_packet->size = 0;
+    QByteArray txData;
+    txData.append((quint8)eRepId_3);
+    txData.append((quint8)opcode);
+    txData.append((quint8)0);
     for (int i = 0; i < data_len; i++) {
-        tx_packet->data[i] = data[i];
+        txData.append(data[i]);
     }
-
-    int len = hidDevice->Write(txUsbBuffer, USB_BUFF_SIZE);
-    if (len < 0) { // Lost connection
-        //if (isConnected) this->onConnectButtonClicked();
-        statusBar()->showMessage(tr("USB Transmit Error"));
-    }
+    hidDevice->writeToDevice(txData);
 }
 
 /**
@@ -431,9 +417,9 @@ void MainWindow::createWidgetsLayout(int count)
 /**
  * @brief MainWindow::handleReceivedPacket
  */
-void MainWindow::handleReceivedPacket()
+void MainWindow::handleReceivedPacket(const QByteArray &received)
 {
-    TAppLayerPacket *rx_packet = (TAppLayerPacket*)rxUsbBuffer;
+    TAppLayerPacket *rx_packet = (TAppLayerPacket*)received.data();
     quint64 dev_addr = *((quint64*)rx_packet->data);
 
     if (rx_packet->rep_id == eRepId_4)
@@ -464,12 +450,6 @@ void MainWindow::handleReceivedPacket()
                 int index = selDevices.value(dev_addr);
                 deviceWidget.at(index)->showDeviceData(rx_packet->data, index + 1);
             }
-            if ((writedDevice < selDevices.size())
-                && (ui->deviceComboBox->currentText() == "DS18B20")) {
-                int index = selDevices.value(dev_addr);
-                float value = *((float*)(rx_packet->data + sizeof(dev_addr)));
-                this->writeCsvFile(value, index+1);
-            }
             break;
 
         case eOwWriteData:
@@ -494,48 +474,6 @@ void MainWindow::handleReceivedPacket()
             break;
         }
     }
-}
-
-/**
- * @brief MainWindow::writeCsvFile
- */
-void MainWindow::writeCsvFile(float value, int index)
-{
-#ifdef __ANDROID__
-    QString folderPath = "/storage/emulated/0/OWController/DS18B20_CSV";
-#else
-    QString folderPath = QDir::currentPath() + "/DS18B20_CSV";
-#endif
-
-    QDir folder(folderPath);
-    if (!folder.exists()) {
-        folder.mkpath(folderPath);
-    }
-
-    QString filename = (folderPath + "/sensor" + QString::number(index) +
-                        QDate::currentDate().toString("_yyyy-MM-dd").append(".csv"));
-
-    QFile csvFile(filename);
-    QTextStream ts(&csvFile);
-
-    if (!csvFile.exists()) {
-        /* Write header for new csv file */
-        if (csvFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            ts << "sep=" << sep << Qt::endl << "Time"
-               << sep << "t, " << 'C' << Qt::endl;
-            csvFile.close();
-        }
-    }
-
-    /* Write data to csv file */
-    if (!csvFile.isOpen())
-        csvFile.open(QIODevice::Append | QIODevice::Text);
-
-    ts << QTime::currentTime().toString("hh:mm:ss") << sep
-       << QString::number(value, 'f', 1) << Qt::endl;
-
-    csvFile.close();
-    writedDevice++;
 }
 
 /**
