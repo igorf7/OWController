@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QClipboard>
-//#include <QDebug>
 
 /**
  * @brief DS_OTHER::DS_OTHER
@@ -14,7 +13,7 @@
  */
 DS_OTHER::DS_OTHER(DeviceWidget *parent) : DeviceWidget(parent)
 {
-#ifdef __ANDROID__
+#ifdef Q_OS_ANDROID
     setPointNameLabelFontSize(16);
     setPrmNameLabelFontSize(24);
     setPrmValueLabelFontSize(32);

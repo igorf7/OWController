@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QIntValidator>
-//#include <QDebug>
 
 /**
  * @brief DS18B20::DS18B20
@@ -16,7 +15,7 @@
 DS18B20::DS18B20(DeviceWidget *parent) : DeviceWidget(parent)
 {
 
-#ifdef __ANDROID__
+#ifdef Q_OS_ANDROID
     setPointNameLabelFontSize(18);
     setPrmNameLabelFontSize(26);
     setPrmValueLabelFontSize(34);

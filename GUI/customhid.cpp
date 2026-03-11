@@ -43,7 +43,7 @@ void CustomHid::Connect()
     }
 
     if (!cur_dev)
-        return false;
+        return;
 
     /* Open found device */
     deviceHandle = hid_open_path(cur_dev->path);
@@ -51,7 +51,7 @@ void CustomHid::Connect()
 
     if (!deviceHandle) {
         hid_exit();
-        return false;
+        return;
     }
 
     hid_set_nonblocking(deviceHandle, 1);

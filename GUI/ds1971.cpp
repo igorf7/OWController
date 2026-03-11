@@ -7,7 +7,6 @@
 #include <QVBoxLayout>
 #include <QClipboard>
 #include <QMessageBox>
-//#include <QDebug>
 
 /**
  * @brief DS1971::DS1971
@@ -15,7 +14,7 @@
  */
 DS1971::DS1971(DeviceWidget *parent) : DeviceWidget(parent)
 {
-#ifdef __ANDROID__
+#ifdef Q_OS_ANDROID
     setPointNameLabelFontSize(16);
     setPrmNameLabelFontSize(24);
     setPrmValueLabelFontSize(32);

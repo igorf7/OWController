@@ -20,25 +20,22 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle(QApplication::applicationName());
 
-/* Create USB Custom HID device */
+    QString filepath = "";
+
+    /* Create USB Custom HID device */
 #ifdef Q_OS_ANDROID
-    hidDevice = new JniLayer(0x0483, 0xdf11);
-    QSize size(38, 38);
-    ui->searchPushButton->setMinimumSize(size);
-    ui->clockPushButton->setMinimumSize(size);
-    ui->settingsPushButton->setMinimumSize(size);
-    ui->connectPushButton->setMinimumSize(size);
-    ui->searchPushButton->setMaximumSize(size);
-    ui->clockPushButton->setMaximumSize(size);
-    ui->settingsPushButton->setMaximumSize(size);
-    ui->connectPushButton->setMaximumSize(size);
-    ui->deviceComboBox->setMinimumSize(size);
+    hidDevice = new JniLayer(VID, PID);
+    filepath = (getScreenDiagonal() > 7.4) ? ":qss/tablet.qss" : ":qss/phone.qss";
+
     connect(hidDevice, &JniLayer::deviceConnected,
             this, &MainWindow::onUsbConnected);
     connect(hidDevice, &JniLayer::deviceDisconnected,
             this, &MainWindow::onUsbDisconnected);
 #else
-    hidDevice = new CustomHid(0x0483, 0xdf11);
+    hidDevice = new CustomHid(VID, PID);
+    filepath = ":qss/desktop.qss";
+    this->window()->resize(252, 316);
+
     connect(hidDevice, &CustomHid::deviceConnected,
             this, &MainWindow::onUsbConnected);
     connect(hidDevice, &CustomHid::deviceDisconnected,
@@ -52,13 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(onClockButtonClicked()));
     connect(ui->deviceComboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onDeviceComboBoxChanged(int)));
-    connect(ui->settingsPushButton, SIGNAL(clicked()),
-            this, SLOT(onSettingsButtonClicked()));
 
-    /* Activate status bar */
-    QFont font;
-    font.setItalic(true);
-    statusBar()->setFont(font);
+    QFile qssfile(filepath);
+    if (qssfile.open(QFile::ReadOnly)) {
+        QString StyleSheet = QLatin1String(qssfile.readAll());
+        qApp->setStyleSheet(StyleSheet);
+    }
 
     this->onStart();
 }
@@ -201,101 +197,6 @@ void MainWindow::onClockButtonClicked()
     }
 
     this->createWidgetsLayout(count);
-}
-
-/**
- * @brief MainWindow::onSettingsButtonClicked
- */
-void MainWindow::onSettingsButtonClicked()
-{
-    settingsWindow = new QDialog;
-
-    settingsWindow->setWindowFlags((settingsWindow->windowFlags())
-                                   & (~Qt::WindowContextHelpButtonHint));
-
-    QPixmap pm = QPixmap(1, 1);
-    pm.fill(QColor(0, 0, 0, 0));
-    settingsWindow->setWindowIcon(QIcon(pm));
-
-    settingsWindow->resize(this->window()->width(), this->window()->height()/2);
-    settingsWindow->setModal(true);
-
-    settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
-
-    QVBoxLayout *vdlgLayout = new QVBoxLayout;
-    writeFilePeriodSpinbox = new QSpinBox;
-    writeFilePeriodSpinbox->setRange(1, 300);
-    writeFilePeriodSpinbox->setSingleStep(1);
-    writeFilePeriodSpinbox->setValue(writeFilePeriod);
-    writeFilePeriodSpinbox->setSuffix(tr(" sec"));
-    pollingPeriodSpinbox = new QSpinBox;
-    pollingPeriodSpinbox->setRange(1, 60);
-    pollingPeriodSpinbox->setSingleStep(1);
-    pollingPeriodSpinbox->setValue(owPollingPeriod);
-    pollingPeriodSpinbox->setSuffix(tr(" sec"));
-    QLabel *pollingPeriodLabel = new QLabel(tr("1-Wire Bus Polling Period"));
-    QLabel *writePeriodLabel = new QLabel(tr("Write CSV file period"));
-    QPushButton *closeButton = new QPushButton(tr("Save and Close"));
-    closeButton->setMinimumHeight(32);
-
-    QHBoxLayout *h1Layout = new QHBoxLayout;
-    h1Layout->addWidget(pollingPeriodLabel);
-    h1Layout->addWidget(pollingPeriodSpinbox);
-    h1Layout->addStretch();
-
-    QHBoxLayout *h2Layout = new QHBoxLayout;
-    h2Layout->addWidget(writePeriodLabel);
-    h2Layout->addWidget(writeFilePeriodSpinbox);
-
-    vdlgLayout->addLayout(h1Layout);
-    vdlgLayout->addLayout(h2Layout);
-    vdlgLayout->addWidget(closeButton);
-    settingsWindow->setLayout(vdlgLayout);
-
-    connect(closeButton, SIGNAL(clicked()),
-            this, SLOT(onCloseSettingsClicked()));
-    connect(writeFilePeriodSpinbox, SIGNAL(valueChanged(int)),
-            this, SLOT(onWriteFilePeriodChanged(int)));
-    connect(pollingPeriodSpinbox, SIGNAL(valueChanged(int)),
-            this, SLOT(onOWPollingPeriodChanged(int)));
-
-    settingsWindow->show();
-}
-
-/**
- * @brief MainWindow::onWriteFilePeriodChanged
- * @param value
- */
-void MainWindow::onWriteFilePeriodChanged(int value)
-{    
-    if (value < pollingPeriodSpinbox->value()) {
-        writeFilePeriodSpinbox->setValue(pollingPeriodSpinbox->value());
-    }
-}
-
-/**
- * @brief MainWindow::onOWPollingPeriodChanged
- * @param value
- */
-void MainWindow::onOWPollingPeriodChanged(int value)
-{
-    if (writeFilePeriodSpinbox->value() < value) {
-        writeFilePeriodSpinbox->setValue(value);
-    }
-}
-
-/**
- * @brief MainWindow::onCloseButtonClicked
- */
-void MainWindow::onCloseSettingsClicked()
-{
-    if (settingsWindow != nullptr)
-    {
-        writeFilePeriod = writeFilePeriodSpinbox->value();
-        settingsWindow->close();
-        delete settingsWindow;
-        settingsWindow = nullptr;
-    }
 }
 
 /**
@@ -506,4 +407,20 @@ void MainWindow::deinitWidgets()
     deviceWidget.clear();
     ui->deviceComboBox->clear();
     ui->deviceComboBox->setCurrentIndex(-1);
+}
+
+/**
+ * @brief MainWindow::getScreenDiagonal
+ * @return
+ */
+qreal MainWindow::getScreenDiagonal()
+{
+    QScreen *screen = QGuiApplication::primaryScreen();
+    //qreal dpi = screen->logicalDotsPerInch();
+    QSizeF size = screen->physicalSize(); // size in millimeters
+    qreal widthInch = size.width() / 25.4;
+    qreal heightInch = size.height() / 25.4; // size in inches
+    // Diagonal in inches
+    qreal diagonal = sqrt(widthInch * widthInch + heightInch * heightInch);
+    return diagonal;
 }

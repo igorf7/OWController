@@ -1,0 +1,30 @@
+QWidget {
+    font: 18px;
+}
+
+QStatusBar {
+    color: teal;
+    font: italic;
+}
+
+QPushButton#connectPushButton {
+    min-height: 42px;
+    max-width: 44px;
+    qproperty-iconSize: 24px;
+}
+
+QPushButton#searchPushButton {
+    min-height: 42px;
+    max-width: 44px;
+    qproperty-iconSize: 22px;
+}
+
+QPushButton#clockPushButton {
+    min-height: 42px;
+    max-width: 44px;
+    qproperty-iconSize: 22px;
+}
+
+QComboBox {
+    min-height: 42px;
+}

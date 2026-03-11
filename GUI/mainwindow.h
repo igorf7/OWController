@@ -48,15 +48,13 @@ private slots:
     void onSearchButtonClicked();
     void onClockButtonClicked();
     void onDeviceComboBoxChanged(int index);
-    void onSettingsButtonClicked();
-    void onCloseSettingsClicked();
-    void onWriteFilePeriodChanged(int value);
-    void onOWPollingPeriodChanged(int value);
 
 private:
     Ui::MainWindow *ui;
 
     static const int USB_POLLING_PERIOD = 10;
+    static const quint16 VID = 0x0483;
+    static const quint16 PID = 0xdf11;
 
     QDialog *settingsWindow = nullptr;
     QSpinBox *writeFilePeriodSpinbox = nullptr;
@@ -90,5 +88,6 @@ private:
     void handleReceivedPacket(const QByteArray &received);
     void initDeviceComboBox();
     void deleteDeviceLayout();
+    qreal getScreenDiagonal();
 };
 #endif // MAINWINDOW_H
