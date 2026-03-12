@@ -1,10 +1,10 @@
-QWidget {
-    font: 14px;
+QStatusBar {
+    color: gray;
+    font: italic;
 }
 
-QStatusBar {
-    color: teal;
-    font: italic;
+QComboBox {
+    min-height: 24px;
 }
 
 QPushButton#connectPushButton {
@@ -25,6 +25,19 @@ QPushButton#clockPushButton {
     qproperty-iconSize: 16px;
 }
 
-QComboBox {
-    min-height: 24px;
+QPushButton#settingsPushButton {
+    border: 1px solid gray;
+    border-radius: 10px;
+}
+
+QLabel#pointNameLabel {
+    font: 9px;
+}
+
+QLabel#prmNameLabel {
+    font: 12px;
+}
+
+QLabel#prmValueLabel {
+    font: 18px;
 }

@@ -8,8 +8,6 @@ DeviceWidget::DeviceWidget(CardView *parent)
 
     connect(ui->settingsPushButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
-
-    deviceFont.setFamily("Segoe UI");
 }
 
 DeviceWidget::~DeviceWidget()
@@ -46,35 +44,4 @@ void DeviceWidget::setParameterValue(const QString &prmValue)
 void DeviceWidget::setPrmValueLabelStyle(const QString &prmStyle)
 {
     ui->prmValueLabel->setStyleSheet(prmStyle);
-}
-
-/**
- * @brief DeviceWidget::setPointNameLabelFontSize
- * @param size
- */
-void DeviceWidget::setPointNameLabelFontSize(int size)
-{
-
-    deviceFont.setPointSize(size);
-    ui->pointNameLabel->setFont(deviceFont);
-}
-
-/**
- * @brief DeviceWidget::setPrmNameLabelFontSize
- * @param size
- */
-void DeviceWidget::setPrmNameLabelFontSize(int size)
-{
-    deviceFont.setPointSize(size);
-    ui->prmNameLabel->setFont(deviceFont);
-}
-
-/**
- * @brief DeviceWidget::setPrmValueLabelFontSize
- * @param size
- */
-void DeviceWidget::setPrmValueLabelFontSize(int size)
-{
-    deviceFont.setPointSize(size);
-    ui->prmValueLabel->setFont(deviceFont);
 }

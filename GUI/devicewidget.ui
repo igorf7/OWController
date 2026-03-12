@@ -24,7 +24,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Name</string>
+        <string> Name</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
@@ -72,7 +72,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Parameter</string>
+        <string> Parameter</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>

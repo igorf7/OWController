@@ -14,18 +14,7 @@
  */
 DS18B20::DS18B20(DeviceWidget *parent) : DeviceWidget(parent)
 {
-
-#ifdef Q_OS_ANDROID
-    setPointNameLabelFontSize(18);
-    setPrmNameLabelFontSize(26);
-    setPrmValueLabelFontSize(34);
-#else
-    setPointNameLabelFontSize(9);
-    setPrmNameLabelFontSize(12);
-    setPrmValueLabelFontSize(18);
-#endif
-
-    setParameterName("Temperature:");
+    setParameterName(" Temperature:");
 }
 
 /**
@@ -87,7 +76,7 @@ void DS18B20::showDeviceData(quint8 *data, int index)
         setPrmValueLabelStyle("color: red");
     }
 
-    QString str = tr("Sensor ") + QString::number(getDeviceIndex());
+    QString str = tr(" Sensor ") + QString::number(getDeviceIndex());
 
     setPointName(str);
 
@@ -95,7 +84,7 @@ void DS18B20::showDeviceData(quint8 *data, int index)
         str = tr("FAILURE");
     }
     else {
-        str = QString::number(temperValue, 'f', 1) + " °C";
+        str = QString::number(temperValue, 'f', 1) + " °C ";
     }
 
     setParameterValue(str);

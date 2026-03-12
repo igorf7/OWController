@@ -13,17 +13,7 @@
  */
 DS_OTHER::DS_OTHER(DeviceWidget *parent) : DeviceWidget(parent)
 {
-#ifdef Q_OS_ANDROID
-    setPointNameLabelFontSize(16);
-    setPrmNameLabelFontSize(24);
-    setPrmValueLabelFontSize(32);
-#else
-    setPointNameLabelFontSize(10);
-    setPrmNameLabelFontSize(10);
-    setPrmValueLabelFontSize(12);
-#endif
-
-    setParameterName("Address:");
+    setParameterName(" ");
 }
 
 /**

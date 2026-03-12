@@ -21,7 +21,8 @@ protected:
 private:
     Ui::CardView *ui;
 
-    QColor color;
+    QColor penColor;
+    //QColor brushColor;
 };
 
 #endif // CARDVIEW_H

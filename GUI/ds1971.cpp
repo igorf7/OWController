@@ -14,17 +14,7 @@
  */
 DS1971::DS1971(DeviceWidget *parent) : DeviceWidget(parent)
 {
-#ifdef Q_OS_ANDROID
-    setPointNameLabelFontSize(16);
-    setPrmNameLabelFontSize(24);
-    setPrmValueLabelFontSize(32);
-#else
-    setPointNameLabelFontSize(10);
-    setPrmNameLabelFontSize(10);
-    setPrmValueLabelFontSize(12);
-#endif
-
-    setParameterName("Address:");
+    setParameterName(" ");
 }
 
 /**
@@ -53,7 +43,7 @@ void DS1971::showDeviceData(quint8 *data, int index)
         pData++;
     }
 
-    QString str = tr("Device ") + QString::number(getDeviceIndex());
+    QString str = tr(" Device ") + QString::number(getDeviceIndex());
     setPointName(str);
     str = QString::number(getDeviceAddress(), 16).toUpper();
     setParameterValue(str);

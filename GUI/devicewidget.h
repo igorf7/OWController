@@ -22,10 +22,6 @@ public:
     void setParameterName(const QString &prmName);
     void setParameterValue(const QString &prmValue);
     void setPrmValueLabelStyle(const QString &prmStyle);
-    void setPointNameLabelFontSize(int size);
-    void setPrmNameLabelFontSize(int size);
-    void setPrmValueLabelFontSize(int size);
-
     void setAddress(quint64 address) {myAddress = address;}
     void setIndex(int index) {myIndex = index;}
     quint64 getDeviceAddress() {return myAddress;}

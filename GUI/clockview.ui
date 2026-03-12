@@ -19,18 +19,21 @@
      <property name="text">
       <string>MCU RTC:</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
     </widget>
    </item>
    <item>
     <widget class="QLCDNumber" name="timeLcd">
      <property name="inputMethodHints">
-      <set>Qt::ImhNone</set>
+      <set>Qt::InputMethodHint::ImhNone</set>
      </property>
      <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+      <enum>QFrame::Shape::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
+      <enum>QFrame::Shadow::Plain</enum>
      </property>
      <property name="smallDecimalPoint">
       <bool>false</bool>
@@ -39,10 +42,10 @@
       <number>8</number>
      </property>
      <property name="mode">
-      <enum>QLCDNumber::Dec</enum>
+      <enum>QLCDNumber::Mode::Dec</enum>
      </property>
      <property name="segmentStyle">
-      <enum>QLCDNumber::Flat</enum>
+      <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="value" stdset="0">
       <double>0.000000000000000</double>
@@ -67,7 +70,7 @@
       <string>Date</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>

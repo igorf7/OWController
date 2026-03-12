@@ -1,30 +1,56 @@
-QWidget {
-    font: 22px;
-}
-
 QStatusBar {
-    color: teal;
+    color: gray;
     font: italic;
 }
 
-QPushButton#connectPushButton {
-    min-height: 42px;
-    max-width: 44px;
-    qproperty-iconSize: 24px;
-}
-
-QPushButton#searchPushButton {
-    min-height: 42px;
-    max-width: 44px;
-    qproperty-iconSize: 22px;
-}
-
-QPushButton#clockPushButton {
-    min-height: 42px;
-    max-width: 44px;
-    qproperty-iconSize: 22px;
+QDialog {
+    border: 1px solid teal;
+    border-radius: 14px;
 }
 
 QComboBox {
-    min-height: 42px;
+    min-height: 46px;
+    border: 1px solid teal;
+}
+
+QPushButton#connectPushButton {
+    min-height: 46px;
+    max-width: 48px;
+    qproperty-iconSize: 24px;
+    border: 1px solid teal;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+
+QPushButton#searchPushButton {
+    min-height: 46px;
+    max-width: 48px;
+    qproperty-iconSize: 22px;
+    border: 1px solid teal;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+
+QPushButton#clockPushButton {
+    min-height: 46px;
+    max-width: 48px;
+    qproperty-iconSize: 22px;
+    border: 1px solid teal;
+}
+
+QPushButton#settingsPushButton {
+    border: 1px solid gray;
+    border-radius: 10px;
+}
+
+QLabel#pointNameLabel {
+    font: 22px;
+}
+
+QLabel#prmNameLabel {
+    font: 32px;
+}
+
+QLabel#prmValueLabel {
+    font: 42px;
 }
