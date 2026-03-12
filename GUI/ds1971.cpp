@@ -14,7 +14,7 @@
  */
 DS1971::DS1971(DeviceWidget *parent) : DeviceWidget(parent)
 {
-    setParameterName(" ");
+    setParameterName("");
 }
 
 /**

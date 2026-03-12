@@ -13,7 +13,7 @@
  */
 DS_OTHER::DS_OTHER(DeviceWidget *parent) : DeviceWidget(parent)
 {
-    setParameterName(" ");
+    setParameterName("");
 }
 
 /**
