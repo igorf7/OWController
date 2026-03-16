@@ -12,11 +12,11 @@
  */
 bool DS1971_ReadScratchpad(uint8_t *data)
 {
-    OW_SendReceiveByte(DS1971_READ_SCRATCHPAD); // cmd
-    OW_SendReceiveByte(0x00);                   // memory address
+    OW_WriteByte(DS1971_READ_SCRATCHPAD); // cmd
+    OW_WriteByte(0x00);                   // memory address
 
     for (uint8_t i = 0; i < DS1971_SCRATCHPAD_SIZE; i++) {
-        data[i] = OW_SendReceiveByte(0xFF);
+        data[i] = OW_ReadByte();
     }
     
     return true;
@@ -28,11 +28,11 @@ bool DS1971_ReadScratchpad(uint8_t *data)
  */
 void DS1971_ReadEeprom(uint8_t *data)
 {
-    OW_SendReceiveByte(DS1971_READ_MEMORY); // cmd
-    OW_SendReceiveByte(0x00);               // memory address
+    OW_WriteByte(DS1971_READ_MEMORY); // cmd
+    OW_WriteByte(0x00);               // memory address
     
     for (uint8_t i = 0; i < DS1971_EEPROM_SIZE; i++) {
-        data[i] = OW_SendReceiveByte(0xFF);
+        data[i] = OW_ReadByte();
     }
 }
 
@@ -42,11 +42,11 @@ void DS1971_ReadEeprom(uint8_t *data)
  */
 void DS1971_WriteScratchpad(uint8_t *data)
 {
-    OW_SendReceiveByte(DS1971_WRITE_SCRATCHPAD);    // cmd
-    OW_SendReceiveByte(0x00);                       // memory address
+    OW_WriteByte(DS1971_WRITE_SCRATCHPAD);    // cmd
+    OW_WriteByte(0x00);                       // memory address
     
     for (uint8_t i = 0; i < DS1971_SCRATCHPAD_SIZE; i++) {
-        OW_SendReceiveByte(data[i]);
+        OW_WriteByte(data[i]);
     }
 }
 
@@ -55,6 +55,6 @@ void DS1971_WriteScratchpad(uint8_t *data)
  */
 void DS1971_CopyScratchpad(void)
 {
-    OW_SendReceiveByte(DS1971_COPY_SCRATCHPAD); // cmd
-    OW_SendReceiveByte(DS1971_VALIDATION_KEY);  // validation key
+    OW_WriteByte(DS1971_COPY_SCRATCHPAD); // cmd
+    OW_WriteByte(DS1971_VALIDATION_KEY);  // validation key
 }

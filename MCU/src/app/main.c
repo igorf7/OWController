@@ -48,10 +48,10 @@ int main(void)
     RTC_Set_Irq(RTC_IT_SEC);
     
     /* Initialize the 1-Wire Bus */
-    OW_InitBus(USART1);
+    OW_InitBus();
     
     /* Search devices task */
-    PutTask(DeviceSearchTask, NULL);
+    PutTask(TaskDeviceSearch, NULL);
     
     /* Initializing the SysTick Timer */
     InitSystickTimer(SysTick_Callback);
@@ -97,7 +97,7 @@ void RTC_SecondEvent(void)
     secCounter++;
     if (secCounter == pollPeriod) {
         secCounter = 0;
-        PutTask(DeviceReadTask, &devFamily); // Schedule a task to read a 1-wire devices
+        PutTask(TaskDeviceRead, &devFamily); // Schedule a task to read a 1-wire devices
     }
 }
 
@@ -113,27 +113,26 @@ void USB_HandleRxData(void)
         switch (rx_packet->opcode)      // Check command code
         {
             case eOwSearch:
-                SetOwDataRequest(true);
-                PutTask(DeviceSearchTask, NULL); // Schedule a task to search a 1-wire devices
+                TaskSetOwDataRequest(true);
+                PutTask(TaskDeviceSearch, NULL); // Schedule a task to search a 1-wire devices
         		break;
             case eOwReadData:
                 devFamily = rx_packet->data[0];
                 pollPeriod = rx_packet->data[1];
-                SetOwDataRequest(true);
+                TaskSetOwDataRequest(true);
         		break;
             case eOwWriteData:
-                SetOwDataRequest(false);
-                PutTask(DeviceWriteTask, rx_packet->data); // Schedule a task to write at 1-wire devices
+                TaskSetOwDataRequest(false);
+                PutTask(TaskDeviceWrite, rx_packet->data); // Schedule a task to write at 1-wire devices
         		break;
             case eSyncRtc:
-                SetOwDataRequest(false);
+                TaskSetOwDataRequest(false);
                 RTC_DisableInterrupt(RTC_IT_SEC);
                 rtcValue = *((uint32_t*)rx_packet->data);
                 RTC_PresetDateTime(rtcValue);
                 RTC_EnableInterrupt(RTC_IT_SEC);
                 break;
             case eGetRtcData:
-                //isRtcDataRequsted = true;
                 break;
         	default:
         		break;

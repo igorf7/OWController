@@ -23,8 +23,6 @@ private slots:
     void onReadButtonClicked();
 
 private:
-    const quint8 devFamilyCode = 0x28;
-
     QDialog *settingsWindow = nullptr;
     QLineEdit *almHighLineEdit = nullptr;
     QLineEdit *almLowLineEdit = nullptr;

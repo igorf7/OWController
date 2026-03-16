@@ -21,7 +21,6 @@ private slots:
 
 private:
     QDialog *settingsWindow = nullptr;
-    quint8 devFamilyCode = 0;
 };
 
 #endif // DS_OTHER_H

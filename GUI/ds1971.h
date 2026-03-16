@@ -23,7 +23,6 @@ private slots:
     void onReadButtonClicked();
 
 private:
-    const quint8 devFamilyCode = 0x14;
     static const quint8 DS1971_MEMORY_SIZE = 32;
     static const quint8 MEM_EDITOR_LINE_LEN = 16;
 

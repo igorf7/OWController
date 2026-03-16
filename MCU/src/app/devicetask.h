@@ -15,10 +15,10 @@
 #include "usb_lib.h"
 
 /* API */
-void DeviceSearchTask(void *prm);
-void DeviceEnumerate(void *prm);
-void DeviceReadTask(void *prm);
-void DeviceWriteTask(void *prm);
-void SetOwDataRequest(bool state);
+void TaskDeviceSearch(void *prm);
+void TaskDeviceEnumerate(void *prm);
+void TaskDeviceRead(void *prm);
+void TaskDeviceWrite(void *prm);
+void TaskSetOwDataRequest(bool state);
 uint8_t DeviceGetCount(void);
 #endif // __DEVIETASK_H

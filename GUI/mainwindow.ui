@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>251</width>
+    <width>337</width>
     <height>316</height>
    </rect>
   </property>
@@ -34,7 +34,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPushButton" name="searchPushButton">
+        <widget class="QPushButton" name="searchButton">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -46,6 +46,9 @@
            <width>16777215</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
          </property>
          <property name="toolTip">
           <string>Search for 1-Wire devices</string>
@@ -73,13 +76,16 @@
            <height>0</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
          <property name="frame">
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="clockPushButton">
+        <widget class="QPushButton" name="clockButton">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -91,6 +97,9 @@
            <width>16777215</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
          </property>
          <property name="toolTip">
           <string>Show RTC</string>
@@ -111,7 +120,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="connectPushButton">
+        <widget class="QPushButton" name="connectButton">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -123,6 +132,9 @@
            <width>16777215</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
          </property>
          <property name="toolTip">
           <string>USB Connect/Disconnect</string>
@@ -167,8 +179,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>233</width>
-         <height>207</height>
+         <width>313</width>
+         <height>169</height>
         </rect>
        </property>
       </widget>
@@ -181,13 +193,20 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>251</width>
-     <height>21</height>
+     <width>337</width>
+     <height>30</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>deviceComboBox</tabstop>
+  <tabstop>clockButton</tabstop>
+  <tabstop>connectButton</tabstop>
+  <tabstop>searchButton</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources>
   <include location="res.qrc"/>
  </resources>

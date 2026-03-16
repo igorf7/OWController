@@ -1,12 +1,13 @@
 /*!
  \file   onewire.h
- \date   November-2024 (created)
+ \date   June-2025 (created)
  \brief  1-wire abstract device driver header file
  */
 #ifndef __ONEWIRE_H
 #define __ONEWIRE_H
 
 #include "stm32f10x.h"
+#include "timer.h"
 #include "stdbool.h"
 
 // Family code mask
@@ -26,12 +27,6 @@
 #define OW_CONVERT_CMD                 0x44
 
 #define OW_ROM_SIZE                    8U
-
-typedef enum
-{
-  OW_OK = 0x00,
-  OW_ERROR = !OW_OK
-} OW_Status_t;
 
 typedef struct {
     uint64_t address;
@@ -58,11 +53,10 @@ static const uint8_t crc8_table[] = {
 };
 
 /* API */
-void OW_InitBus(USART_TypeDef *USARTx);
-uint8_t OW_SendReceiveBit(uint8_t bit);
-uint8_t OW_SendReceiveByte(uint8_t byte);
-OW_Status_t OW_Reset(void);
-OW_Status_t OW_ReadRom(uint8_t *data_dst);
+void OW_InitBus(void);
+uint8_t OW_ReadByte(void);
+void OW_WriteByte(uint8_t dt);
+uint8_t OW_Reset(void);
 void OW_SkipRom(void);
 void OW_MatchRom(uint8_t *address);
 bool OW_SearchRom(uint8_t *address);

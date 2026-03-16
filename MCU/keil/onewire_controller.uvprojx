@@ -423,6 +423,11 @@
               <FilePath>..\src\board\systick.c</FilePath>
             </File>
             <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\timer.c</FilePath>
+            </File>
+            <File>
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\usart.c</FilePath>
@@ -937,6 +942,11 @@
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\timer.c</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>

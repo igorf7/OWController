@@ -22,7 +22,7 @@ static uint8_t dataBuffer[64];
  \brief Search for devices on the 1-Wire bus
  \param optional parameter
 */
-void DeviceSearchTask(void *prm)
+void TaskDeviceSearch(void *prm)
 {
     uint8_t i;
     deviceCount = 0;
@@ -49,7 +49,7 @@ void DeviceSearchTask(void *prm)
     OW_ClearSearchResult();
     
     if (isOwDataRequested) {
-        DeviceEnumerate(NULL);
+        TaskDeviceEnumerate(NULL);
     }
 }
 
@@ -57,7 +57,7 @@ void DeviceSearchTask(void *prm)
  \brief Enumerates all found devices on the 1-Wire bus
  \param optional parameter
 */
-void DeviceEnumerate(void *prm)
+void TaskDeviceEnumerate(void *prm)
 {
     uint8_t i;
     
@@ -76,7 +76,7 @@ void DeviceEnumerate(void *prm)
  \brief Returns the number of devices found on the 1-Wire bus
  \retval number of devices
 */
-uint8_t DeviceGetCount(void)
+uint8_t TaskDeviceGetCount(void)
 {
     return deviceCount;
 }
@@ -85,7 +85,7 @@ uint8_t DeviceGetCount(void)
  \brief Enable/Disable transmit via USB
  \param true - enable transmit, false disable transmit
 */
-void SetOwDataRequest(bool state)
+void TaskSetOwDataRequest(bool state)
 {
     isOwDataRequested = state;
 }
@@ -94,7 +94,7 @@ void SetOwDataRequest(bool state)
  \brief Read devices memory
  \param optional parameter (here is the device family code)
 */
-void DeviceReadTask(void *prm)
+void TaskDeviceRead(void *prm)
 {
     uint16_t i, data_size;
     uint8_t dev_family = 0;
@@ -135,7 +135,7 @@ void DeviceReadTask(void *prm)
     
     isOwDataRequested = false;
     
-    if (dev_family == DS18B20) {
+    if (sel_dev_family == DS18B20) {
         OW_Reset();
         OW_SkipRom();
         DS18B20_Convert();  // start new conversion for all DS18B20
@@ -146,7 +146,7 @@ void DeviceReadTask(void *prm)
  \brief Write devices memory
  \param optional parameter (here is the device address and data to write)
 */
-void DeviceWriteTask(void *prm)
+void TaskDeviceWrite(void *prm)
 {
     uint64_t address = 0;
     uint8_t check_sum = 0;

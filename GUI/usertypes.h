@@ -35,6 +35,6 @@ typedef struct
     quint8 data[60];
 } TAppLayerPacket;
 
-typedef QMap<QString, quint8> TDeviceMap;
+typedef QMap<quint8, QString> TDeviceMap;
 
 #endif // USERTYPES_H

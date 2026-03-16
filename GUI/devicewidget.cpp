@@ -6,7 +6,7 @@ DeviceWidget::DeviceWidget(CardView *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->settingsPushButton, SIGNAL(clicked()),
+    connect(ui->settingsButton, SIGNAL(clicked()),
             this, SLOT(onSettingsButtonClicked()));
 }
 

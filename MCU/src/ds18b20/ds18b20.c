@@ -14,7 +14,7 @@ static uint8_t rxDataBuffer[DS18B20_SCRATCHPAD_SIZE + 1];
  */
 void DS18B20_Convert(void)
 {
-    OW_SendReceiveByte(OW_CONVERT_CMD);
+    OW_WriteByte(OW_CONVERT_CMD);
 }
 
 /*!
@@ -26,10 +26,10 @@ bool DS18B20_ReadScratchpad(DS18B20_t *mem)
 {
     uint16_t temperature, sign;
     
-    OW_SendReceiveByte(DS18B20_READ_SCRATCHPAD);
+    OW_WriteByte(DS18B20_READ_SCRATCHPAD);
 
     for (uint8_t i = 0; i < (DS18B20_SCRATCHPAD_SIZE + 1); i++) {
-        rxDataBuffer[i] = OW_SendReceiveByte(0xFF);
+        rxDataBuffer[i] = OW_ReadByte();
     }
     
     uint8_t checkSum = OW_CalcChecksum(rxDataBuffer, DS18B20_SCRATCHPAD_SIZE);
@@ -83,10 +83,10 @@ bool DS18B20_ReadScratchpad(DS18B20_t *mem)
  */
 void DS18B20_WriteScratchpad(uint8_t *data)
 {
-    OW_SendReceiveByte(DS18B20_WRITE_SCRATCHPAD);
+    OW_WriteByte(DS18B20_WRITE_SCRATCHPAD);
     
     for (uint8_t i = 0; i < 3; i++) {
-        OW_SendReceiveByte(data[i]);
+        OW_WriteByte(data[i]);
     }
 }
 
@@ -95,5 +95,5 @@ void DS18B20_WriteScratchpad(uint8_t *data)
  */
 void DS18B20_CopyScratchpad(void)
 {
-    OW_SendReceiveByte(DS18B20_COPY_SCRATCHPAD);
+    OW_WriteByte(DS18B20_COPY_SCRATCHPAD);
 }

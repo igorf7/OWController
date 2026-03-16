@@ -35,8 +35,6 @@ void DS_OTHER::showDeviceData(quint8 *data, int index)
 
     if ((address != getDeviceAddress()) || (index != getDeviceIndex())) return;
 
-    devFamilyCode = (quint8)(address & 0xFF);
-
     QString str = tr("Device ") + QString::number(getDeviceIndex());
     setPointName(str);
     str = QString::number(getDeviceAddress(), 16).toUpper();
@@ -57,7 +55,8 @@ void DS_OTHER::onSettingsButtonClicked()
     pm.fill(QColor(0, 0, 0, 0));
     settingsWindow->setWindowIcon(QIcon(pm));
 
-    settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
+    quint8 family_code = (quint8)(getDeviceAddress() & 0xFF);
+    settingsWindow->setWindowTitle(OWDevice::getName(family_code));
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
@@ -86,7 +85,7 @@ void DS_OTHER::onSettingsButtonClicked()
     connect(closeButton, SIGNAL(clicked()), this, SLOT(onCloseButtonClicked()));
 
     addressLabel->setText(tr("Address: ") + QString::number(getDeviceAddress(), 16).toUpper());
-    descrLabel->setText(OWDevice::getDescription(devFamilyCode));
+    descrLabel->setText(OWDevice::getDescription(family_code));
 
     settingsWindow->show();
 }

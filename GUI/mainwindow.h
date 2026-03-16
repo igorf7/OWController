@@ -73,9 +73,7 @@ private:
     QHash<quint64, int> selDevices;
 
     int timeStamp = 0;
-    int secCounter = 0;
     int owPollingPeriod = 1; // 1 sec by default
-    int writeFilePeriod = 60; // 60 sec by default
 
     bool isConnected = false;
     bool isUsbPollRunning = false;

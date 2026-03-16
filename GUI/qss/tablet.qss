@@ -13,7 +13,7 @@ QComboBox {
     border: 1px solid teal;
 }
 
-QPushButton#connectPushButton {
+QPushButton#connectButton {
     min-height: 46px;
     max-width: 48px;
     qproperty-iconSize: 24px;
@@ -21,8 +21,11 @@ QPushButton#connectPushButton {
     border-top-right-radius: 14px;
     border-bottom-right-radius: 14px;
 }
+QPushButton#connectButton:pressed {
+    background-color:gray;
+}
 
-QPushButton#searchPushButton {
+QPushButton#searchButton {
     min-height: 46px;
     max-width: 48px;
     qproperty-iconSize: 22px;
@@ -30,15 +33,21 @@ QPushButton#searchPushButton {
     border-top-left-radius: 14px;
     border-bottom-left-radius: 14px;
 }
+QPushButton#searchButton:pressed {
+    background-color:gray;
+}
 
-QPushButton#clockPushButton {
+QPushButton#clockButton {
     min-height: 46px;
     max-width: 48px;
     qproperty-iconSize: 22px;
     border: 1px solid teal;
 }
+QPushButton#clockButton:pressed {
+    background-color:gray;
+}
 
-QPushButton#settingsPushButton {
+QPushButton#settingsButton {
     background-color: transparent;
     border: none;
 }

@@ -103,8 +103,8 @@ void DS18B20::onSettingsButtonClicked()
     QPixmap pm = QPixmap(1, 1);
     pm.fill(QColor(0, 0, 0, 0));
     settingsWindow->setWindowIcon(QIcon(pm));
-
-    settingsWindow->setWindowTitle(OWDevice::getName(devFamilyCode));
+    quint8 family_code = (quint8)(getDeviceAddress() & 0xFF);
+    settingsWindow->setWindowTitle(OWDevice::getName(family_code));
     settingsWindow->setModal(true);
 
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);
@@ -161,7 +161,7 @@ void DS18B20::onSettingsButtonClicked()
     connect(readButton, SIGNAL(clicked()), this, SLOT(onReadButtonClicked()));
 
     addressLabel->setText("Address: " + QString::number(getDeviceAddress(), 16).toUpper());
-    descrLabel->setText(OWDevice::getDescription(devFamilyCode));
+    descrLabel->setText(OWDevice::getDescription(family_code));
 
     QIntValidator *alm_val = new QIntValidator(settingsWindow);
     QIntValidator *res_val = new QIntValidator(settingsWindow);

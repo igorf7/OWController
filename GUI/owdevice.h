@@ -12,17 +12,34 @@ public:
 
     static const QString &getName(quint8 family)
     {
-        return deviceName = deviceMap.key(family);
+        if (deviceMap.contains(family))
+            return deviceName = deviceMap.value(family);
+        else
+            return deviceName = "0x" + QString::number(family, 16).toUpper();
     }
 
     static const QString &getDescription(quint8 family)
     {
-        return descriptionString = description.value(family);
+        if (description.contains(family))
+            return descriptionString = description.value(family);
+        else
+            return descriptionString = "Unknoun device with family code 0x" +
+                                       QString::number(family, 16).toUpper();
     }
 
     static quint8 getFamily(const QString &name)
     {
-        return deviceMap.value(name);
+        quint8 family = deviceMap.key(name, 0);
+
+        if (family != 0) {
+            return family;
+        }
+        else {
+            bool Ok;
+            quint8 val = (quint8)name.toUInt(&Ok, 16);
+            family = Ok ? val : 0;
+        }
+        return family;
     }
 
 private:
@@ -32,44 +49,44 @@ private:
     /* Supported devices */
     static const inline TDeviceMap deviceMap =
     {
-        {"DS1990A", 0x01},  // 64-bit unique serial number
-        {"DS1991", 0x02},   // 2048 bits of nonvolatile read/write memory
-        {"DS1994", 0x04},   // 4096 bit read/write nonvolatile memory
-        {"DS2405", 0x05},   // Addressable Switch with controlled open drain PIO pin
-        {"DS1993", 0x06},   // 4096 bit read/write nonvolatile memory
-        {"DS1992", 0x08},   // 1024 bit read/write nonvolatile memory
-        {"DS1982", 0x09},   // 1024 bit Electrically Programmable Read Only Memory
-        {"DS1995", 0x0A},   // 16384 bit read/write nonvolatile memory
-        {"DS1985", 0x0B},   // 16384 bit Electrically Programmable Read Only Memory
-        {"DS1996", 0x0C},   // 65536 bit read/write nonvolatile memory
-        {"DS1986", 0x0F},   // 65536 bit Electrically Programmable Read Only Memory
-        {"DS18S20", 0x10},  // Digital thermometer -55C to 125C 9 bit resolution
-        {"DS2406", 0x12},   // 1-Wire Dual Addressable Switch
-        {"DS1983", 0x13},   // 4096 bit Electrically Programmable Read Only Memory
-        {"DS1971", 0x14},   // Electrically Erasable Programmable Read Only Memory
-        {"DS1963S", 0x18},  // 4096 bits of read/write nonvolatile memory
-        {"DS1963L", 0x1A},  // 4096 bit read/write nonvolatile memory
-        {"DS28E04", 0x1C},  // Addressable 1-Wire 4K-bit EEPROM
-        {"DS2423", 0x1D},   // 1-Wire counter with 4096 bits of read/write
-        {"DS2409", 0x1F},   // 1-Wire Network Coupler with dual addressable
-        {"DS2450", 0x20},   // Four high-impedance inputs for measurement of analog voltages
-        {"DS1921", 0x21},   // Thermochron
-        {"DS1822", 0x22},   // Digital thermometer -55C to 125C 12 bit resolution
-        {"DS1973", 0x23},   // EEPROM 4096 bits
-        {"DS2415", 0x24},   // Real time clock
-        {"DS2438", 0x26},   // Smart Battery Monitor
-        {"DS2417", 0x27},   // Real time clock with interrupt
-        {"DS18B20", 0x28},  // Digital thermometer -55C to 125C 12 bit resolution
-        {"DS2408", 0x29},   // 1-Wire 8-Channel Addressable Switch
-        {"DS2890", 0x2C},   // 1-Wire linear taper digitally controlled potentiometer with 256 wiper positions
-        {"DS1972", 0x2D},   // 1K-Bit protected 1-Wire EEPROM
-        {"DS2760", 0x30},   // 1-Cell Li-Ion Battery Monitor
-        {"DS1961S", 0x33},  // 1K-Bit protected 1-Wire EEPROM with SHA-1 Engine
-        {"DS1977", 0x37},   // 32KB password protected memory
-        {"DS2413", 0x3A},   // Dual Channel Addressable Switch
-        {"DS1923", 0x41},   // Hygrochron
-        {"DS28EA00", 0x42}, // Programmable resolution digital thermometer with 'sequence detect'
-        {"DS28EC20", 0x43}  // 20Kb 1-Wire EEPROM
+        {0x01, "DS1990A"},  // 64-bit unique serial number
+        {0x02, "DS1991"},   // 2048 bits of nonvolatile read/write memory
+        {0x04, "DS1994"},   // 4096 bit read/write nonvolatile memory
+        {0x05, "DS2405"},   // Addressable Switch with controlled open drain PIO pin
+        {0x06, "DS1993"},   // 4096 bit read/write nonvolatile memory
+        {0x08, "DS1992"},   // 1024 bit read/write nonvolatile memory
+        {0x09, "DS1982"},   // 1024 bit Electrically Programmable Read Only Memory
+        {0x0A, "DS1995"},   // 16384 bit read/write nonvolatile memory
+        {0x0B, "DS1985"},   // 16384 bit Electrically Programmable Read Only Memory
+        {0x0C, "DS1996"},   // 65536 bit read/write nonvolatile memory
+        {0x0F, "DS1986"},   // 65536 bit Electrically Programmable Read Only Memory
+        {0x10, "DS18S20"},  // Digital thermometer -55C to 125C 9 bit resolution
+        {0x12, "DS2406"},   // 1-Wire Dual Addressable Switch
+        {0x13, "DS1983"},   // 4096 bit Electrically Programmable Read Only Memory
+        {0x14, "DS1971"},   // Electrically Erasable Programmable Read Only Memory
+        {0x18, "DS1963S"},  // 4096 bits of read/write nonvolatile memory
+        {0x1A, "DS1963L"},  // 4096 bit read/write nonvolatile memory
+        {0x1C, "DS28E04"},  // Addressable 1-Wire 4K-bit EEPROM
+        {0x1D, "DS2423"},   // 1-Wire counter with 4096 bits of read/write
+        {0x1F, "DS2409"},   // 1-Wire Network Coupler with dual addressable
+        {0x20, "DS2450"},   // Four high-impedance inputs for measurement of analog voltages
+        {0x21, "DS1921"},   // Thermochron
+        {0x22, "DS1822"},   // Digital thermometer -55C to 125C 12 bit resolution
+        {0x23, "DS1973"},   // EEPROM 4096 bits
+        {0x24, "DS2415"},   // Real time clock
+        {0x26, "DS2438"},   // Smart Battery Monitor
+        {0x27, "DS2417"},   // Real time clock with interrupt
+        {0x28, "DS18B20"},  // Digital thermometer -55C to 125C 12 bit resolution
+        {0x29, "DS2408"},   // 1-Wire 8-Channel Addressable Switch
+        {0x2C, "DS2890"},   // 1-Wire linear taper digitally controlled potentiometer with 256 wiper positions
+        {0x2D, "DS1972"},   // 1K-Bit protected 1-Wire EEPROM
+        {0x30, "DS2760"},   // 1-Cell Li-Ion Battery Monitor
+        {0x33, "DS1961S"},  // 1K-Bit protected 1-Wire EEPROM with SHA-1 Engine
+        {0x37, "DS1977"},   // 32KB password protected memory
+        {0x3A, "DS2413"},   // Dual Channel Addressable Switch
+        {0x41, "DS1923"},   // Hygrochron
+        {0x42, "DS28EA00"}, // Programmable resolution digital thermometer with 'sequence detect'
+        {0x43, "DS28EC20"}  // 20Kb 1-Wire EEPROM
     };
 
     /* Device description */

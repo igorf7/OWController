@@ -7,25 +7,25 @@ QComboBox {
     min-height: 24px;
 }
 
-QPushButton#connectPushButton {
+QPushButton#connectButton {
     min-height: 24px;
     max-width: 32px;
     qproperty-iconSize: 18px;
 }
 
-QPushButton#searchPushButton {
+QPushButton#searchButton {
     min-height: 24px;
     max-width: 32px;
     qproperty-iconSize: 16px;
 }
 
-QPushButton#clockPushButton {
+QPushButton#clockButton {
     min-height: 24px;
     max-width: 32px;
     qproperty-iconSize: 16px;
 }
 
-QPushButton#settingsPushButton {
+QPushButton#settingsButton {
     background-color: transparent;
     border: none;
 }

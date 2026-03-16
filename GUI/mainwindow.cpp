@@ -41,11 +41,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(hidDevice, &CustomHid::deviceDisconnected,
             this, &MainWindow::onUsbDisconnected);
 #endif
-    connect(ui->connectPushButton, SIGNAL(clicked()),
+    connect(ui->connectButton, SIGNAL(clicked()),
             this, SLOT(onConnectButtonClicked()));
-    connect(ui->searchPushButton, SIGNAL(clicked()),
+    connect(ui->searchButton, SIGNAL(clicked()),
             this, SLOT(onSearchButtonClicked()));
-    connect(ui->clockPushButton, SIGNAL(clicked()),
+    connect(ui->clockButton, SIGNAL(clicked()),
             this, SLOT(onClockButtonClicked()));
     connect(ui->deviceComboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onDeviceComboBoxChanged(int)));
@@ -117,13 +117,13 @@ void MainWindow::onConnectButtonClicked()
 void MainWindow::onUsbConnected()
 {
     isConnected = true;
-    ui->connectPushButton->setIcon(QIcon(":/images/sw_on.png"));
+    ui->connectButton->setIcon(QIcon(":/images/sw_on.png"));
     statusBar()->showMessage(tr("USB device connected"));
 
     if (!isUsbPollRunning) {
         isUsbPollRunning = true;
         secIntervalEvent = startTimer(1000);
-        usbPollingEvent = startTimer(1);
+        usbPollingEvent = startTimer(10);
     }
 }
 
@@ -132,7 +132,7 @@ void MainWindow::onUsbConnected()
  */
 void MainWindow::onUsbDisconnected()
 {
-    ui->connectPushButton->setIcon(QIcon(":/images/sw_off.png"));
+    ui->connectButton->setIcon(QIcon(":/images/sw_off.png"));
     isConnected = false;
     this->deinitWidgets();
     statusBar()->showMessage(tr("USB device disconnected"));
@@ -145,7 +145,6 @@ void MainWindow::onUsbDisconnected()
 void MainWindow::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == secIntervalEvent) {
-        secCounter++;
         if (!isOwSearchDone) {
             this->onSearchButtonClicked();
         }
@@ -154,9 +153,6 @@ void MainWindow::timerEvent(QTimerEvent *event)
             tx_data[0] = OWDevice::getFamily(ui->deviceComboBox->currentText());
             tx_data[1] = (quint8)owPollingPeriod;
             this->onSendCommand(eOwReadData, tx_data, sizeof(tx_data));
-            if (secCounter >= writeFilePeriod) {
-                secCounter = 0;
-            }
         }
     }
     else if (event->timerId() == usbPollingEvent) {
@@ -252,7 +248,12 @@ void MainWindow::onDeviceComboBoxChanged(int index)
     isShowClockEnabled = false;
     selDevices.clear();
 
-    quint8 dev_family = OWDevice::getFamily(ui->deviceComboBox->currentText());
+    QString dev_name = ui->deviceComboBox->currentText();
+    quint8 dev_family = OWDevice::getFamily(dev_name);
+
+    bool Ok = true;
+    if (dev_family == 0) dev_family = (quint8)dev_name.toUInt(&Ok, 16);
+    if (!Ok) return;
 
     for (int i = 0, j = 0; i < allDeviceAddressList.size(); ++i) {
         if (dev_family == (allDeviceAddressList.at(i) & 0xFF)) {
