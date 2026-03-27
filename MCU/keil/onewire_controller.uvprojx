@@ -336,9 +336,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src\app;..\src\board;..\src\ds18b20;..\src\ds1971;..\src\onewire;..\src\USB-FS\inc</IncludePath>
+              <IncludePath>..\src\app;..\src\board;..\src\onewire;..\src\usb_fs\inc;..\src\spl;..\src\spl\inc;..\CMSIS\Core\Include;..\CMSIS\Device\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -428,11 +428,6 @@
               <FilePath>..\src\board\timer.c</FilePath>
             </File>
             <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\usart.c</FilePath>
-            </File>
-            <File>
               <FileName>usb_endp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\usb_endp.c</FilePath>
@@ -468,62 +463,116 @@
           <GroupName>onewire</GroupName>
           <Files>
             <File>
-              <FileName>onewire.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\onewire\onewire.c</FilePath>
-            </File>
-            <File>
               <FileName>ds18b20.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\ds18b20\ds18b20.c</FilePath>
+              <FilePath>..\src\onewire\ds18b20.c</FilePath>
             </File>
             <File>
               <FileName>ds1971.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\ds1971\ds1971.c</FilePath>
+              <FilePath>..\src\onewire\ds1971.c</FilePath>
+            </File>
+            <File>
+              <FileName>onewire.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\onewire\onewire.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>usb-fs</GroupName>
+          <GroupName>usb_fs</GroupName>
           <Files>
             <File>
               <FileName>usb_core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_core.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_core.c</FilePath>
             </File>
             <File>
               <FileName>usb_init.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_init.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_init.c</FilePath>
             </File>
             <File>
               <FileName>usb_int.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_int.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_int.c</FilePath>
             </File>
             <File>
               <FileName>usb_mem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_mem.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_mem.c</FilePath>
             </File>
             <File>
               <FileName>usb_regs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_regs.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_regs.c</FilePath>
             </File>
             <File>
               <FileName>usb_sil.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_sil.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_sil.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>::CMSIS</GroupName>
+          <GroupName>spl</GroupName>
+          <Files>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_bkp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_bkp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_rtc.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
-          <GroupName>::Device</GroupName>
+          <GroupName>system</GroupName>
+          <Files>
+            <File>
+              <FileName>startup_stm32f10x_md.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\system\startup_stm32f10x_md.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMSIS</GroupName>
+          <Files>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CMSIS\Device\Source\system_stm32f10x.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
@@ -857,9 +906,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src\app;..\src\board;..\src\ds18b20;..\src\ds1971;..\src\onewire;..\src\USB-FS\inc</IncludePath>
+              <IncludePath>..\src\app;..\src\board;..\src\onewire;..\src\usb_fs\inc;..\src\spl;..\src\spl\inc;..\CMSIS\Core\Include;..\CMSIS\Device\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -949,11 +998,6 @@
               <FilePath>..\src\board\timer.c</FilePath>
             </File>
             <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\usart.c</FilePath>
-            </File>
-            <File>
               <FileName>usb_endp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\usb_endp.c</FilePath>
@@ -989,62 +1033,116 @@
           <GroupName>onewire</GroupName>
           <Files>
             <File>
-              <FileName>onewire.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\onewire\onewire.c</FilePath>
-            </File>
-            <File>
               <FileName>ds18b20.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\ds18b20\ds18b20.c</FilePath>
+              <FilePath>..\src\onewire\ds18b20.c</FilePath>
             </File>
             <File>
               <FileName>ds1971.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\ds1971\ds1971.c</FilePath>
+              <FilePath>..\src\onewire\ds1971.c</FilePath>
+            </File>
+            <File>
+              <FileName>onewire.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\onewire\onewire.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>usb-fs</GroupName>
+          <GroupName>usb_fs</GroupName>
           <Files>
             <File>
               <FileName>usb_core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_core.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_core.c</FilePath>
             </File>
             <File>
               <FileName>usb_init.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_init.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_init.c</FilePath>
             </File>
             <File>
               <FileName>usb_int.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_int.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_int.c</FilePath>
             </File>
             <File>
               <FileName>usb_mem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_mem.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_mem.c</FilePath>
             </File>
             <File>
               <FileName>usb_regs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_regs.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_regs.c</FilePath>
             </File>
             <File>
               <FileName>usb_sil.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\USB-FS\src\usb_sil.c</FilePath>
+              <FilePath>..\src\usb_fs\src\usb_sil.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>::CMSIS</GroupName>
+          <GroupName>spl</GroupName>
+          <Files>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_bkp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_bkp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\spl\src\stm32f10x_rtc.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
-          <GroupName>::Device</GroupName>
+          <GroupName>system</GroupName>
+          <Files>
+            <File>
+              <FileName>startup_stm32f10x_md.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\system\startup_stm32f10x_md.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CMSIS</GroupName>
+          <Files>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CMSIS\Device\Source\system_stm32f10x.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
@@ -1052,114 +1150,31 @@
 
   <RTE>
     <apis/>
-    <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="BKP" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="EXTI" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="Framework" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="GPIO" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH RCC">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="PWR" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH RCC">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="RCC" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="RTC" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="USART" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH RCC">
-        <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
-      </component>
-    </components>
+    <components/>
     <files>
       <file attr="config" category="header" name="RTE_Driver\Config\RTE_Device.h" version="1.1.2">
-        <instance index="0">RTE\Device\STM32F103CB\RTE_Device.h</instance>
+        <instance index="0" removed="1">RTE\Device\STM32F103CB\RTE_Device.h</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
         <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="source" condition="STM32F1xx MD ARMCC" name="Device\Source\ARM\startup_stm32f10x_md.s" version="1.0.1">
-        <instance index="0">RTE\Device\STM32F103CB\startup_stm32f10x_md.s</instance>
+        <instance index="0" removed="1">RTE\Device\STM32F103CB\startup_stm32f10x_md.s</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
         <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="source" name="Device\StdPeriph_Driver\templates\stm32f10x_conf.h" version="3.6.0">
-        <instance index="0">RTE\Device\STM32F103CB\stm32f10x_conf.h</instance>
+        <instance index="0" removed="1">RTE\Device\STM32F103CB\stm32f10x_conf.h</instance>
         <component Cclass="Device" Cgroup="StdPeriph Drivers" Csub="Framework" Cvendor="Keil" Cversion="3.6.0" condition="STM32F1xx STDPERIPH"/>
         <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="source" name="Device\Source\system_stm32f10x.c" version="1.0.1">
-        <instance index="0">RTE\Device\STM32F103CB\system_stm32f10x.c</instance>
+        <instance index="0" removed="1">RTE\Device\STM32F103CB\system_stm32f10x.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="STM32F1xx CMSIS"/>
         <package name="STM32F1xx_DFP" schemaVersion="1.7.2" url="https://www.keil.com/pack/" vendor="Keil" version="2.4.1"/>
-        <targetInfos>
-          <targetInfo name="debug"/>
-          <targetInfo name="release"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
     </files>
   </RTE>

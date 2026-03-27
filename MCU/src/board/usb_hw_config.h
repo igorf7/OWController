@@ -45,7 +45,7 @@ typedef struct
     uint8_t data[60];   // data field
 } AppLayerPacket_t;
 
-__STATIC_INLINE void Wait_ticks(volatile uint32_t nCount)
+static __INLINE void Wait_ticks(volatile uint32_t nCount)
 {
     for (; nCount != 0; nCount--);
 }

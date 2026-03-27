@@ -7,8 +7,8 @@
         <file>images/sw_off.png</file>
         <file>images/sw_on.png</file>
         <file>images/menu.png</file>
-        <file>qss/desktop.qss</file>
         <file>qss/phone.qss</file>
         <file>qss/tablet.qss</file>
+        <file>qss/desktop.qss</file>
     </qresource>
 </RCC>

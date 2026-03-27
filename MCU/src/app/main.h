@@ -10,7 +10,6 @@
 #include "ds18b20.h"
 #include "led.h"
 #include "rtc.h"
-#include "usart.h"
 
 #define IWDG_WA_Enable      ((uint16_t)0x5555)
 #define IWDG_WA_Disable     ((uint16_t)0x0000)
@@ -18,7 +17,7 @@
 #define KR_KEY_Enable       ((uint16_t)0xCCCC)
 #define WatchdogReload(key) (IWDG->KR = key)
 
-__STATIC_INLINE void InitWatchdog(void)
+static __INLINE void InitWatchdog(void)
 {
     IWDG->KR = IWDG_WA_Enable;
     IWDG->PR = 0x02;

@@ -3,28 +3,6 @@ QStatusBar {
     font: italic;
 }
 
-QComboBox {
-    min-height: 24px;
-}
-
-QPushButton#connectButton {
-    min-height: 24px;
-    max-width: 32px;
-    qproperty-iconSize: 18px;
-}
-
-QPushButton#searchButton {
-    min-height: 24px;
-    max-width: 32px;
-    qproperty-iconSize: 16px;
-}
-
-QPushButton#clockButton {
-    min-height: 24px;
-    max-width: 32px;
-    qproperty-iconSize: 16px;
-}
-
 QPushButton#settingsButton {
     background-color: transparent;
     border: none;

@@ -22,7 +22,7 @@ void LED_Init(GPIO_TypeDef *led_port, uint16_t led_pin)
 
 /*!
  */
-void LED_Blink(GPIO_TypeDef *led_port, uint16_t led_pin, uint32_t ticks)
+void LED_Blink(GPIO_TypeDef *led_port, uint16_t led_pin, volatile uint32_t ticks)
 {
     LED_ON(led_port, led_pin);
     for (; ticks != 0; ticks--);

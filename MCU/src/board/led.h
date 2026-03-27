@@ -25,5 +25,5 @@
 #define LED_TOGGLE(led_port, led_pin)   (led_port->ODR ^= led_pin)
 
 void LED_Init(GPIO_TypeDef *led_port, uint16_t led_pin);
-void LED_Blink(GPIO_TypeDef *led_port, uint16_t led_pin, uint32_t ticks);
+void LED_Blink(GPIO_TypeDef *led_port, uint16_t led_pin, volatile uint32_t ticks);
 #endif // __LED_H
