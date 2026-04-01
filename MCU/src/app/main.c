@@ -58,9 +58,9 @@ int main(void)
     StartSystickTimer(300);
         
     /* Enable Watchdog */
-    #ifndef DEBUG
+#ifndef DEBUG
     InitWatchdog();
-    #endif
+#endif
 
     __enable_irq();
     
@@ -77,9 +77,9 @@ int main(void)
 static void BackgroundTask(void)
 {
     /* Reload watchdog */
-    #ifndef DEBUG
+#ifndef DEBUG
     WatchdogReload(KR_KEY_Reload);
-    #endif
+#endif
     
     /* Send RTC data via USB */
     if (isRtcSendEnabled) {
