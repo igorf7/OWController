@@ -46,8 +46,17 @@
       target_reset_script="Reset();" />
     <configuration
       Name="Debug"
+      STLinkConnection="USB"
+      arm_stldr_loader_path=""
+      arm_stldr_stack_size="256"
+      arm_stm32cubeprogrammer_directory="$(STM32CUBEPROGDIR)"
+      arm_target_connect_with_reset_stlink="No"
+      arm_target_interface_speed_stlink="4000"
+      arm_target_interface_type_stlink="SWD"
+      arm_target_mass_erase="No"
       c_preprocessor_definitions="USE_STDPERIPH_DRIVER"
-      c_user_include_directories=".;$(ProjectDir)/../src/spl;$(ProjectDir)/../src/spl/inc;$(ProjectDir)/../src/app;$(ProjectDir)/../src/board;$(ProjectDir)/../src/onewire;$(ProjectDir)/../src/usb_fs/inc;$(ProjectDir)/../CMSIS/Core/Include;$(ProjectDir)/../CMSIS/Device/Include" />
+      c_user_include_directories=".;$(ProjectDir)/../src/spl;$(ProjectDir)/../src/spl/inc;$(ProjectDir)/../src/app;$(ProjectDir)/../src/board;$(ProjectDir)/../src/onewire;$(ProjectDir)/../src/usb_fs/inc;$(ProjectDir)/../CMSIS/Core/Include;$(ProjectDir)/../CMSIS/Device/Include"
+      debug_target_connection="ST-Link" />
     <configuration
       Name="Release"
       c_preprocessor_definitions="USE_STDPERIPH_DRIVER"

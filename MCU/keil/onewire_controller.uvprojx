@@ -562,11 +562,6 @@
               <FileType>2</FileType>
               <FilePath>.\system\startup_stm32f10x_md.s</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>CMSIS</GroupName>
-          <Files>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
@@ -1132,11 +1127,6 @@
               <FileType>2</FileType>
               <FilePath>.\system\startup_stm32f10x_md.s</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>CMSIS</GroupName>
-          <Files>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
